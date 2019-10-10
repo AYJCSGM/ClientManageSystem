@@ -1,0 +1,52 @@
+package com.java1234.controller.business;
+
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import com.java1234.entity.Client;
+import com.java1234.entity.ClientType;
+import com.java1234.entity.business.XiaoShou;
+import com.java1234.service.ClientService;
+import com.java1234.service.ClientTypeService;
+import com.java1234.service.business.XiaoShouService;
+
+
+
+@Controller
+@RequestMapping("/houtai/xiaoshou")
+public class HouTai_XiaoShou_Controller {
+	
+	@Resource
+	private XiaoShouService xiaoShouService;
+	
+	@Resource
+	private ClientTypeService clientTypeService;
+	
+	
+	@RequestMapping("/manage")
+	public ModelAndView manage() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		List<XiaoShou> trans_no_list = xiaoShouService.trans_no_list();
+		mav.addObject("trans_no_list", trans_no_list);
+		
+		mav.setViewName("/admin/bussiness/bussiness_manage");
+		return mav;
+	}
+	
+	
+	@RequestMapping("/tongji")
+	public ModelAndView tongji() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/admin/bussiness/tongji");
+		return mav;
+	}
+	
+	
+}

@@ -1,0 +1,17 @@
+package com.java1234.service;
+
+import java.util.List;
+import com.java1234.entity.DingDanInfo;
+
+public interface DingDanInfoService {
+
+
+	public Integer add(DingDanInfo info);
+	
+	public List<DingDanInfo> list(Integer dingdanId);
+	
+	public Integer deleteByDingDanId(Integer dingdanId);
+	
+	
+	
+}

@@ -1,0 +1,123 @@
+package com.java1234.service.weixin;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+
+import com.java1234.dao.ClickEventDao;
+import com.java1234.dao.ConfigDao;
+import com.java1234.entity.Config;
+import com.java1234.entity.weixin.ClickEvent;
+import com.java1234.entity.weixin.WXNewsMessage;
+import com.java1234.entity.weixin.WXTextMessage;
+import com.java1234.util.weixin.WeiXinUtil;
+
+import net.sf.json.JSONObject;
+
+
+@Service("clickEventService")
+public class ClickEventServiceImpl implements ClickEventService {
+	
+	@Resource
+	private ClickEventDao clickEventDao;
+	
+	@Resource
+	private ConfigDao configDao;
+	
+	public Integer add(ClickEvent clickEvent) {
+		return clickEventDao.add(clickEvent);
+	}
+
+	public Integer update(ClickEvent clickEvent) {
+		return clickEventDao.update(clickEvent);
+	}
+
+	public List<ClickEvent> list(Map<String, Object> map) {
+		return clickEventDao.list(map);
+	}
+	
+
+	public Integer getTotal(Map<String, Object> map) {
+		return clickEventDao.getTotal(map);
+	}
+
+	public ClickEvent findById(Integer id) {
+		return clickEventDao.findById(id);
+	}
+	
+	public List<ClickEvent>  findByEventKey(String eventKey) {
+		return clickEventDao.findByEventKey(eventKey);
+	}
+	
+	@Override
+	public Integer delete(Integer id) {
+		// TODO Auto-generated method stub
+		return clickEventDao.delete(id);
+	}
+	
+	@Override
+	public String doingWXClick(Map<String, Object> map) {
+		
+		String EventKey = map.get("EventKey").toString();
+		List<ClickEvent> clickEventList = clickEventDao.findByEventKey(EventKey);
+		
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		JSONObject token = (JSONObject) servletContext.getAttribute("token");
+		
+		for(ClickEvent clickEvent : clickEventList){
+			if(clickEvent.getMessageType()==2){
+				//发送一个媒体id   测试代码
+				String post_url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token="+token.getString("access_token");
+				//openid  msgtype  text 组成消息  返回过来 
+				WeiXinUtil.set_client_message(clickEvent.getMedia_id(), map.get("FromUserName").toString(), post_url, clickEvent.getMedia_type());
+			}
+		}
+		
+		String RespXml = null ;
+		
+		for(ClickEvent clickEvent : clickEventList){
+			
+			if(clickEvent.getMessageType()==0){
+				WXTextMessage text = new WXTextMessage();
+				text.setToUserName(map.get("FromUserName").toString());
+				text.setFromUserName(map.get("ToUserName").toString());
+				text.setContent(clickEvent.getDesc_());
+				text.setMsgType("text");
+				text.setCreateTime(new Date().getTime()+"");
+				RespXml = WeiXinUtil.TextMessageToXML(text);
+				break;
+			}
+			
+			if(clickEvent.getMessageType()==1){
+				//返回图文的二维码
+				Config config = configDao.findById(1);
+				
+				WXNewsMessage news = new WXNewsMessage();
+				news.setToUserName(map.get("FromUserName").toString());//这个是用户的openid
+				news.setFromUserName(map.get("ToUserName").toString());
+				news.setTitle(clickEvent.getTitle());
+				news.setDescription(clickEvent.getDesc_());//标题图片下面是这个
+				news.setContent("内容:"+clickEvent.getDesc_());//这个不会显示
+				news.setMsgType("news");
+				news.setCreateTime(new Date().getTime()/1000);
+				news.setPicUrl(config.getWeb_site()+clickEvent.getThumbnail());
+				news.setUrl(clickEvent.getUrl());
+				RespXml = WeiXinUtil.NewsMessageToXML(news);
+				break;
+			}
+		}
+		return RespXml;
+	}
+
+
+	
+	
+	
+}

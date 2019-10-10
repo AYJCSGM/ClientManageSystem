@@ -1,0 +1,41 @@
+package com.java1234.dao;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.business.XiaoShou;
+
+
+
+
+public interface XiaoShouDao {
+	
+	public Integer add(XiaoShou xiaoshou);
+	
+	public List<XiaoShou> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public Integer delete(Integer id);
+	
+	public XiaoShou findByFlowId(Integer flow_id);
+	
+	/**
+	 * SELECT * FROM `t_bussiness_xiaoshou` GROUP BY trans_no
+	 * @return
+	 */
+	public List<XiaoShou> trans_no_list();
+	
+	/**
+	 * 按日期   客户类型统计
+	 * SELECT SUM(sheet_amt) AS sheet_amt ,trans_no FROM  
+	 * t_bussiness_xiaoshou WHERE oper_date > '2018-02-01 00:00:00' 
+	 * AND oper_date <  '2018-02-25 59:59:59' 
+	 * AND SUP_NAME LIKE  "R%"  
+	 * GROUP BY trans_no 
+	 * @param map
+	 * @return
+	 */
+	public XiaoShou tongji(Map<String,Object> map);
+	
+	
+}

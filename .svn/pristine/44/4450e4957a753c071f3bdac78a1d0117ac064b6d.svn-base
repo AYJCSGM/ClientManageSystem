@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.RefundDao">
+	
+	<resultMap type="Refund" id="RefundResult">
+		<result property="id" column="id" />
+		<result property="openid" column="openid" />
+		<result property="state" column="state" />
+		<result property="out_trade_no" column="out_trade_no" />
+		<result property="out_refund_no" column="out_refund_no" />
+		
+		<result property="createDateTime" column="createDateTime" />
+		<result property="refund_jine" column="refund_jine" />
+		<result property="refund_desc" column="refund_desc" />
+		<result property="ip" column="ip" />
+		<result property="result_" column="result_" />
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="Refund">
+		insert into t_refund values(null,#{openid},#{state},#{out_trade_no},#{out_refund_no},#{createDateTime},#{refund_jine},#{refund_desc}
+		,#{ip},#{result_})
+	</insert>
+	
+	
+	<select id="list" parameterType="Map" resultMap="RefundResult">
+		select * from t_refund
+		<where>
+			<if test="q!=null and q!=''">
+				and (openid like #{q}  or refund_desc like #{q} or out_trade_no like #{q}    ) 
+			</if>
+			<if test="state!=null and state!='' ">
+		 		and state  =  #{state}
+			</if>
+			<if test="openid!=null and openid!='' ">
+		 		and openid  =  #{openid}
+			</if>
+		</where>
+		order by id DESC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from t_refund
+		<where>
+			<if test="q!=null and q!=''">
+				and (openid like #{q}  or refund_desc like #{q} or out_trade_no like #{q}    ) 
+			</if>
+			<if test="state!=null and state!='' ">
+		 		and state  =  #{state}
+			</if>
+			<if test="openid!=null and openid!='' ">
+		 		and openid  =  #{openid}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="RefundResult">
+		select * from t_refund where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_refund where id=#{id}
+	</delete>
+	
+	
+</mapper> 

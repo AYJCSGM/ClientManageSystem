@@ -1,0 +1,97 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<!-- 强制  高速模式 渲染网页    -->
+<meta name=”renderer” content=”webkit”>
+<meta http-equiv=”X-UA-Compatible” content=”IE=Edge,chrome=1″ >
+
+<!--添加  jq  支持加载-->
+<script	src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<!--添加  jq  支持加载-->
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+<!-- 加入移动布局 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+<!-- 加入移动布局 -->
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!--添加  本地 mui  支持-->
+<script src="${pageContext.request.contextPath}/static/mui/js/mui.min.js"></script>
+<link href="${pageContext.request.contextPath}/static/mui/css/mui.css" rel="stylesheet"/>
+<!--添加  本地  mui  支持-->
+
+<!--添加layer移动  弹出窗口的 插件支持-->
+<script src="${pageContext.request.contextPath}/static/layer_mobile/layer.js"></script>
+<!--添加layer移动  弹出窗口的 插件支持-->
+
+<!--添加  js api-->
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<!--添加  js api-->
+
+<!--添加  微信分享js 自己扩展的  -->
+<script src="${pageContext.request.contextPath}/static/weixin_js/weixin_share.js"></script>
+<!--添加  微信分享js 自己扩展的  -->
+
+<title>扫一扫</title>
+<style type="text/css">
+</style>
+
+</head>
+<script type="text/javascript" charset="utf-8">
+mui.init();
+var url;
+$(function() {
+	url = window.location.href;
+	$.post('/weixin/share', {url : url}, function(result) {
+		var appId = result.appId;
+		var nonceStr = result.noncestr;
+		var signature = result.signature;
+		var timestamp = result.timestamp;
+		
+        wx.config({
+            debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            appId: appId, // 必填，公众号的唯一标识
+            timestamp:timestamp , // 必填，生成签名的时间戳
+            nonceStr: nonceStr, // 必填，生成签名的随机串
+            signature: signature,// 必填，签名
+            jsApiList: ['scanQRCode'] // 必填，需要使用的JS接口列表
+        });
+        
+	},'json');
+});
+
+function scanCode(){
+	  wx.scanQRCode({ 
+	   needResult : 1, 
+	   scanType : [ "qrCode", "barCode" ], 
+	   success : function(res) { 
+		   var obj = eval(res);
+	   	  alert(obj.resultStr); 
+	   }, 
+	   fail : function(res) { 
+	    console.log(res) 
+	    alert(JSON.stringify(res)); 
+	   } 
+	  }); 
+}
+
+</script>
+
+
+<body>
+<div class="mui-content">
+
+
+<input type="button" onclick="scanCode()" value="扫一扫" />
+		
+</div>
+
+</body>
+</html>

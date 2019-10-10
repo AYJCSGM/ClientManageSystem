@@ -1,0 +1,152 @@
+/* 投票首页   轮播下面哪个详情 参加人数啥 的 */
+.top_item{
+	overflow: hidden; 
+	flex:1;
+	-webkit-flex:1;
+}
+.top_item_num{
+	font-weight: bold;
+	color:white;
+	text-align: center;
+}
+.top_item_tip{
+	color:white;
+	text-align: center;
+	font-size: 13px;
+}
+/* 投票首页   轮播下面哪个详情 参加人数啥 的 */
+
+
+/* 首页 投票时间 规则  详情 */
+.desc_item{
+	display: flex;
+	display: -webkit-flex;
+	color: #758697;
+	font-size: 13px;
+}
+.desc_item_left{
+	width: 87px;
+}
+.desc_item_right{
+	flex:1;
+	-webkit-flex:1;
+}
+.desc_item_img{
+	width: 13px;
+	margin-right: 5px;
+}
+/* 首页 投票时间 规则  详情 */
+
+
+/* 首页 搜索框 */
+.search_input{
+	flex:1 !important;	
+	-webkit-flex:1 !important;	 
+	border-radius: 0px !important;	
+	height:40px !important;	 
+	margin-bottom: 0px !important;	
+}
+.search_img{
+	width: 15px;
+}
+.search_btn{
+	background-image: url(/static/images/vote/search.png);
+	background-repeat:no-repeat;
+	background-size:15px 15px;
+	background-position: 25px 11px;
+	padding-left: 42px;
+	width: 100px;
+	background-color: #ef5350; 
+	height:40px;  
+	color:white; 
+	line-height: 40px;
+	font-weight: bold;
+    font-size: 14px;
+}
+/* 首页 搜索框 */
+
+
+/* 首页作品列表 */
+.show_item{
+	padding: 0px 5px 0px 5px; 
+	width:49.98%;
+	display:inline-block; 
+	float:left; 
+	margin-bottom: 10px;
+}
+
+.show_item_body{
+	background-color:white; 
+	position: relative;
+	padding-bottom: 15px;
+}
+
+.show_item_title{
+	padding:5px 5px 5px 5px;
+	height: 31px;
+	overflow: hidden;
+}
+
+.show_item_title p{
+	height: 21px;
+	overflow: hidden;
+	color: #758697;
+	font-size: 14px;
+	text-align: center;
+	margin: 0px;
+}
+
+.show_item_btn{
+	background-color: #ee4a47;
+	color: white;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
+}
+/* 首页作品列表 */
+
+
+/* 使用 的content  使用这些格式  */
+.activity_content img{
+	width: 100%;
+}
+.activity_content iframe{
+	width: 100%;
+	height: 200px;
+}
+
+
+.activity_content p{
+	margin-bottom: 0px;
+}
+/* 使用 的content  使用这些格式  */
+
+
+
+/* 这个top 作品页面 展示封面 哪个 */
+.top{
+	padding:10px 10px 10px 10px; 
+	background-color:white; 
+	box-shadow: 0 1px 1px rgba(128, 128, 128, 0.96);
+}
+/* 这个top 作品页面 展示封面 哪个 */
+
+/* 票数  排名  距上一名 */
+.top3{
+	background-color: white; 
+	display: flex; 
+	padding:10px; 
+	display: -webkit-flex;
+	box-shadow: 0 1px 1px rgba(128, 128, 128, 0.96);
+}
+.top3_item{
+	flex:1;-webkit-flex:1;
+}
+.top3_item_top{
+	text-align: center; 
+	font-weight: bold;
+}
+.top3_item_bottom{
+	text-align: center; font-size: 12px;color: #6f6f6f;
+}
+/* 票数  排名  距上一名 */

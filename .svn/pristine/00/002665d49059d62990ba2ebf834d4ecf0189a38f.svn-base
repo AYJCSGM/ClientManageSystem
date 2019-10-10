@@ -1,0 +1,144 @@
+package com.java1234.entity;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+
+public class Goods {
+	
+	private Integer id;
+	private String title;
+	private BigDecimal price;
+	private String spec;//规格
+	private Integer kucun;//库存
+	private Integer sales;//销量
+	private String content;//详情   由富文本编辑器提供
+	private String contentNoTag;
+	private Integer isUse;//是否上架此商品
+	private String showImg;//展示图片
+	private Integer order_;
+	
+	
+	//属于哪个分类
+	private Integer fenleiId;
+	private FenLei fenlei;
+	
+	private Integer createUserId;
+	private User createUser;
+	private Date createDateTime;
+	
+	
+	//在什么位置显示   1推荐商品显示 
+	private Integer pos;
+	
+	
+	
+	
+	public Integer getPos() {
+		return pos;
+	}
+	public void setPos(Integer pos) {
+		this.pos = pos;
+	}
+	public Integer getOrder_() {
+		return order_;
+	}
+	public void setOrder_(Integer order_) {
+		this.order_ = order_;
+	}
+	public String getShowImg() {
+		return showImg;
+	}
+	public void setShowImg(String showImg) {
+		this.showImg = showImg;
+	}
+	public Integer getIsUse() {
+		return isUse;
+	}
+	public void setIsUse(Integer isUse) {
+		this.isUse = isUse;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+	public String getContentNoTag() {
+		return contentNoTag;
+	}
+	public void setContentNoTag(String contentNoTag) {
+		this.contentNoTag = contentNoTag;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public BigDecimal getPrice() {
+		return price;
+	}
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+	public String getSpec() {
+		return spec;
+	}
+	public void setSpec(String spec) {
+		this.spec = spec;
+	}
+	public Integer getKucun() {
+		return kucun;
+	}
+	public void setKucun(Integer kucun) {
+		this.kucun = kucun;
+	}
+	public Integer getSales() {
+		return sales;
+	}
+	public void setSales(Integer sales) {
+		this.sales = sales;
+	}
+	public Integer getFenleiId() {
+		return fenleiId;
+	}
+	public void setFenleiId(Integer fenleiId) {
+		this.fenleiId = fenleiId;
+	}
+	public FenLei getFenlei() {
+		return fenlei;
+	}
+	public void setFenlei(FenLei fenlei) {
+		this.fenlei = fenlei;
+	}
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
+	}
+	public User getCreateUser() {
+		return createUser;
+	}
+	public void setCreateUser(User createUser) {
+		this.createUser = createUser;
+	}
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
+	}
+	
+	
+	
+	
+	
+}

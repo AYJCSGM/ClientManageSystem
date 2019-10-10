@@ -1,0 +1,66 @@
+package com.java1234.controller.weixin;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+
+@Controller
+@RequestMapping("/houtai/weixin")
+public class HouTai_WeiXin_Controller {
+	
+	
+	
+	/**
+	 *  微信公从号   图文素材管理
+	 * /houtai/weixin/news/manage
+	 * 
+	 */
+	@RequestMapping("/news/manage")
+	public ModelAndView news_manage(HttpServletResponse  res,HttpServletRequest req,
+			@RequestParam(value = "clientIds", required = false) String clientIds,
+			@RequestParam(value = "jsp", required = false) String jsp
+			) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/admin/page/weixin/sucai/news_manage");
+		return mav;
+	}
+	
+	
+	/**
+	 *  微信公从号   图片 语音  视频   素材  管理控制 器 传来type
+	 * /houtai/weixin/sucai/manage?type=12
+	 * image图文   voice语音    video视频
+	 * 
+	 */
+	@RequestMapping("/sucai/manage")
+	public ModelAndView sucai_manage(HttpServletResponse  res,HttpServletRequest req,
+			@RequestParam(value = "type", required = false) String type
+			) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("type", type);
+		mav.setViewName("/admin/page/weixin/sucai/sucai_manage");
+		return mav;
+	}
+	
+	
+	
+	/**
+	 *  测试扫码支付 
+	 * /houtai/weixin/scan/pay
+	 * 
+	 */
+	@RequestMapping("/scan/pay")
+	public ModelAndView scan_pay() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/admin/page/weixin/scan_pay/scan_pay");
+		return mav;
+	}
+	
+	
+	
+}

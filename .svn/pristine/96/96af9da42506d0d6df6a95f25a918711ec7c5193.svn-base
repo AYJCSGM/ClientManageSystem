@@ -1,0 +1,76 @@
+package com.java1234.controller.vote.wap;
+
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.java1234.entity.vote.Activity;
+import com.java1234.entity.vote.ActivityWork;
+import com.java1234.service.vote.ActivityService;
+import com.java1234.service.vote.ActivityWorkService;
+
+
+
+@Controller
+@RequestMapping("/wap/activity/work")
+public class WAP_Activity_Work_Controller {
+	
+	
+	@Resource
+	private ActivityWorkService  activityWorkService;
+	
+	@Resource
+	private ActivityService  activityService;
+	
+	/**
+	 * /wap/activity/work/15
+	 */
+	@RequestMapping("/{id}")
+	public ModelAndView see_id(@PathVariable("id") Integer id, HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		ActivityWork activityWork = activityWorkService.findById(id);
+		mav.addObject("activityWork", activityWork);
+		
+		
+		mav.addObject("activity", activityWork.getActivity());
+		Activity activity = activityWork.getActivity();
+		activity.setClick_(activity.getClick_()+1);
+		activityService.update(activity, "");
+		
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("activityId",activityWork.getActivity().getId());
+		
+		List<ActivityWork> activityWorkList = activityWorkService.listRowNum(map);
+		
+		
+		ActivityWork temp = null;
+		for ( ActivityWork a :activityWorkList) {
+			if(a.getId()==activityWork.getId()){
+				activityWork.setRowNum(a.getRowNum());
+				//计算与前一名差多少票
+				if(temp==null){
+					activityWork.setNumGap(0);
+				}else{
+					activityWork.setNumGap(temp.getNum()-activityWork.getNum());
+				}
+			}
+			
+			temp = a ; 
+		}
+		
+		
+		mav.setViewName("/wap/vote/activity/work/work");
+		return mav;
+	}
+	
+	
+	
+}

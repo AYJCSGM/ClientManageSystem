@@ -1,0 +1,208 @@
+package com.java1234.controller.business;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.SecurityUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.java1234.entity.Client;
+import com.java1234.entity.ClientType;
+import com.java1234.entity.Config;
+import com.java1234.entity.PageBean;
+import com.java1234.entity.Result;
+import com.java1234.entity.User;
+import com.java1234.entity.business.XiaoShou;
+import com.java1234.service.ClientService;
+import com.java1234.service.ConfigService;
+import com.java1234.service.business.XiaoShouService;
+import com.java1234.util.DateUtil;
+import com.java1234.util.ResponseUtil;
+import com.java1234.util.StringUtil;
+
+import net.sf.json.JSONObject;
+
+
+@Controller
+@RequestMapping("/admin/xiaoshou")
+public class Admin_XiaoShou_Controller {
+	
+	@Resource
+	private XiaoShouService xiaoShouService;
+	@Resource
+	private ConfigService configService;
+	
+	
+	@RequestMapping("/list")
+	public String list(@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "limit", required = false) String rows,
+			@RequestParam(value = "q", required = false) String q,
+			@RequestParam(value = "date1", required = false) String date1,
+			@RequestParam(value = "date2", required = false) String date2,
+			@RequestParam(value = "trans_no", required = false) String trans_no,
+			
+			HttpServletResponse response, HttpServletRequest request) throws Exception {
+		PageBean pageBean = new PageBean(Integer.parseInt(page), Integer.parseInt(rows));
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("start", pageBean.getStart());
+		map.put("size", pageBean.getPageSize());
+		map.put("q", StringUtil.formatLike(q));
+		map.put("date1", date1);
+		map.put("date2", date2);
+		map.put("trans_no", trans_no);
+		List<XiaoShou> list = xiaoShouService.list(map);
+		Integer total = xiaoShouService.getTotal(map);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm").create();
+		map.clear();
+		map.put("data", list);
+		map.put("count", total);
+		map.put("code", 0);
+		map.put("msg", "");
+		ResponseUtil.write(response, gson.toJson(map));
+		return null;
+	}
+	
+	@RequestMapping("/syn")
+	public String syn(@RequestParam(value = "date1", required = false) String date1,
+			@RequestParam(value = "date2", required = false) String date2,  HttpServletResponse response, HttpServletRequest request) throws Exception {
+		
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("date1", date1);
+		map.put("date2",date2);
+		int resultTotal = xiaoShouService.syn(map);
+		
+		Result result = new Result();
+		Gson gson = new Gson();
+		if (resultTotal > 0) {
+			Config config = new Config();
+			config.setId(1);
+			config.setBus_last_update(new Date());
+			configService.update(config);
+			
+			
+			result.setSuccess(true);
+			result.setMsg("同步完成");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("同步失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	@RequestMapping("/delete")
+	public String delete(@RequestParam(value = "ids", required = false) String ids, HttpServletResponse response)
+			throws Exception {
+		String[] idsStr = ids.split(",");
+		Gson gson = new Gson();
+		Result result = new Result();
+
+		for (int i = 0; i < idsStr.length; i++) {
+			xiaoShouService.delete(Integer.parseInt(idsStr[i]));
+		}
+		result.setSuccess(true);
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	/**
+	 * 接受年月 然后传加  数据 
+	 * @param year
+	 * @param month
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/tongji")
+	public String tongji(@RequestParam(value = "year", required = false) String year,
+			@RequestParam(value = "month", required = false) String month,   HttpServletResponse response)
+			throws Exception {
+		
+		//yyyy-MM-dd HH:mm:ss
+		String date = year+"-"+month;
+		
+		String date1 = date+"-01 00:00:00";
+		String date2 = DateUtil.getDays(date)+" 23:59:59";
+		
+		//
+		List<JSONObject> list = new ArrayList<JSONObject>();
+		
+		JSONObject item1 = new JSONObject();
+		item1.put("name", "政府采购");
+		item1.put("like", "C%");
+		list.add(item1);
+		JSONObject item2 = new JSONObject();
+		item2.put("name", "思迅软件");
+		item2.put("like", "R%");
+		list.add(item2);
+		JSONObject item3 = new JSONObject();
+		item3.put("name", "企业");
+		item3.put("like", "Q%");
+		list.add(item3);
+		JSONObject item4 = new JSONObject();
+		item4.put("name", "同行");
+		item4.put("like", "T%");
+		list.add(item4);
+		JSONObject item5 = new JSONObject();
+		item5.put("name", "财务软件");
+		item5.put("like", "Y%");
+		list.add(item5);
+		JSONObject item6 = new JSONObject();
+		item6.put("name", "散户");
+		item6.put("like", "S%");
+		list.add(item6);
+		
+		JSONObject item7 = new JSONObject();
+		item7.put("name", "公司自用");
+		item7.put("like", "Z%");
+		list.add(item7);
+		
+		JSONObject item8 = new JSONObject();
+		item8.put("name", "合计");
+		list.add(item8);
+		
+		
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("date1", date1);
+		map.put("date2", date2);
+		
+		XiaoShou xiaoshou = null;
+		
+		for(JSONObject item : list){
+			if(item.get("like")!=null){
+				map.put("sup_name", item.get("like").toString());
+			}else{
+				map.put("sup_name", null);
+			}
+			
+			xiaoshou = xiaoShouService.tongji(map);
+			if(xiaoshou!=null){
+				item.put("jine", xiaoshou.getSheet_amt());
+			}else {
+				item.put("jine", "0");
+			}
+			
+		}
+		
+		JSONObject result = new JSONObject();
+		result.put("data", list.toString());
+		result.put("success", true);
+		
+		ResponseUtil.write(response, result.toString());
+		return null;
+	}
+	
+	
+	
+	
+	
+} 

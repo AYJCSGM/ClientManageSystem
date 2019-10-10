@@ -1,0 +1,477 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>${title}</title>
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+${config.headStr}
+
+${config.layuiStr}
+
+<!-- 加入移动布局 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+<!-- 加入移动布局 -->
+
+<!-- 引入manage 的基础css -->
+<script	src="${pageContext.request.contextPath}/static/common/manage/manage_base.js"></script>
+<link href="${pageContext.request.contextPath}/static/common/manage/manage_base.css" rel="stylesheet"/>
+<!-- 引入manage 的基础css -->
+
+</head>
+<style>
+
+/*修改table表格  左右内边框 为0*/
+.layui-table-cell {
+	padding-left: 0px;
+	padding-right: 0px;
+	text-align: center;
+}
+/*修改table表格 左右内边框 为0*/
+
+</style>
+<body>
+<script>
+var global_ids;
+var global_ids_len;
+var w ;//窗口的宽
+var h ;//窗口的高
+
+
+//打开编辑窗口
+function open_edit(id){
+	var w = 700;
+	var h = 600;
+	if(window.parent.layui_tab_item_height){
+		if(h>window.parent.layui_tab_item_height){
+			h = (window.parent.layui_tab_item_height-50);
+		}
+	}
+	layer.open({
+	  type: 2,
+	  title: '修改',
+	  shadeClose: true,
+	  shade: 0.8,
+	  area: [w+'px', h+'px'],
+	  content: '/houtai/client/edit?id='+id //iframe的url
+	});
+}
+
+//子窗口调用 的  关闭窗口方法 
+function closeDlg(msg){
+	 layer.closeAll();
+	 layer.msg(msg);
+	 reload_data();
+}
+
+//相当前刷新  重新加载
+function reload_data(){
+	var q = $("#q").val();
+	var date1 = $("#date1").val();
+	var date2 = $("#date2").val();
+	var nickname = $("#nickname").val();
+	var clientTypeId = $("#clientTypeId").val();
+
+	table.reload('table', {
+		 where: {
+			  q: q
+			 ,date1:date1
+			 ,date2:date2
+			 ,nickname:nickname
+			 ,clientTypeId:clientTypeId
+	        }
+    });
+}
+
+
+//同步公众号粉丝
+function syn(){
+	layer.msg("正在同步");
+	var index = layer.load(1, {
+		shade : [ 0.1, '#fff' ]
+	//0.1透明度的白色背景
+	});
+	$.post("/weixin/syn/weixin/user", {}, function(result) {
+		if (result.success) {
+			layer.msg("同步成功");
+			layer.closeAll();//关闭loading
+			reload_data();
+		} else {
+			layer.msg("同步失败");
+			layer.closeAll();//关闭loading
+		}
+	}, 'json');
+}
+
+
+//查看 用户的微信资料
+function see_wxuser_info(wx_user_id){
+	var w = 900;
+	var h = 600;
+	if(window.parent.layui_tab_item_height){
+		h = (window.parent.layui_tab_item_height-50);
+	}
+	if(window.parent.layui_tab_item_width){
+		if(w>window.parent.layui_tab_item_width){
+			w = (window.parent.layui_tab_item_width-50);
+		}
+	}
+	layer.open({
+	  type: 2,
+	  title: '查看',
+	  shadeClose: true,
+	  shade: 0.8,
+	  area: [w+'px', h+'px'],
+	  content: '/houtai/weixin/user/see?id='+wx_user_id //iframe的url
+	});
+}
+
+
+//打开发送 文本消息对话框 
+function open_send_text_dlg(){
+	global_ids="";
+	global_ids_len=0;
+	getTableSelected();
+	w = 600;
+	h = 300;
+	checkWindow();
+	
+	
+	
+	if(global_ids_len>0){
+			layer.open({
+			  type: 2,
+			  title: '纯文本消息',
+			  shadeClose: true,
+			  shade: 0.8,
+			  area: [w+'px', h+'px'],
+			  content: '/houtai/weixin/messages/text?clientIds='+global_ids
+			});
+	}
+}
+
+
+//   /admin/page/weixin/TemplateMessages/wei_oa_notice
+//打开模板消息  窗口  传入jsp页面参数
+function open_weixin_template_messages_dlg(jsp){
+	global_ids="";
+	global_ids_len=0;
+	getTableSelected();
+	
+	w = 600;
+	h = 1200;
+	
+	checkWindow();
+	
+	if(global_ids_len>0){
+		//打开窗口
+		layer.open({
+		  type: 2,
+		  title: "模板消息",
+		  shadeClose: true,
+		  shade: 0.8,
+		  area: [w+'px', h+'px'],
+		  content: "/houtai/weixin/messages/template?jsp="+jsp+"&clientIds="+global_ids
+		});
+	}
+}
+
+//发送公众号图文 消息   其实就是媒体id
+function open_send_gzhnews_dlg(title,msgtype){
+	global_ids="";
+	global_ids_len=0;
+	getTableSelected();
+	
+	w = 600;
+	h = 1200;
+	checkWindow();
+	
+	if(global_ids_len>0){
+			layer.open({
+			  type: 2,
+			  title: title,
+			  shadeClose: true,
+			  shade: 0.8,
+			  area: [w+'px', h+'px'],
+			  content: '/houtai/weixin/messages/client?clientIds='+global_ids+'&msgtype='+msgtype
+			});
+	}
+}
+
+//发送 自定义 图文消息  
+function open_custom_news_dlg(){
+	global_ids="";
+	global_ids_len=0;
+	getTableSelected();
+	w = 600;
+	h = 1200;
+	checkWindow();
+	
+	if(global_ids_len>0){
+		layer.open({
+		  type: 2,
+		  title: '自定义图文消息',
+		  shadeClose: true,
+		  shade: 0.8,
+		  area: [w+'px', h+'px'],
+		  content: '/houtai/weixin/messages/custom/news?clientIds='+global_ids
+		});
+	}
+}
+
+
+function seeImg(url){
+	w = 700;
+	h = 600;
+	checkWindow();
+	//iframe层
+	if(!url){
+		url = "   ";
+	}
+	
+	layer.open({
+	  type: 2,
+	  title: '图片',
+	  shadeClose: true,
+	  shade: 0.8,
+	  area: [w+'px', h+'px'],
+	  content: url //iframe的url
+	});
+}
+
+function table_edit_update(id,field,value){
+	$.post('/admin/client/update?'+field+'='+value,{id:id},function(result){
+		if(result.success){
+			layer.msg('修改成功');
+		}else{
+			layer.closeAll();
+			layer.msg(result.msg);
+		}
+	},'json');
+}
+
+
+function receive(openid){
+	w = 600;
+	h = 1200;
+	checkWindow();
+	
+	layer.open({
+	  type: 2,
+	  title: '添加-消息接受者',
+	  shadeClose: true,
+	  shade: 0.8,
+	  area: [w+'px', h+'px'],
+	  content: '/houtai/receive/add?openid='+openid
+	});
+}
+
+
+</script>
+
+<div class="layui-form" style="min-width:1000px;">
+
+
+<div class="layui-table-toolbar" style="margin-bottom: 3px; ">
+	<div class="layui-btn-group">
+		<button onclick="syn()" class="layui-btn  layui-btn-sm">同步公众号粉丝</button>
+	    <button onclick="reload_data()" class="layui-btn layui-btn-sm">刷新</button>
+	    <button onclick="open_weixin_template_messages_dlg('/admin/page/weixin/messages/wei_oa_notice')" class="layui-btn   layui-btn-sm">微OA任务提醒</button>
+	    <button onclick="open_send_text_dlg()" class="layui-btn  layui-btn-sm">发送纯文本信息</button>
+	    <button onclick="open_send_gzhnews_dlg('发送公众号文章','mpnews')" class="layui-btn   layui-btn-sm">发送公众号文章</button>
+	    <button onclick="open_send_gzhnews_dlg('发送图片素材','image')" class="layui-btn   layui-btn-sm">发送图片素材</button>
+	    <button onclick="open_send_gzhnews_dlg('发送语音素材','voice')" class="layui-btn   layui-btn-sm">发送语音素材</button>
+	    <button onclick="open_send_gzhnews_dlg('发送视频素材','video')" class="layui-btn   layui-btn-sm">发送视频素材</button>
+	    <button onclick="open_custom_news_dlg()" class="layui-btn   layui-btn-sm">发送自定义图文消息可发外链</button>
+ 	 </div>
+</div>
+
+<form class="layui-form layui-form-pane" style="margin-bottom: 3px; "  >
+  <div class="layui-form-item" style="margin-bottom: 1px; min-width:1051px;">
+  	 <label class="layui-form-label" style="width: 100px;">分类</label>
+    <div class="layui-input-inline" style="  width: 160px; margin-right: -1px; ">
+    	<select id="clientTypeId">
+	     	<option value="" selected="">全部</option>
+	     	<c:forEach var="clientType" items="${clientTypeList}" >
+	     		<option value="${clientType.id}" >${clientType.name}</option>
+	     	</c:forEach>
+	      </select>
+    </div>
+    
+    <label class="layui-form-label" style="width: 97px;">模糊查询</label>
+    <div class="layui-input-inline" style="  width: 150px; margin-right: -1px;">
+      <input class="layui-input" id="q" onkeydown="if(event.keyCode==13) reload_data()" placeholder="模糊查询" ">
+    </div>
+  
+   <label class="layui-form-label" style="width: 97px;">微信昵称</label>
+    <div class="layui-input-inline" style="  width: 150px; margin-right: -1px;">
+      <input class="layui-input" id="nickname" onkeydown="if(event.keyCode==13) reload_data()" placeholder="微信昵称查询" ">
+    </div>
+    <div class="layui-input-inline" style="  width: 113px;">
+    	<a class="layui-btn" onclick="reload_data()">查询</a>
+    </div>
+</div>
+
+<div class="layui-form-item" style="margin-bottom: 1px; min-width:1051px;">
+    <label class="layui-form-label" style="width: 63px;">大于</label>
+    <div class="layui-input-inline" style="  width: 113px; margin-right: -1px; ">
+      <input class="layui-input" id="date1" placeholder="大于几号" >
+    </div>
+    
+    <label class="layui-form-label" style="width: 63px;">小于</label>
+    <div class="layui-input-inline" style="  width: 113px; margin-right: -1px; ">
+      <input class="layui-input" id="date2" placeholder="小于几号" >
+    </div>
+</div>
+</form>
+
+
+<table class="layui-hide"   id="table" lay-filter="table"></table> 
+<script type="text/html" id="table_bar">
+<div class="layui-btn-group">
+	<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+	<a class="layui-btn layui-btn-xs" lay-event="see_wxuser_info">查看微信资料</a>
+	<a class="layui-btn layui-btn-xs" lay-event="receive">添加消息接受者</a>
+</div>
+</script>
+
+
+<script type="text/html" id="format_wx">
+  {{#  if(d.weixin_user_id != null){ }}
+	 {{d.weiXinUser.openid}} 
+  {{#  } else { }}
+    <er>未使用</er>   
+  {{#  } }}
+</script>
+
+<script type="text/html" id="format_wx_headimg">
+  {{#  if(d.weiXinUser.headimgurl != null){ }}
+<img style="width: 40px; height: 40px;" alt="" src="{{d.weiXinUser.headimgurl}}" onclick="seeImg('{{d.weiXinUser.headimgurl}}') " />
+  {{#  } else { }}
+  {{#  } }}
+</script>
+
+
+<script type="text/html" id="format_wx_sex">
+  {{#  if(d.weiXinUser.sex =='1'){ }}
+	<eb>男</eb>
+  {{#  } else if(d.weiXinUser.sex =='0') { }}
+     <er>女</er>
+  {{#  } }}
+</script>
+
+
+<script type="text/html" id="format_wx_nickname">
+  {{#  if(d.weiXinUser.nickname != null){ }}
+	 {{d.weiXinUser.nickname}} 
+  {{#  } else { }}
+  {{#  } }}
+</script>
+
+<script type="text/html" id="format_type">
+  {{#  if(d.clientType != null){ }}
+	 <eg>{{d.clientType.name}}</eg>
+  {{#  } else { }}
+  {{#  } }}
+</script>
+
+<script type="text/html" id="format_clientType">
+  {{#  if(d.clientType != null){ }}
+	 <eg>{{d.clientType.name}}</eg>
+  {{#  } else { }}
+  {{#  } }}
+</script>
+
+
+<script>
+		layui.use([ 'laydate', 'laypage', 'layer', 'table', 'carousel',
+				'upload', 'element' ], function() {
+			var laydate = layui.laydate //日期
+			, laypage = layui.laypage //分页
+			layer = layui.layer //弹层
+			, table = layui.table //表格
+			, carousel = layui.carousel //轮播
+			, upload = layui.upload //上传
+			, element = layui.element; //元素操作
+			
+			  table.render({
+			    elem: '#table'
+			    ,url: '/admin/client/list',
+			    height: 'full-150',
+			   cols: [[
+			      {checkbox: true, fixed: true}
+			      ,{field:'id', title: 'ID', width:50,style:'font-size: 7px;' }
+			      
+			      ,{field:'id', title: '头像', width:80, templet: '#format_wx_headimg'}
+			      ,{field:'weixin_user_id', title: '微信昵称', width:100, templet: '#format_wx_nickname',style:'font-size: 7px;'}
+			      ,{field:'clientTypeId', title: '客户类型', width:80, templet: '#format_clientType'}
+			      
+			      ,{field:'id', title: '性别', width:50, templet: '#format_wx_sex',style:'font-size: 7px;'}
+			      ,{field:'name', title: '姓名', width:80,style:'font-size: 7px;', edit: 'text'}
+			      ,{field:'phone', title: '电话', width:100,style:'font-size: 7px;', edit: 'text'}
+			      ,{field:'address', title: '地址', width:100,style:'font-size: 7px;', edit: 'text'}
+			      
+			      ,{field:'createDateTime', title: '创建时间', width:120,style:'font-size: 7px;'}
+			      ,{field:'remark', title: '备注', width:100,style:'font-size: 7px;', edit: 'text'}
+			      
+			      ,{fixed:'right', width:180,title: '操作',  toolbar: '#table_bar'}
+			    ]]
+			    ,id: 'table'
+			    ,page: true
+			    ,limits:[10,50,100,200,500,1000],
+			   limit:100
+			  });
+			
+			//常规用法
+			  laydate.render({
+			    elem: '#date1'
+			  });
+			//常规用法
+			  laydate.render({
+			    elem: '#date2'
+			  });
+			
+			    
+			//监听工具条 table_bar
+				table.on('tool(table)', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+					var data = obj.data //获得当前行数据
+					, layEvent = obj.event; //获得 lay-event 对应的值
+					if (layEvent === 'add_send_list') {
+						//layer.msg('查看操作' + data.id);
+						add_send_list(data.id)
+					} else if (layEvent === 'see_hongbao') {
+						see_hongbao(data.id);
+					} else if (layEvent === 'edit') {
+						//layer.msg('编辑操作' + data.id);
+						open_edit(data.id);
+					} else if(layEvent === 'receive'){
+						receive(data.openid);
+					}else if(layEvent ==='see_wxuser_info'){
+						see_wxuser_info(data.weixin_user_id);
+					}
+				});
+				
+				//监听单元格编辑
+				  table.on('edit(table)', function(obj){
+				    var value = obj.value //得到修改后的值
+				    ,data = obj.data //得到所在行所有键值
+				    ,field = obj.field; //得到字段
+				    //layer.msg('[ID: '+ data.id +'] ' + field + ' 字段更改为：'+ value);
+				    table_edit_update(data.id,field,value);
+				  });
+				
+				
+			
+				
+		});
+</script>
+
+
+</body>
+</html>

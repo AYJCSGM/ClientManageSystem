@@ -1,0 +1,57 @@
+package com.java1234.service.impl;
+
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import org.springframework.stereotype.Service;
+import com.java1234.dao.LinkDao;
+import com.java1234.dao.LinkFenLeiDao;
+import com.java1234.entity.LinkFenLei;
+import com.java1234.service.LinkFenLeiService;
+
+
+@Service("linkFenLeiService")
+public class LinkFenLeiServiceImpl implements LinkFenLeiService {
+	
+	
+	@Resource
+	private LinkFenLeiDao linkFenLeiDao;
+	
+	
+	@Override
+	public Integer add(LinkFenLei linkFenLei) {
+		// TODO Auto-generated method stub
+		return linkFenLeiDao.add(linkFenLei);
+	}
+
+	@Override
+	public Integer update(LinkFenLei linkFenLei) {
+		// TODO Auto-generated method stub
+		return linkFenLeiDao.update(linkFenLei);
+	}
+
+	@Override
+	public List<LinkFenLei> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return linkFenLeiDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return linkFenLeiDao.getTotal(map);
+	}
+
+	@Override
+	public LinkFenLei findById(Integer id) {
+		// TODO Auto-generated method stub
+		return linkFenLeiDao.findById(id);
+	}
+
+	@Override
+	public Integer delete(Integer id) {
+		// TODO Auto-generated method stub
+		return linkFenLeiDao.delete(id);
+	}
+
+}

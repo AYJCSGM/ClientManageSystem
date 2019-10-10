@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.CardBillDao">
+	
+	<resultMap type="CardBill" id="CardBillResult">
+		<result property="id" column="id" />
+		<result property="clientId" column="clientId" />
+		<result property="clientName" column="clientName" />
+		<result property="carno" column="carno" />
+		<result property="actual" column="actual" />
+		<result property="discounts" column="discounts" />
+		<result property="money" column="money" />
+		<result property="balance" column="balance" />
+		<result property="type" column="type" />
+		<result property="remark" column="remark" />
+		
+		<result property="createDateTime" column="createDateTime" />
+		<result property="createUserId" column="createUserId" />
+		<association property="createUser" column="createUserId" select="com.java1234.dao.UserDao.findById"></association>
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="CardBill">
+		insert into t_card_bill values(null,#{clientId},#{clientName},#{carno},#{actual},#{discounts},#{money},#{balance},#{type},#{remark},#{createDateTime},#{createUserId})
+	</insert>
+	
+	<update id="update" parameterType="CardBill">
+		update t_card_bill
+		<set>
+			<if test="carno!=null ">
+				carno=#{carno},
+			</if>
+			<if test="clientName!=null ">
+				clientName=#{clientName},
+			</if>
+			<if test="actual!=null ">
+				actual=#{actual},
+			</if>
+			<if test="money!=null ">
+				money=#{money},
+			</if>
+			<if test="balance!=null ">
+				balance=#{balance},
+			</if>
+			<if test="createDateTime!=null ">
+				createDateTime=#{createDateTime},
+			</if>
+			<if test="createUserId!=null ">
+				createUserId=#{createUserId},
+			</if>
+			<if test="remark!=null ">
+				remark=#{remark},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="CardBillResult">
+		select * from t_card_bill
+		<where>
+			<if test="q!=null and q!=''">
+				and (carno like #{q}  or clientName like #{q} or remark like #{q} ) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="clientTypeId!=null and clientTypeId!='' ">
+		 		and clientTypeId =  #{clientTypeId} 
+			</if>
+			<if test="clientId!=null and clientId!='' ">
+		 		and clientId =  #{clientId} 
+			</if>
+			<if test="type!=null and type!='' ">
+		 		and type =  #{type} 
+			</if>
+		</where>
+		order by id DESC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select	count(*) from t_card_bill
+		<where>
+			<if test="q!=null and q!=''">
+				and (carno like #{q}  or clientName like #{q} or remark like #{q} ) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="clientTypeId!=null and clientTypeId!='' ">
+		 		and clientTypeId =  #{clientTypeId} 
+			</if>
+			<if test="clientId!=null and clientId!='' ">
+		 		and clientId =  #{clientId} 
+			</if>
+			<if test="type!=null and type!='' ">
+		 		and type =  #{type} 
+			</if>
+		</where>
+	</select>
+	
+	
+	<select id="list_heji" parameterType="Map" resultMap="CardBillResult">
+		SELECT SUM(t.actual)actual , SUM(t.discounts)discounts,SUM(t.money)money  FROM(
+		
+		select * from t_card_bill
+		<where>
+			<if test="q!=null and q!=''">
+				and (carno like #{q}  or clientName like #{q} or remark like #{q} ) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="clientTypeId!=null and clientTypeId!='' ">
+		 		and clientTypeId =  #{clientTypeId} 
+			</if>
+			<if test="clientId!=null and clientId!='' ">
+		 		and clientId =  #{clientId} 
+			</if>
+			<if test="type!=null and type!='' ">
+		 		and type =  #{type} 
+			</if>
+		</where>
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+		)t
+	</select>
+	
+	
+	
+</mapper> 

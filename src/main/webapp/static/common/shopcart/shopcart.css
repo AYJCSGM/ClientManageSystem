@@ -1,0 +1,41 @@
+
+.shop_list{
+	margin-bottom: 100px;
+}
+
+.shop_item{
+	position:relative;
+	background-color:white;
+	padding:10px 10px 10px 10px ;
+	display: flex;
+	display: -webkit-flex;
+}
+
+.shop_item:after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    content: '';
+    -webkit-transform: scaleY(.5);
+    transform: scaleY(.5);
+    background-color: #c8c7cc;
+}
+
+.shop_item_title{
+    max-height: 65px;
+    overflow: hidden;
+    letter-spacing: 1px;
+    padding: 5px 0px 5px 0px;
+    font-size: 13px;
+    font-family: "Helvitica Neue",Helvitica,Arial,"Hiragino Sans GB","Microsoft YaHei","Arial Regular","Microsoft JhengHei",sans-serif;
+}
+.shop_item_btn_del{
+	display: inline-block;
+	background-color: #E91E63;
+	padding: 2px 5px 2px 5px;
+	color: white;
+	font-size: 13px;
+	border-radius: 2px;
+}

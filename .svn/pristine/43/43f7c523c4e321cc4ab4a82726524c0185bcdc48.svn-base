@@ -1,0 +1,23 @@
+package com.java1234.dao;
+
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.weixin.WXSuCai;
+
+
+public interface WXSuCaiDao {
+	
+	
+	public Integer add(WXSuCai wxSuCai);
+	
+	public Integer update(WXSuCai wxSuCai);
+	
+	public List<WXSuCai> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public Integer deleteAll(String type);
+	
+	
+}

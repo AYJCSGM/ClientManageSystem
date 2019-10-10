@@ -1,0 +1,87 @@
+package com.java1234.entity.weixin;
+
+public class TextEvent {
+	
+	private Integer id;
+	private String content;//用户发送的啥内容
+	
+	////////推送      啥事件     /////////
+	private Integer messageType;//0是 文本消息   消息内容就用desc_     1是图文消息
+	
+	
+	private String title;//返回给用户的 图文 消息 标题
+	private String desc_;//返回给用户的 图文 消息 摘要  
+	private String thumbnail; //返回给用户的 图文消息 缩略图  
+	private String url; //返回给用户的 图文消息  点击跳转的url
+	
+	private Integer order_;//排序号
+	
+	
+	//添加返回  客户接口信息  需要  媒体id  msgtype 媒体类型
+	private String media_id;
+	private String media_type;//image图文   voice语音    video视频     music音乐    mpnews文章消息 图文
+	
+	
+	
+	public String getMedia_id() {
+		return media_id;
+	}
+	public void setMedia_id(String media_id) {
+		this.media_id = media_id;
+	}
+	public String getMedia_type() {
+		return media_type;
+	}
+	public void setMedia_type(String media_type) {
+		this.media_type = media_type;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+	public Integer getMessageType() {
+		return messageType;
+	}
+	public void setMessageType(Integer messageType) {
+		this.messageType = messageType;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getDesc_() {
+		return desc_;
+	}
+	public void setDesc_(String desc_) {
+		this.desc_ = desc_;
+	}
+	public String getThumbnail() {
+		return thumbnail;
+	}
+	public void setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public Integer getOrder_() {
+		return order_;
+	}
+	public void setOrder_(Integer order_) {
+		this.order_ = order_;
+	}
+	
+}

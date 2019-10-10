@@ -1,0 +1,78 @@
+package com.java1234.entity;
+
+import java.util.Date;
+
+/**
+ * 
+ * 关于用户 显示菜单的思路，菜单传到前台之前 应该过虑一边。
+ * 拿到用户的treeMenusIds然后过虑一下，
+ */
+public class User {
+	private Integer id;
+	private String name;//帐号
+	private String password;//密码
+	private Date createDateTime;
+	private String menuIds;
+	private String ip;//创建用户的ip位置
+	private String remark;//备注
+	private String trueName;//真实姓名 
+	
+	
+	public String getTrueName() {
+		return trueName;
+	}
+	public void setTrueName(String trueName) {
+		this.trueName = trueName;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	public String getIp() {
+		return ip;
+	}
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
+	}
+	public String getMenuIds() {
+		return menuIds;
+	}
+	public void setMenuIds(String menuIds) {
+		this.menuIds = menuIds;
+	}
+ 
+	
+	
+	
+	
+	
+	
+}

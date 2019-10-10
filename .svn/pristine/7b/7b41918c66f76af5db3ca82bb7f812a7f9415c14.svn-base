@@ -1,0 +1,67 @@
+package com.java1234.entity.business;
+
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+public class XiaoShou {
+	
+	private Integer id;
+	
+	private Integer flow_id;
+	private String trans_no;//单据类型   so销售  ri销售退货       pi采购       ro采购退货
+	private BigDecimal sheet_amt;//金额
+	private String voucher_no;//单据号
+	private String sup_name;//商户名
+	private  Date oper_date;//录入日期 
+	
+	
+	
+	
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public Integer getFlow_id() {
+		return flow_id;
+	}
+	public void setFlow_id(Integer flow_id) {
+		this.flow_id = flow_id;
+	}
+	public String getTrans_no() {
+		return trans_no;
+	}
+	public void setTrans_no(String trans_no) {
+		this.trans_no = trans_no;
+	}
+	public BigDecimal getSheet_amt() {
+		return sheet_amt;
+	}
+	public void setSheet_amt(BigDecimal sheet_amt) {
+		this.sheet_amt = sheet_amt;
+	}
+	public String getVoucher_no() {
+		return voucher_no;
+	}
+	public void setVoucher_no(String voucher_no) {
+		this.voucher_no = voucher_no;
+	}
+	public String getSup_name() {
+		return sup_name;
+	}
+	public void setSup_name(String sup_name) {
+		this.sup_name = sup_name;
+	}
+	public Date getOper_date() {
+		return oper_date;
+	}
+	public void setOper_date(Date oper_date) {
+		this.oper_date = oper_date;
+	}
+	
+	
+	
+	
+}

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.FenLeiDao">
+	
+	<resultMap type="FenLei" id="FenLeiResult">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="imgUrl" column="imgUrl" />
+		<result property="order_" column="order_" />
+		<result property="isUse" column="isUse" />
+		<result property="createUserId" column="createUserId" />
+		<result property="createDateTime" column="createDateTime" />
+		<association property="createUser" column="createUserId"
+			select="com.java1234.dao.UserDao.findById"></association>
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="FenLei">
+		insert into t_fen_lei values(null,#{name},#{imgUrl},#{order_},#{isUse},#{createUserId},#{createDateTime})
+	</insert>
+	
+	<update id="update" parameterType="FenLei">
+		update t_fen_lei
+		<set>
+			<if test="name!=null ">
+				name=#{name},
+			</if>
+			<if test="imgUrl!=null ">
+				imgUrl=#{imgUrl},
+			</if>
+			<if test="order_!=null ">
+				order_=#{order_},
+			</if>
+			<if test="isUse!=null ">
+				isUse=#{isUse},
+			</if>
+			<if test="createUserId!=null ">
+				createUserId=#{createUserId},
+			</if>
+			<if test="createDateTime!=null ">
+				createDateTime=#{createDateTime},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	
+	<select id="list" parameterType="Map" resultMap="FenLeiResult">
+		select * from t_fen_lei
+		<where>
+			<if test="q!=null and q!=''">
+				and (trueName like #{q}  or remark like #{q}  or phone like #{q} or openid like #{q}) 
+			</if>
+			<if test="nickname!=null and nickname!='' ">
+		 		and weixin_user_id  IN (SELECT id FROM t_weixin_user  WHERE nickname like  #{nickname} )
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="isUse!=null and isUse!='' ">
+		 		and isUse =  #{isUse} 
+			</if>
+		</where>
+		order by order_ ASC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select	count(*) from t_fen_lei
+		<where>
+			<if test="q!=null and q!=''">
+				and (trueName like #{q}  or remark like #{q}  or phone like #{q} or openid like #{q}) 
+			</if>
+			<if test="nickname!=null and nickname!='' ">
+		 		and weixin_user_id  IN (SELECT id FROM t_weixin_user  WHERE nickname like  #{nickname} )
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="isUse!=null and isUse!='' ">
+		 		and isUse =  #{isUse} 
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="FenLeiResult">
+		select * from t_fen_lei where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_fen_lei where id=#{id}
+	</delete>
+	
+	
+</mapper> 

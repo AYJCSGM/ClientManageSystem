@@ -1,0 +1,79 @@
+package com.java1234.controller.vote.houtai;
+
+
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.java1234.entity.ClientType;
+import com.java1234.entity.vote.Activity;
+import com.java1234.service.vote.ActivityService;
+
+
+@Controller
+@RequestMapping("/houtai/activity")
+public class HouTai_Activity_Controller {
+	
+	@Resource
+	private ActivityService activityService;
+	
+	@RequestMapping("/manage")
+	public ModelAndView manage() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("table_url", "/admin/activity/list");
+		mav.setViewName("/admin/page/vote/activity/activity_manage");
+		return mav;
+	}
+	
+	
+	/**
+	 * /houtai/activity/add
+	 */
+	@RequestMapping("/add")
+	public ModelAndView add() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("btn_text", "添加");
+		mav.addObject("title", "新建投票活动");
+		mav.addObject("save_url", "/admin/activity/add");
+		mav.setViewName("/admin/page/vote/activity/add_or_update");
+		return mav;
+	}
+	
+	@RequestMapping("/edit")
+	public ModelAndView edit(@RequestParam(value = "id", required = false) String id, HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		Activity activity       = activityService.findById(Integer.parseInt(id));
+		mav.addObject("activity", activity);
+		mav.addObject("btn_text", "修改");
+		mav.addObject("save_url", "/admin/activity/update?id=" + id);
+		mav.addObject("isEdit", true);
+		mav.addObject("title", "修改投票活动 - "+activity.getName());
+		
+		mav.setViewName("/admin/page/vote/activity/add_or_update");
+		return mav;
+	}
+	
+	
+	@RequestMapping("/lunbo_manage")
+	public ModelAndView lunbo_manage(@RequestParam(value = "id", required = false) String id, HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		Activity activity       = activityService.findById(Integer.parseInt(id));
+		mav.addObject("activity", activity);
+		mav.addObject("btn_text", "修改");
+		mav.addObject("table_url", "/admin/activity/list" + id);
+		mav.setViewName("/admin/page/vote/activity/activity_lunbo_manage");
+		return mav;
+	}
+	
+	
+	
+	
+}

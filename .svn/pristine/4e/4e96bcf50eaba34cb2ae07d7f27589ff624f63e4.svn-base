@@ -1,0 +1,90 @@
+
+.footer{
+	background-color: #fff;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+}
+.footer :before{
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: #ddd;
+    right: 0;
+    height: 1px;
+    -webkit-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+}
+
+
+.footer ul{    
+	padding:5px 0px 5px 0px;
+	margin:0px;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: flex;
+	list-style-type: none;
+	list-style: none;
+}
+.footer ul li{    
+	color: #555;
+	-webkit-box-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+    list-style: none;
+	font-size: 10px;
+	padding-top: 25px;
+	background: no-repeat center 2px;
+	background-size: auto 25px;
+	text-align: center;
+}
+.footer ul li.active {
+    color: #50b350;
+}
+
+.footer ul li:nth-child(1).active {
+    background-image: url(/static/images/index/btm/bottombtn_home02.png);
+    background-size: 20px 20px;
+}
+
+.footer ul li:nth-child(1) {
+    background-image: url(/static/images/index/btm/bottombtn_home01.png);
+    background-size: 20px 20px;
+}
+
+
+
+.footer ul li:nth-child(2).active {
+    background-image: url(/static/images/index/btm/bottombtn_category02.png);
+    background-size: 20px 20px;
+}
+
+.footer ul li:nth-child(2) {
+    background-image: url(/static/images/index/btm/bottombtn_category01.png);
+    background-size: 20px 20px;
+}
+
+.footer ul li:nth-child(3).active {
+    background-image: url(/static/images/index/btm/bottombtn_shop02.png);
+    background-size: 20px 20px;
+}
+
+.footer ul li:nth-child(3) {
+    background-image: url(/static/images/index/btm/bottombtn_shop01.png);
+    background-size: 20px 20px;
+}
+
+.footer ul li:nth-child(4).active {
+    background-image: url(/static/images/index/btm/bottombtn_my02.png);
+    background-size: 20px 20px;
+}
+
+.footer ul li:nth-child(4) {
+    background-image: url(/static/images/index/btm/bottombtn_my01.png);
+    background-size: 20px 20px;
+}
+
+

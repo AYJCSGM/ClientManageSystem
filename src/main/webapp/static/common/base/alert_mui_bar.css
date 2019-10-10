@@ -1,0 +1,26 @@
+.mui-bar .mui-icon:active {
+/*设置返回不透明*/
+    opacity: 1;  
+}
+.mui-action-back{ 
+/*设置header的前景色-白*/
+	color: #ffffff;
+}
+.mui-title {
+/*设置header的前景色-白*/
+	color: #fff;
+}
+.mui-bar{
+/*设置header的背景色-绿*/
+    background-color: #50b350;
+}
+
+
+/* 修改mui标题，有点向左， */
+.mui-bar-nav.mui-bar .mui-icon {
+    padding-left:0px  !important;  
+}
+.mui-bar .mui-title {
+  padding-left: 28px  !important;
+}
+/* 修改mui标题，有点向左， */

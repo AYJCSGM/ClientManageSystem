@@ -1,0 +1,126 @@
+package com.java1234.controller.xc;
+
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.java1234.entity.PageBean;
+import com.java1234.entity.Result;
+import com.java1234.entity.xiche.Message;
+import com.java1234.service.xiche.MessageService;
+import com.java1234.util.MyUtil;
+import com.java1234.util.ResponseUtil;
+import com.java1234.util.StringUtil;
+
+
+
+@Controller
+@RequestMapping("/admin/message")
+public class Admin_Message_Controller {
+	
+
+	@Resource
+	private MessageService messageService;
+	
+	
+	@RequestMapping("/add")
+	public String add(Message message , HttpServletResponse response, HttpServletRequest request) throws Exception {
+		
+		if(StringUtil.isEmpty(message.getNickName())){
+			message.setNickName("匿名");
+		}
+		
+		message.setCreateDateTime(new Date());
+		message.setIp(MyUtil.getRemoteAddress(request));
+		message.setIsUse(0);
+		
+		int resultTotal = messageService.add(message);
+		
+		Result result = new Result();
+		Gson gson = new Gson();
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("添加成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("添加失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	@RequestMapping("/update")
+	public String update(Message message, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		
+		int resultTotal = messageService.update(message);
+		
+		Result result = new Result();
+		Gson gson = new Gson();
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("修改成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("修改失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	@RequestMapping("/list")
+	public String list(@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "limit", required = false) String rows,
+			@RequestParam(value = "q", required = false) String q, 
+			HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		PageBean pageBean = new PageBean(Integer.parseInt(page), Integer.parseInt(rows));
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("start", pageBean.getStart());
+		map.put("size", pageBean.getPageSize());
+		map.put("q", StringUtil.formatLike(q));
+		List<Message> list = messageService.list(map);
+		Integer total = messageService.getTotal(map);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm").create();
+		map.clear();
+		map.put("data", list);
+		map.put("count", total);
+		map.put("code", 0);
+		map.put("msg", "");
+		ResponseUtil.write(response, gson.toJson(map));
+		return null;
+	}
+	
+	
+	@RequestMapping("/delete")
+	public String delete(@RequestParam(value = "ids", required = false) String ids, 
+			HttpServletResponse response,HttpServletRequest request)
+			throws Exception {
+		String[] idsStr = ids.split(",");
+		Gson gson = new Gson();
+		Result result = new Result();
+		for (int i = 0; i < idsStr.length; i++) {
+			messageService.delete(Integer.parseInt(idsStr[i]));
+		}
+		result.setSuccess(true);
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	
+	
+}

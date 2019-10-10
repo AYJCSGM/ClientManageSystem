@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.ActivityWorkDao">
+	
+	<resultMap type="ActivityWork" id="ActivityWorkResult">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="desc_" column="desc_" />
+		<result property="createDateTime" column="createDateTime" />
+		<result property="content" column="content" />
+		
+		<result property="order_" column="order_" />
+		<result property="num" column="num" />
+		<result property="activityId" column="activityId" />
+		<result property="imgUrl" column="imgUrl" />
+		<result property="createUserId" column="createUserId" />
+		
+		<result property="isUse" column="isUse" />
+		<result property="rowNum" column="rowNum" />
+		<result property="url" column="url" />
+		
+		<association property="activity" column="activityId"
+			select="com.java1234.dao.ActivityDao.findById"></association>
+		
+		<association property="createUser" column="createUserId"
+			select="com.java1234.dao.UserDao.findById"></association>
+	</resultMap>
+	
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="ActivityWork">
+		insert into t_vote_activity_work values(null,#{name},#{desc_},#{createDateTime},#{content}
+		,#{order_},#{num},#{activityId},#{imgUrl},#{createUserId},#{isUse},#{url})
+	</insert>
+	
+	
+	<update id="update" parameterType="ActivityWork">
+		update t_vote_activity_work
+		<set>
+			<if test="name!=null ">
+				name=#{name},
+			</if>
+			<if test="desc_!=null ">
+				desc_=#{desc_},
+			</if>
+			<if test="createDateTime!=null ">
+				createDateTime=#{createDateTime},
+			</if>
+			<if test="content!=null ">
+				content=#{content},
+			</if>
+			<if test="order_!=null ">
+				order_=#{order_},
+			</if>
+			<if test="num!=null ">
+				num=#{num},
+			</if>
+			<if test="activityId!=null ">
+				activityId=#{activityId},
+			</if>
+			<if test="imgUrl!=null ">
+				imgUrl=#{imgUrl},
+			</if>
+			<if test="isUse!=null ">
+				isUse=#{isUse},
+			</if>
+			<if test="url!=null ">
+				url=#{url},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="ActivityWorkResult">
+		select * from t_vote_activity_work
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  or desc_ like #{q} ) 
+			</if>
+			<if test="isUse!=null and isUse!='' ">
+		 		and isUse =  #{isUse} 
+			</if>
+			<if test="activityId!=null and activityId!='' ">
+		 		and activityId =  #{activityId} 
+			</if>
+			<if test="createUserId!=null and createUserId!='' ">
+		 		and createUserId =  #{createUserId} 
+			</if>
+		</where>
+		order by order_ ASC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select	count(*) from t_vote_activity_work
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  or desc_ like #{q} ) 
+			</if>
+			<if test="isUse!=null and isUse!='' ">
+		 		and isUse =  #{isUse} 
+			</if>
+			<if test="activityId!=null and activityId!='' ">
+		 		and activityId =  #{activityId} 
+			</if>
+			<if test="createUserId!=null and createUserId!='' ">
+		 		and createUserId =  #{createUserId} 
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="ActivityWorkResult">
+		select * from t_vote_activity_work where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_vote_activity_work where id=#{id}
+	</delete>
+	
+	<select id="pm" parameterType="Map" resultMap="ActivityWorkResult">
+		select * from t_vote_activity_work where isUse = 1 and  activityId = #{activityId} 
+		order by num DESC
+	</select>
+	
+	<select id="listRowNum" parameterType="Map" resultMap="ActivityWorkResult">
+		SELECT (@row_number := @row_number + 1) AS rowNum,id,name,num   from t_vote_activity_work work_, (SELECT @row_number := 0) tmp_row_number 
+		WHERE  work_.activityId=#{activityId}  ORDER BY work_.num DESC
+	</select>
+	
+	
+</mapper> 

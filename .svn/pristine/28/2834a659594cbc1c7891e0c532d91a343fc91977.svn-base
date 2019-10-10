@@ -1,0 +1,22 @@
+package com.java1234.service;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.Link;
+
+
+public interface LinkService {
+	
+	public Integer add(Link link);
+
+	public Integer update(Link link,String webPath);
+
+	public List<Link> list(Map<String, Object> map);
+
+	public Integer getTotal(Map<String, Object> map);
+
+	public Link findById(Integer id);
+
+	public Integer delete(Integer id,String webPath);
+
+}

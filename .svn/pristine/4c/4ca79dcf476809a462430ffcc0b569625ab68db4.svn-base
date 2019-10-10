@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.UserDao">
+	
+	<resultMap type="User" id="UserResult">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="password" column="password" />
+		<result property="createDateTime" column="createDateTime" />
+		<result property="menuIds" column="menuIds" />
+		<result property="ip" column="ip" />
+		<result property="remark" column="remark" />
+		<result property="trueName" column="trueName" />
+	</resultMap>
+	
+	
+	<insert id="add" parameterType="User">
+		insert into t_user	values(null,#{name},#{password},#{createDateTime},#{menuIds},#{ip},#{remark},#{trueName})
+	</insert>
+	
+	<update id="update" parameterType="User">
+		update t_user
+		<set>
+			<if test="name!=null  ">
+				name=#{name},
+			</if>
+			<if test="password!=null and password!=''  ">
+				password=#{password},
+			</if>
+			<if test="createDateTime!=null ">
+				createDateTime=#{createDateTime},
+			</if>
+			<if test="ip!=null  ">
+				ip=#{ip},
+			</if>
+			<if test="remark!=null  ">
+				remark=#{remark},
+			</if>
+			<if test="trueName!=null  ">
+				trueName=#{trueName},
+			</if>
+			<if test="menuIds!=null  ">
+				menuIds=#{menuIds},
+			</if>
+			 
+		</set>
+		where id=#{id}
+	</update>
+	
+	
+	<select id="list" parameterType="Map" resultMap="UserResult">
+		select * from t_user
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  or remark like #{q}  or trueName like #{q}) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+		</where>
+		order by id DESC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select
+		count(*) from t_user
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  or remark like #{q}  or trueName like #{q}) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="UserResult">
+		select * from t_user where id=#{id}
+	</select>
+	
+	<select id="findByName" parameterType="String" resultMap="UserResult">
+		select * from t_user where name=#{name}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_user where id=#{id}
+	</delete>
+	
+</mapper> 

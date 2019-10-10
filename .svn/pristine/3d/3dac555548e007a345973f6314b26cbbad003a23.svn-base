@@ -1,0 +1,99 @@
+package com.java1234.quartz;
+
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import com.java1234.entity.Config;
+import com.java1234.entity.vote.Activity;
+import com.java1234.service.ConfigService;
+import com.java1234.service.PublicService;
+import com.java1234.service.business.XiaoShouService;
+import com.java1234.service.vote.ActivityService;
+import com.java1234.util.DateUtil;
+
+
+@Component
+public class Task {
+	
+	/*
+	@Scheduled(cron="* * * * * ?") 每秒执行一次
+	@Scheduled(cron="0 * * * * ?") 每分执行一次
+	@Scheduled(cron="0 0 * * * ?") 每时执行一次
+	@Scheduled(cron="0 0 0 * * ?") 每天执行一次
+	@Scheduled(cron="0 0 10,11,14,16  *  *  ?") 每天上午10点，下午2点，4点
+	*/
+	
+	@Resource
+	private PublicService publicService;
+	@Resource
+	private ActivityService activityService;
+	@Resource
+	private ConfigService configService;
+	@Resource
+	private XiaoShouService xiaoShouService;
+	
+	
+	/**
+	 * 每1小时刷新一次 微信公众号的token 和js 分享的 ticket
+	 */
+	@Scheduled(cron="0 0 * * * ?")
+	public void weixin_token_task() {
+		publicService.refreshToken();
+		publicService.refreshTicket();
+	}
+	
+	/**
+	 * 每天刷新一次  订单下标 刷新到1
+	 */
+	@Scheduled(cron="0 0 0 * * ?")
+	public void clear_pay_index() {
+		configService.update_index_0(1);
+	}
+	
+	/**
+	 * 每天上午10点，下午2点，4点
+	 * 自动同步商贸王 
+	 */
+	@Scheduled(cron="0 0 * * * ?")
+	public void syn_bussiness() {
+		Config config = configService.findById(1);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("date2", DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
+		map.put("date1",DateUtil.addDay(DateUtil.formatDate(new Date(), "yyyy-MM-dd"), 0-config.getBus_update_day()) );
+		xiaoShouService.syn(map);
+		xiaoShouService.syn(map);
+		xiaoShouService.syn(map);
+		xiaoShouService.syn(map);
+		xiaoShouService.syn(map);
+		xiaoShouService.syn(map);
+		xiaoShouService.syn(map);
+		xiaoShouService.syn(map);
+		xiaoShouService.syn(map);
+		xiaoShouService.syn(map);
+	}
+	
+	/**
+	 * 每1分 检查一次活动 有没有  到期   设置  state//是否使用此活动   0未使用  1使用中  2结束
+	 */
+	@Scheduled(cron="0 * * * * ?")
+	public void check_activity_end() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("state", 1);
+		List<Activity> activitieList = activityService.list(map );
+		Date nowDateTime = new Date();
+		for(Activity activity :activitieList ){
+			//开始时间小于结束时间
+			if(DateUtil.formatDate(nowDateTime, "yyyyMMdd hhmmssSSS").compareTo(DateUtil.formatDate(activity.getEndDateTime(), "yyyyMMdd hhmmssSSS"))>0){
+				activity.setState(2);
+				activityService.update(activity, "");
+			}
+		}
+	}
+	
+	
+}

@@ -1,0 +1,68 @@
+package com.java1234.controller.weixin;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.java1234.entity.ClientType;
+import com.java1234.entity.weixin.TextEvent;
+import com.java1234.service.ClientTypeService;
+import com.java1234.service.weixin.TextEventService;
+
+@Controller
+@RequestMapping("/houtai/textEvent")
+public class HouTai_TextEvent_Controller {
+	
+
+	
+	@Resource
+	private TextEventService textEventService;
+	
+	
+	
+	/**
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/manage")
+	public ModelAndView manage() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/admin/page/weixin/TextEvent/TextEvent_manage");
+		return mav;
+	}
+	
+	
+	
+	@RequestMapping("/add")
+	public ModelAndView add() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("btn_text", "Ìí¼Ó");
+		mav.addObject("save_url", "/admin/textEvent/add");
+		mav.setViewName("/admin/page/weixin/TextEvent/add_or_update");
+		return mav;
+	}
+	
+	
+	@RequestMapping("/edit")
+	public ModelAndView edit(@RequestParam(value = "id", required = false) String id, HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		TextEvent textEvent       = textEventService.findById(Integer.parseInt(id));
+		mav.addObject("textEvent", textEvent);
+		mav.addObject("btn_text", "ÐÞ¸Ä");
+		mav.addObject("save_url", "/admin/textEvent/update?id=" + id);
+		mav.setViewName("/admin/page/weixin/TextEvent/add_or_update");
+		return mav;
+	}
+	
+	
+	
+	
+	
+}

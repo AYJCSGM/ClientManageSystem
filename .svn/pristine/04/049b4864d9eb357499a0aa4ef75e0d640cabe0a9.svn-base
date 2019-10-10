@@ -1,0 +1,66 @@
+package com.java1234.entity.weixin;
+
+import java.util.Date;
+
+/**
+ *  image图片  voice语音    video视频
+ * @author Administrator
+ *
+ */
+public class WXSuCai {
+	
+	private Integer id;
+	private String media_id;
+	private String name;
+	private Date updateDateTime;//更新时间
+	private String url;
+	private String type;//image图片  voice语音    video视频
+	
+	
+	
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getMedia_id() {
+		return media_id;
+	}
+	public void setMedia_id(String media_id) {
+		this.media_id = media_id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	
+	
+	
+	public Date getUpdateDateTime() {
+		return updateDateTime;
+	}
+	public void setUpdateDateTime(Date updateDateTime) {
+		this.updateDateTime = updateDateTime;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	
+	
+	
+	
+	
+}

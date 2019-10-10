@@ -1,0 +1,28 @@
+package com.java1234.controller.xc;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+import com.java1234.service.xiche.MessageService;
+
+@Controller
+@RequestMapping("/houtai/message")
+public class HouTai_Message_Controller {
+
+	@Resource
+	private MessageService messageService;
+	
+	
+	@RequestMapping("/manage")
+	public ModelAndView manage() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/admin/page/xiche/message/message_manage");
+		return mav;
+	}
+	
+}

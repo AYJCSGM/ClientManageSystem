@@ -1,0 +1,120 @@
+package com.java1234.entity.weixin;
+
+import java.util.Date;
+
+public class WeiXinUser {
+	
+	
+	private Integer id;
+	private Integer subscribe;//1订阅  0没有订阅
+	private String openid;//这个openid 与  user表的id  一致   是主键
+	private String nickname;//昵称
+	private Integer sex;// 性别1男2女
+	private String language;//  简体中文
+	private String city;// 城市 深圳
+	private String province;// 省  广东
+	private String country;// 国家  中国
+	private String headimgurl;// 头像url
+	//////////////////////////////////////
+	/////////////////////////////////////
+	private Date subscribe_time;//订阅时间
+	private String remark;
+	private Integer groupid;
+	private Integer state_;//活动id
+	
+	
+	
+	
+	
+	public Integer getState_() {
+		return state_;
+	}
+	public void setState_(Integer state_) {
+		this.state_ = state_;
+	}
+	public Integer getSubscribe() {
+		return subscribe;
+	}
+	public void setSubscribe(Integer subscribe) {
+		this.subscribe = subscribe;
+	}
+	public Integer getSex() {
+		return sex;
+	}
+	public void setSex(Integer sex) {
+		this.sex = sex;
+	}
+	public Date getSubscribe_time() {
+		return subscribe_time;
+	}
+	public void setSubscribe_time(Date subscribe_time) {
+		this.subscribe_time = subscribe_time;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	public Integer getGroupid() {
+		return groupid;
+	}
+	public void setGroupid(Integer groupid) {
+		this.groupid = groupid;
+	}
+	public String getOpenid() {
+		return openid;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public void setOpenid(String openid) {
+		this.openid = openid;
+	}
+	public String getNickname() {
+		return nickname;
+	}
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+	public String getLanguage() {
+		return language;
+	}
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public String getProvince() {
+		return province;
+	}
+	public void setProvince(String province) {
+		this.province = province;
+	}
+	public String getCountry() {
+		return country;
+	}
+	public void setCountry(String country) {
+		this.country = country;
+	}
+	public String getHeadimgurl() {
+		return headimgurl;
+	}
+	public void setHeadimgurl(String headimgurl) {
+		this.headimgurl = headimgurl;
+	}
+	
+	
+	
+	
+	
+	
+	
+}

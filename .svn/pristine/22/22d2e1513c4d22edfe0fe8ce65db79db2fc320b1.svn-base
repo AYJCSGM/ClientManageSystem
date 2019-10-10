@@ -1,0 +1,71 @@
+package com.java1234.entity.weixin;
+
+import com.java1234.entity.Client;
+
+/**
+ * 消息接受者
+ * 不同的消息 接受者不同
+ * @author Administrator
+ */
+public class Receive {
+	
+	
+	private Integer id;
+	private String openid;
+	private Client client;
+	private WeiXinUser wxUser;
+	
+	private Integer receiveTypeId;
+	private ReceiveType receiveType;
+	
+	private Integer order_;
+	
+	
+	
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public Integer getOrder_() {
+		return order_;
+	}
+	public void setOrder_(Integer order_) {
+		this.order_ = order_;
+	}
+	public String getOpenid() {
+		return openid;
+	}
+	public void setOpenid(String openid) {
+		this.openid = openid;
+	}
+	public Client getClient() {
+		return client;
+	}
+	public void setClient(Client client) {
+		this.client = client;
+	}
+	public WeiXinUser getWxUser() {
+		return wxUser;
+	}
+	public void setWxUser(WeiXinUser wxUser) {
+		this.wxUser = wxUser;
+	}
+	public Integer getReceiveTypeId() {
+		return receiveTypeId;
+	}
+	public void setReceiveTypeId(Integer receiveTypeId) {
+		this.receiveTypeId = receiveTypeId;
+	}
+	public ReceiveType getReceiveType() {
+		return receiveType;
+	}
+	public void setReceiveType(ReceiveType receiveType) {
+		this.receiveType = receiveType;
+	}
+	
+	
+	
+	
+}	

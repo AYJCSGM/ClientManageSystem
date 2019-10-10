@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.ClientTypeDao">
+	
+	<resultMap type="ClientType" id="ClientTypeResult">
+		<result property="id" column="id" />
+		<result property="order_" column="order_" />
+		<result property="name" column="name" />
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="ClientType">
+		insert into t_client_type values(null,#{order_},#{name})
+	</insert>
+	
+	<update id="update" parameterType="ClientType">
+		update t_client_type
+		<set>
+			<if test="name!=null ">
+				name=#{name},
+			</if>
+			<if test="order_!=null ">
+				order_=#{order_},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="ClientTypeResult">
+		select * from t_client_type
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  ) 
+			</if>
+		</where>
+		order by order_ asc
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select	count(*) from t_client_type
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  ) 
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="ClientTypeResult">
+		select * from t_client_type where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_client_type where id=#{id}
+	</delete>
+	
+</mapper> 

@@ -1,0 +1,23 @@
+package com.java1234.service.xiche;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.xiche.Message;
+
+public interface MessageService {
+	
+	
+	public Integer add(Message message);
+	
+	public Integer update(Message message);
+	
+	public List<Message> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public Integer delete(Integer id);
+	
+	public Message findById(Integer id);
+	
+	
+}

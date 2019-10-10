@@ -1,0 +1,175 @@
+package com.java1234.entity;
+
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+
+
+public class DingDan {
+	
+	private Integer id;
+	
+	private String openid;//opendid
+	private String title;
+	
+	//客户id
+	private Integer clientId;
+	private Client client;
+	
+	//商品
+	private List<DingDanInfo> info;
+	
+	private Date createDateTime;//订单创建时间
+	private String  spbill_create_ip ;//发起支付的ip
+	private String out_trade_no;//订单号
+	private String prepay_id;//预付id
+	private Integer state;//状态 初始是0待付款        1付款成功            已取消的订单 =3      申请退款的订单=4  退款成功的订单5  
+	private Date payDateTime;//记录付款时间
+	private String wx_msm;//这个记录微信校验金额
+	private String remark;//备注
+	
+	private String name;//
+	private String phone;
+	private String address;
+	
+	//付款金额
+	private BigDecimal jine;
+	
+	//说明
+	private String desc_;
+	
+	
+	public String getDesc_() {
+		return desc_;
+	}
+	public void setDesc_(String desc_) {
+		this.desc_ = desc_;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public List<DingDanInfo> getInfo() {
+		return info;
+	}
+	public void setInfo(List<DingDanInfo> info) {
+		this.info = info;
+	}
+	public BigDecimal getJine() {
+		return jine;
+	}
+	public void setJine(BigDecimal jine) {
+		this.jine = jine;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
+	}
+	public String getWx_msm() {
+		return wx_msm;
+	}
+	public void setWx_msm(String wx_msm) {
+		this.wx_msm = wx_msm;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public Integer getClientId() {
+		return clientId;
+	}
+	public void setClientId(Integer clientId) {
+		this.clientId = clientId;
+	}
+	public Client getClient() {
+		return client;
+	}
+	public void setClient(Client client) {
+		this.client = client;
+	}
+	
+	
+	
+
+
+	public String getOpenid() {
+		return openid;
+	}
+	public void setOpenid(String openid) {
+		this.openid = openid;
+	}
+	public String getSpbill_create_ip() {
+		return spbill_create_ip;
+	}
+	public void setSpbill_create_ip(String spbill_create_ip) {
+		this.spbill_create_ip = spbill_create_ip;
+	}
+	public String getOut_trade_no() {
+		return out_trade_no;
+	}
+	public void setOut_trade_no(String out_trade_no) {
+		this.out_trade_no = out_trade_no;
+	}
+
+	public String getPrepay_id() {
+		return prepay_id;
+	}
+
+	public void setPrepay_id(String prepay_id) {
+		this.prepay_id = prepay_id;
+	}
+
+	public Integer getState() {
+		return state;
+	}
+
+	public void setState(Integer state) {
+		this.state = state;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public Date getPayDateTime() {
+		return payDateTime;
+	}
+
+	public void setPayDateTime(Date payDateTime) {
+		this.payDateTime = payDateTime;
+	}
+	
+	
+	
+	
+	
+}

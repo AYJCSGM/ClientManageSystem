@@ -1,0 +1,17 @@
+package com.java1234.service.weixin;
+
+import com.java1234.entity.weixin.News_;
+
+public interface News_Service {
+	
+	
+	public Integer add(News_ news_);
+	
+	public Integer delete(Integer id);
+	
+	public News_ findByMediaId(String media_id);
+	
+	public Integer deleteAll(Integer id);
+	
+	
+}

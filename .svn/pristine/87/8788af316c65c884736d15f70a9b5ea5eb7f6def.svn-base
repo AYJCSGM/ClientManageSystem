@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.XiaoShouDao">
+	
+	<resultMap type="XiaoShou" id="XiaoShouResult">
+		<result property="id" column="id" />
+		<result property="flow_id" column="flow_id" />
+		<result property="trans_no" column="trans_no" />
+		<result property="sheet_amt" column="sheet_amt" />
+		<result property="voucher_no" column="voucher_no" />
+		<result property="sup_name" column="sup_name" />
+		<result property="oper_date" column="oper_date" />
+	</resultMap>
+	
+	
+	<insert id="add"  parameterType="XiaoShou">
+		insert into t_bussiness_xiaoshou values(null,#{flow_id},#{trans_no},#{sheet_amt},#{voucher_no},#{sup_name},#{oper_date})
+	</insert>
+	
+	<select id="list" parameterType="Map" resultMap="XiaoShouResult">
+		select * from t_bussiness_xiaoshou
+		<where>
+			<if test="q!=null and q!=''">
+				and (sup_name like #{q}) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and oper_date &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and oper_date &lt;  #{date2} 
+			</if>
+			<if test="trans_no!=null and trans_no!='' ">
+		 		and trans_no = #{trans_no} 
+			</if>
+			
+		</where>
+		order by flow_id DESC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from t_bussiness_xiaoshou
+		<where>
+			<if test="q!=null and q!=''">
+				and (sup_name like #{q}) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and oper_date &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and oper_date &lt;  #{date2} 
+			</if>
+			<if test="trans_no!=null and trans_no!='' ">
+		 		and trans_no = #{trans_no} 
+			</if>
+		</where>
+	</select>
+	
+	<select id="findByFlowId" parameterType="Integer" resultMap="XiaoShouResult">
+		select * from t_bussiness_xiaoshou where flow_id=#{flow_id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_bussiness_xiaoshou where id=#{id}
+	</delete>
+	
+	<select id="trans_no_list"  resultMap="XiaoShouResult">
+		select * from  t_bussiness_xiaoshou group by trans_no
+	</select>
+	
+	<select id="tongji" parameterType="Map" resultMap="XiaoShouResult">
+		select SUM(sheet_amt) AS sheet_amt  from t_bussiness_xiaoshou
+		<where>
+			<if test="date1!=null and date1!='' ">
+		 		and oper_date &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and oper_date &lt;  #{date2} 
+			</if>
+			<if test="sup_name!=null and sup_name!='' ">
+		 		and sup_name like #{sup_name} 
+			</if>
+		</where>
+	</select>
+	
+	
+	
+</mapper> 

@@ -1,0 +1,260 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>${title}</title>
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+${config.headStr}
+
+${config.layuiStr}
+
+<!-- shiro标签 授权   -->
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<!--  shiro标签 授权 -->
+
+<!-- 加入移动布局 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+<!-- 加入移动布局 -->
+
+<!-- 引入manage 的基础css -->
+<script	src="${pageContext.request.contextPath}/static/common/manage/manage_base.js"></script>
+<link href="${pageContext.request.contextPath}/static/common/manage/manage_base.css" rel="stylesheet"/>
+<!-- 引入manage 的基础css -->
+
+</head>
+<style>
+body{
+	padding-top: 3px;
+}
+
+/*修改table表格  左右内边框 为0*/
+.layui-table-cell {
+	padding-left: 0px;
+	padding-right: 0px;
+	text-align: center;
+}
+/*修改table表格 左右内边框 为0*/
+
+
+</style>
+<body>
+<script>
+//用户选中的行ids = 1,2,3,5   len=4
+var blobal_ids;
+var blobal_ids_len;
+//用户选中的行ids = 1,2,3,5   len=4
+var w ;//窗口的宽
+var h ;//窗口的高
+
+//打开添加窗口
+function add(){
+	w = 700;
+	h = 1200;
+	checkWindow();
+	layer.open({
+	  type: 2,
+	  title: '添加',
+	  shadeClose: true,
+	  shade: 0.8,
+	  area: [w+'px', h+'px'],
+	  content: '/lunbo/pc/add' //iframe的url
+	});
+}
+
+
+//打开编辑窗口
+function open_edit(id){
+	w = 700;
+	h = 1200;
+	checkWindow();
+	layer.open({
+	  type: 2,
+	  title: '修改',
+	  shadeClose: true,
+	  shade: 0.8,
+	  area: [w+'px', h+'px'],
+	  content: '/lunbo/pc/edit?id='+id //iframe的url
+	});
+}
+
+function seeImg(url){
+	var w = 700;
+	var h = 600;
+	checkWindow();
+	//iframe层
+	layer.open({
+	  type: 2,
+	  title: '查处图片',
+	  shadeClose: true,
+	  shade: 0.8,
+	  area: [w+'px', h+'px'],
+	  content: "${pageContext.request.contextPath}"+url //iframe的url
+	});
+}
+
+//子窗口调用 的  关闭窗口方法 
+function closeDlg(msg){
+	 layer.closeAll();
+	 layer.msg(msg);
+	 reload_data();
+}
+
+
+//相当前刷新  重新加载
+function reload_data(){
+	var state = $("#state").val();
+	var q = $("#q").val();
+	
+	table.reload('table', {
+		 where: {
+			 state:state,q:q
+	        }
+    });
+}
+
+function del(ids){
+	var index = layer.load(1, {
+		  shade: [0.1,'#fff'] //0.1透明度的白色背景
+	});
+	$.post('/admin/refund/delete',{ids:ids},function(result){
+		if(result.success){
+			layer.closeAll();
+			layer.msg('删除成功');
+			reload_data();
+		}else{
+			layer.closeAll();
+			layer.msg(result.msg);
+		}
+	},'json');
+}
+</script>
+<div class="layui-form" style="min-width:1000px;">
+<div class="layui-table-toolbar" style="margin-bottom: 3px; ">
+	<div class="layui-btn-group">
+		<shiro:hasPermission name="refund:del">
+			<button onclick="delSelected()" class="layui-btn layui-btn-sm"><i class="layui-icon">&#xe640;</i>删除</button>
+		</shiro:hasPermission>
+		
+		<button class="layui-btn layui-btn-sm" onclick="reload_data()"><i class="layui-icon">&#x1002;</i>刷新</button>
+ 	 </div>
+</div>
+
+<div class="layui-form layui-form-pane" style="margin-bottom: 3px; "  >
+	  <div class="layui-form-item" style="margin-bottom: 1px; min-width:1051px;">
+	  
+		    <label class="layui-form-label" style="width: 100px;">状态</label>
+		    <div class="layui-input-inline" style="  width: 160px; margin-right: -1px; ">
+		    	<select id="state">
+			     	<option value="" selected="">全部</option>
+			     	<option value="1"  >成功</option>
+			     	<option value="2"  >失败</option>
+			      </select>
+		    </div>
+		    
+		    <label class="layui-form-label" style="width: 97px;">模糊查询</label>
+		    <div class="layui-input-inline" style="  width: 150px; margin-right: -1px;">
+		      <input class="layui-input" id="q" onkeydown="if(event.keyCode==13) reload_data()" placeholder="模糊查询" ">
+		    </div>
+	    
+	    
+		    <div class="layui-input-inline" style="  width: 113px;">
+		    	<a class="layui-btn" onclick="reload_data()">查询</a>
+		    </div>
+	  </div>
+</div>
+
+<table class="layui-hide"   id="table" lay-filter="table"></table>
+</div>
+
+<script type="text/html" id="table_bar">
+<div class="layui-btn-group">
+	<a class="layui-btn layui-btn-xs" lay-event="11">修改</a>
+</div>
+</script>
+
+<script type="text/html" id="format_state">
+  {{#  if(d.state == '1'){ }}
+     	<eg>成功</eg>
+  {{#  } else if(d.state == '2') { }}
+		<er>失败</er>
+  {{#  }   }}
+</script>
+
+<script type="text/html" id="format_result">
+	<input style="width: 100%;height: 100%;" type="text" value="{{d.result_}}" />
+</script>
+
+<script>
+
+		layui.use([ 'laydate', 'laypage', 'layer', 'table', 'carousel',
+				'upload', 'element' ], function() {
+			var laydate = layui.laydate //日期
+			, laypage = layui.laypage //分页
+			layer = layui.layer //弹层
+			, table = layui.table //表格
+			, carousel = layui.carousel //轮播
+			, upload = layui.upload //上传
+			, element = layui.element; //元素操作
+			  table.render({
+			    elem: '#table'
+			    ,url: '/admin/refund/list',
+			    height: 'full-100',
+			   cols: [[
+			      {checkbox: true, fixed: true}
+			      ,{field:'id', title: 'ID', width:50 }
+			      ,{field:'openid', title: 'openid', width:220,  style:'font-size: 12px;' }
+			      ,{field:'out_trade_no', title: '购买订单号', width:133 ,  style:'font-size: 12px;' }
+			      ,{field:'out_refund_no', title: '退款订单号', width:160 ,  style:'font-size: 12px;' }
+			      ,{field:'refund_jine', title: '退款金额', width:71 ,  style:'font-size: 12px;' }
+			      ,{field:'refund_desc', title: '退款原因', width:92 ,  style:'font-size: 12px;' }
+			      ,{field:'state', title: '状态', width:92 ,  style:'font-size: 12px;',templet: '#format_state' }
+			      ,{field:'ip', title: '操作ip', width:120,  style:'font-size: 12px;'  }
+			      ,{field:'createDateTime', title: '退款时间', width:125,  style:'font-size: 12px;'}
+			      ,{field:'result_', title: 'result_', width:223,  style:'font-size: 12px;',templet: '#format_result'  }
+			      
+			      
+			      
+			      ,{fixed:'right', width:100,title: '操作',  toolbar: '#table_bar'}
+			    ]]
+			    ,id: 'table'
+			    ,page: true
+			    ,limits:[10,50,100,200,500,1000],
+			   limit:100
+			  });
+			    
+			//监听工具条 table_bar
+				table.on('tool(table)', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+					var data = obj.data //获得当前行数据
+					, layEvent = obj.event; //获得 lay-event 对应的值
+					if (layEvent === 'directoryManage') {
+						//layer.msg('查看操作' + data.id);
+						directoryManage(data.id)
+					} else if (layEvent === 'see_hongbao') {
+						see_hongbao(data.id);
+					} else if (layEvent === 'edit') {
+						//layer.msg('编辑操作' + data.id);
+						open_edit(data.id);
+					} else if(layEvent === 'see_pay_list'){
+						open_pay_list(data.id);
+					}else if(layEvent ==='see_wxuser_info'){
+						see_wxuser_info(data.weixin_user_id);
+					}
+
+				});
+			
+				//重新加载
+				reload_data();
+				
+		});
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,443 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<!-- 强制  高速模式 渲染网页    -->
+<meta name=”renderer” content=”webkit”>
+<meta http-equiv=”X-UA-Compatible” content=”IE=Edge,chrome=1″ >
+
+<!--添加  jq  支持加载-->
+<script	src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<!-- JSTL -->
+
+<!-- 加入移动布局 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+<!-- 加入移动布局 -->
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!--添加  本地 mui  支持-->
+<script src="${pageContext.request.contextPath}/static/mui/js/mui.min.js"></script>
+<link href="${pageContext.request.contextPath}/static/mui/css/mui.css" rel="stylesheet"/>
+<!--添加  本地  mui  支持-->
+
+<!--添加layer移动  弹出窗口的 插件支持-->
+<script src="${pageContext.request.contextPath}/static/layer_mobile/layer.js"></script>
+<!--添加layer移动  弹出窗口的 插件支持-->
+
+<!--添加  vue.js 支持加载-->
+<script src="${pageContext.request.contextPath}/static/vue/vue.min.js"></script>
+<!--添加  vue.js 支持加载-->
+
+<!--mui head 变成绿色 -->
+<link href="${pageContext.request.contextPath}/static/common/base/alert_mui_bar.css" rel="stylesheet"/>
+
+
+<!-- 微信支付 js-->
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<!-- 微信支付 js-->
+<!--添加  微信分享js 自己扩展的  -->
+<script src="${pageContext.request.contextPath}/static/weixin_js/weixin_share.js"></script>
+<!--添加  微信分享js 自己扩展的  -->
+
+
+<title>${title }</title>
+<style type="text/css">
+
+.top_tar_item{
+	padding: 10px;
+	font-size: 15px;
+	text-align: center;
+	flex:1;
+	-webkit-flex:1;
+}
+.top_tar_item.active {
+	border-bottom:2px solid #F33B34;
+    color: #F33B34;
+    font-weight: bold;
+}
+
+
+.dingdan_item{
+	border-top: 1px solid #999; 
+	border-bottom:1px solid #999; 
+	padding: 0px 10px 0px 10px; 
+	background-color: white; 
+	margin-bottom: 20px;
+}
+.dingdan_item_num{
+	display: flex;
+	display: -webkit-flex; 
+	border-bottom: 1px solid #CACACA; 
+	font-size: 14px; 
+	padding: 9px 0px 9px 0px;
+}
+.dingdan_item_dingdan{
+	display: flex;
+	display: -webkit-flex;
+	position: relative; 
+	padding: 6px 0px 6px 0px; 
+	border-bottom: 1px solid #CACACA;
+}
+.dingdan_item_dingdan::last-child{
+	border-bottom: 0px solid #CACACA;
+}
+
+.red_blod{
+	color: red; 
+	font-weight: bold;
+}
+
+.dingdan_item_cancel{
+	font-size: 13px; 
+	display: inline-block; 
+	padding: 0px 5px 0px 5px; 
+	border: 1px solid #ccc; 
+	border-radius:5px; 
+	color: #222;
+    background-color: #FFFFFF;
+    margin-right: 16px;
+}
+
+.dingdan_item_pay{
+	font-size: 13px;
+	display: inline-block; 
+	padding: 0px 5px 0px 5px; 
+	border: 1px solid #ccc; 
+	border-radius:5px; 
+	color: white; 
+	background-color:#E03C36;
+}
+
+</style>
+</head>
+
+<script type="text/javascript" charset="utf-8">
+//state=9全部订单   0待付款订单   1已付款订单
+var state = ${state};
+
+//分页属性
+var page = 1;
+var limit = 100;
+var openid = '${openid}';
+
+
+var share_url;//分享连接
+var share_img_url;//分享图标
+var share_title= "我的订单";//分享标题
+var share_desc = "我的订单";//分享摘要
+
+
+//定义 是否  继续查询 
+var bFound = true;
+
+mui.init();
+$(function() {
+	//设置 active
+	top_tar_item_active();
+	//加载数据
+	loadData();
+	
+	//监听 滚动
+	listenScroll();
+	
+	//分享连接
+	var host = document.domain; 
+	share_url = window.location.href;
+	share_img_url = 'http://'+host+'${config.wx_share_img}';
+	weixin_share();
+	//分享连接
+	
+});
+
+
+
+
+function listenScroll(){
+	$(window).scroll(function () {
+    	//这个方法是当前滚动条滚动的距离
+        var scrollTop =  $(window).scrollTop();
+    	console.log("距离屏幕顶部位置:"+scrollTop);
+    	/* if(scrollTop>300){
+    		//显示返回顶
+    		showGoTop();
+    	}else{
+    		hideGoTop();
+    	} */
+    	
+    	var doc_height = $(document).height();
+    	console.log("获取当前文档的高度:"+doc_height);
+    	
+    	var window_height = $(window).height();
+    	console.log("获取当前窗体的高度:"+window_height);
+    	
+    	// 距离屏幕的位置 加上   当前窗体的高度  >= 文档的高度-100【-100提早加载】    那么就表示  文档到底部了
+    	if((window_height+scrollTop)>(doc_height-100)){
+    		if(bFound){
+    			console.log("要翻页了");
+    			loadData();
+    		}
+    	}
+    	
+    	
+    	/*
+        //$(window).height()获取当前窗体的高度
+        //$(document).height()获取当前文档的高度
+        var bot = 50; //bot是底部距离的高度
+        if ((bot + $(window).scrollTop()) >= ($(document).height() - $(window).height())) {
+           //当底部基本距离+滚动的高度〉=文档的高度-窗体的高度时；
+            //我们需要去异步加载数据了
+            $.getJSON("url", { page: "2" }, function (str) { alert(str); });
+        }
+        */
+    });
+}
+
+
+
+//state=9全部订单   0待付款订单   1已付款订单
+function top_tar_item_active(){
+	var top_tar_items = $(".top_tar_item");
+	
+	switch(state){
+		case 9:
+			$(top_tar_items).eq(0).addClass("active");
+		break;
+		
+		case 0:
+			$(top_tar_items).eq(1).addClass("active");
+		break;
+	  	
+		case 1:
+			$(top_tar_items).eq(2).addClass("active");
+		break;
+		
+		case 3:
+			$(top_tar_items).eq(3).addClass("active");
+		break;
+		
+		
+	}
+}
+
+//加载数据
+function loadData(){
+	
+	layer.open({
+	    type: 2
+	    ,content: '加载中'
+	    ,shadeClose:false
+    });
+	
+	$.post("/dingdan/list", {page:page,limit:limit,state:state,openid:openid}, function(result) {
+		
+		if(result.data.length>0){
+			page++;
+		}else{
+			bFound = false;
+			console.log("没有数据了");
+			layer.closeAll();
+			 //提示
+			 if(page==1){
+				 $("#dingdan_list").append('<p style=" text-align: center;">暂无</p>');
+			 }
+			 return;
+		}
+		
+		//状态对应的文字  0待付款  1已付款
+		var state_text = '';
+		
+		
+		
+		
+		//填充数据
+		for(var i=0;i<result.data.length;i++){
+			
+			if(result.data[i].state==0){
+				state_text = '待付款';
+			}
+			if(result.data[i].state==1){
+				state_text = '已付款';
+			}
+			if(result.data[i].state==3){
+				state_text = '已取消';
+			}
+			
+			//付款的htm
+			var payStr = "";
+			//商品列表html
+			var items_html = "";
+			//共几个商品
+			var shop_num = 0 ;
+			
+			
+			//未付款   订单显示这段html   已付款 关闭   就不用显示了
+			if(result.data[i].state==0){
+				payStr += 
+				'<div class="dingdan_item_dingdan" style="display: block; text-align: right;">'+
+				'<span onclick="dingdan_cancel_dlg('+result.data[i].id+')" class="dingdan_item_cancel">取消订单</span>'+
+				'<span onclick="window.location.href=\'/wap/dingdan/pay/'+result.data[i].id+'\' " class="dingdan_item_pay">支付订单</span>'+
+			'</div>'
+			}
+			
+			
+			for(var j=0;j<result.data[i].info.length;j++){
+				items_html += 
+					'<div class="dingdan_item_dingdan" onclick="window.location.href=\'/wap/dingdan/detail/'+result.data[i].id+'\' ">'+
+						'<div style="flex:1;	-webkit-flex:1; display: flex;display: -webkit-flex; " >'+
+							'<span style="vertical-align:top; width: 50px; height: 50px; display: block;"><img style="width: 50px;" src="'+result.data[i].info[j].showImg+'" /></span>'+
+							'<span style="vertical-align:top;color: #333;font-size: 13px; display: block; flex:1;-webkit-flex:1;max-height: 50px; overflow:hidden; line-height: 16px;">'+result.data[i].info[j].title+'</span>'+
+						'</div>'+
+						'<div style="width:72px; padding-left: 5px;" >'+
+							'<div style="padding:0px 0px 0px 0px; color: #F00;font-size: 13px; font-weight: bold;">¥ '+result.data[i].info[j].price+'</div>'+
+							'<div style="padding:0px 0px 0px 0px; color: #777;font-size: 13px;">x '+result.data[i].info[j].num+'</div>'+
+						'</div>'+
+					'</div>'
+				shop_num = shop_num+result.data[i].info[j].num;
+			}
+			
+			
+			
+			$("#dingdan_list").append(
+					
+					'<div class="dingdan_item">'+
+					'<div class="dingdan_item_num">'+
+						'<div style="flex:1;-webkit-flex:1;font-size: 13px;  ">订单号：'+result.data[i].out_trade_no+'</div>'+
+						'<div style=" width: 60px; color: rgb(255, 150, 0);font-weight: bold; font-size: 13px; ">'+state_text+'</div>'+
+					'</div>'+
+					
+					
+					items_html+
+					 
+					'<div class="dingdan_item_dingdan" style="display: block;">'+
+						'<div style="font-size: 13px; text-align: right;">共<span class="red_blod">'+shop_num+'</span>个商品 实付:<span class="red_blod">¥'+result.data[i].jine+'</span></div>'+
+					'</div>'+
+					
+					payStr+
+	
+				'</div>'
+				
+				
+			);
+			
+			
+		}
+		layer.closeAll();
+		
+	}, 'json');
+}
+
+//取消订单
+function dingdan_cancel_dlg(dingdanId){
+	//弹出确定 对话框
+	  //询问框
+	  layer.open({
+	    content: '您确定要取消订单吗？'
+	    ,btn: ['是', '不是']
+	    ,yes: function(index){
+	    	dingdan_cancel(dingdanId)
+	    }
+	  });
+}
+
+//取消订单
+function dingdan_cancel(dingdanId){
+	
+	layer.open({
+	    type: 2
+	    ,content: '取消中'
+	    ,shadeClose:false
+  });
+	
+	$.post("/dingdan/update", {id:dingdanId,state:3}, function(result) {
+		if(result.success){
+			location.replace(location.href);
+		}
+	}, 'json');
+}
+
+
+</script>
+
+<body id="app">
+<header id="header" class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left "><span style="font-size: 16px; line-height: 20px; height: 20px;">返回</span></a>
+	<h1 class="mui-title">${title }</h1>
+</header>
+
+<div class="mui-content">
+	
+	<div style="display: flex;display: -webkit-flex; border-bottom: 1px solid #bbb;background-color: white; margin-bottom: 10px;">
+		<div class="top_tar_item" onclick="window.location.href='/wap/dingdan/my?state=9'">
+			全部
+		</div>
+		<div  class="top_tar_item" onclick="window.location.href='/wap/dingdan/my?state=0'">
+			待付款
+		</div>
+		<div   class="top_tar_item" onclick="window.location.href='/wap/dingdan/my?state=1'">
+			已付款
+		</div>
+		<div class="top_tar_item" onclick="window.location.href='/wap/dingdan/my?state=3'">
+			已取消
+		</div>
+		
+	</div>
+	
+	<div id="dingdan_list" style="margin-bottom: 90px;">
+		
+		<!-- <div class="dingdan_item" >
+			<div class="dingdan_item_num">
+				<div style="flex:1;-webkit-flex:1;  ">订单号:12316545612313512</div>
+				<div style=" width: 60px;color: #777;">待付款</div>
+			</div>
+			
+			<div class="dingdan_item_dingdan" onclick="window.location.href='/wap/dingdan/detail/12' ">
+				<div style="flex:1;	-webkit-flex:1; display: flex;display: -webkit-flex; " >
+					<span style="vertical-align:top; width: 50px; height: 50px; display: block;"><img style="width: 50px;" src="/static/images/base/share_index_log.jpg" /></span>
+					<span style="vertical-align:top;color: #333;font-size: 13px; display: block; flex:1;-webkit-flex:1;max-height: 50px; overflow:hidden; line-height: 16px;">苹果 好号的很</span>
+				</div>
+				<div style="width:72px; padding-left: 5px;" >
+					<div style="padding:0px 0px 0px 0px; color: #777;font-size: 13px;">¥ 55.00</div>
+					<div style="padding:0px 0px 0px 0px; color: #777;font-size: 13px;">x 5</div>
+				</div>
+			</div>
+			
+			
+			<div class="dingdan_item_dingdan" onclick="window.location.href='/wap/dingdan/detail/12' ">
+				<div style="flex:1;	-webkit-flex:1; display: flex;display: -webkit-flex; " >
+					<span style="vertical-align:top; width: 50px; height: 50px; display: block;"><img style="width: 50px;" src="/static/images/base/share_index_log.jpg" /></span>
+					<span style="vertical-align:top;color: #333;font-size: 13px; display: block; flex:1;-webkit-flex:1;max-height: 50px; overflow:hidden; line-height: 16px;">苹果 好号的很</span>
+				</div>
+				
+				<div style="width:72px; padding-left: 5px;" >
+					<div style="padding:0px 0px 0px 0px; color: #777;font-size: 13px;">¥ 55.00</div>
+					<div style="padding:0px 0px 0px 0px; color: #777;font-size: 13px;">x 5</div>
+				</div>
+			</div>
+			
+			<div class="dingdan_item_dingdan" style="display: block;">
+				<div style="font-size: 13px; text-align: right;">共<span class="red_blod">1</span>个商品 实付:<span class="red_blod">¥55522.00</span></div>
+			</div>
+			
+			<div class="dingdan_item_dingdan" style="display: block; text-align: right;">
+				<span onclick="dingdan_cancel_dlg(1)" class="dingdan_item_cancel">取消订单</span>
+				<span onclick="window.location.href='/wap/dingdan/pay/83' "  class="dingdan_item_pay">支付订单</span>
+			</div>
+		</div> -->
+		
+		
+	</div>
+	
+</div>
+
+<!-- 底部菜单 -->
+<jsp:include page="/wap/common/fixed_btm.jsp"/>
+
+</body>
+</html>

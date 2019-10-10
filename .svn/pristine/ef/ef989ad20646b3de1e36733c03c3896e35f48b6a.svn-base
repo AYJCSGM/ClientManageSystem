@@ -1,0 +1,199 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<!-- 强制  高速模式 渲染网页    -->
+<meta name=”renderer” content=”webkit”>
+<meta http-equiv=”X-UA-Compatible” content=”IE=Edge,chrome=1″ >
+<!-- 强制  高速模式 渲染网页    -->
+
+<!--添加  jq  支持加载-->
+<script	src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<!--添加  jq  支持加载-->
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+<!-- 加入移动布局 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+<!-- 加入移动布局 -->
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!--添加  本地 mui  支持-->
+<script src="${pageContext.request.contextPath}/static/mui/js/mui.min.js"></script>
+<link href="${pageContext.request.contextPath}/static/mui/css/mui.css" rel="stylesheet"/>
+<!--添加  本地  mui  支持-->
+
+<!--添加layer移动  弹出窗口的 插件支持-->
+<script src="${pageContext.request.contextPath}/static/layer_mobile/layer.js"></script>
+<!--添加layer移动  弹出窗口的 插件支持-->
+
+<!--添加  js api-->
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<!--添加  js api-->
+
+<!--添加  微信分享js 自己扩展的  -->
+<script src="${pageContext.request.contextPath}/static/weixin_js/weixin_share.js"></script>
+<!--添加  微信分享js 自己扩展的  -->
+
+<!--添加  vue.js 支持加载-->
+<script src="${pageContext.request.contextPath}/static/vue/vue.min.js"></script>
+<!--添加  vue.js 支持加载-->
+
+<title>会员查询 -${config.domain_title}</title>
+
+
+<style type="text/css">
+
+table.hovertable {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #999999;
+	border-collapse: collapse;
+}
+table.hovertable th {
+	background-color:#c3dde0;
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #a9c6c9;
+}
+table.hovertable tr {
+	background-color:#d4e3e5;
+}
+table.hovertable td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #a9c6c9;
+}
+</style>
+
+</head>
+<script type="text/javascript" charset="utf-8">
+
+mui.init();
+
+function sub(){
+	layer.open({
+	    type: 2
+	    ,content: '查询中...'
+	    ,shadeClose:false
+	});
+	
+	$("#table").hide();
+	
+	if(app.card!=null){
+		if(app.card.length<2){       layer.closeAll();
+			 layer.open({content: '请填写卡号',skin: 'msg',time: 2});
+			 return;
+		}
+	}else{
+		layer.closeAll();
+		layer.open({content: '请填写卡号',skin: 'msg',time: 2});
+		return;
+	}
+	
+	if(app.password!=null){
+		if(app.password.length<2){      layer.closeAll();
+			  layer.open({content: '请填写密码',skin: 'msg',time: 2});
+			return;
+		}
+	}else{
+		layer.closeAll();
+		layer.open({content: '请填写密码',skin: 'msg',time: 2});
+		return;
+	}
+	
+	$.post("/member/find",{card:app.card,password:app.password},function(result){
+		if(result.success){
+			layer.closeAll();
+			$("#table").show();
+			app.td_card = result.data.card;
+			app.name = result.data.name;
+			app.phone = result.data.phone;
+			app.plate = result.data.plate;
+			app.endDateTime = result.data.endDateTime;
+		}else{
+			$("#table").hide();
+			layer.closeAll();
+			layer.open({content: '没有查询到信息,请确定后,重试',skin: 'msg',time: 2});
+		}
+	},'json');
+}
+
+</script>
+<body>
+<header id="header" class="mui-bar mui-bar-nav">
+	<h1 class="mui-title">会员查询</h1>
+</header>
+
+<div class="mui-content" id="app">
+	
+	<form class="mui-input-group" style="margin-bottom: 20px; margin-top: 10px;">
+		<div class="mui-input-row">
+		<label>卡号</label>
+		<input type="text" v-model="card" class="mui-input-clear"  placeholder="请输入卡号">
+		</div>
+		
+		<div class="mui-input-row">
+		<label>密码</label>
+		<input type="password" v-model="password" class="mui-input-clear" placeholder="请输入密码">
+		</div>
+		
+	</form>
+	
+	<div style="padding: 0px 10px 0px 10px; margin-bottom: 10px;">
+		<button onclick="sub()" type="button" style="padding: 9px 0px 9px 0px; margin-bottom: 0px;" class="mui-btn mui-btn-success mui-btn-block">查询</button>
+	</div>
+	
+	
+	<div id="table" style="padding: 10px; margin-bottom: 10px; text-align: center; display: none;">
+		<table class="hovertable" style="margin: 0 auto;">
+			<tr>
+				<td>卡号</td>
+				<td>{{ td_card }}</td>
+			</tr>
+			<tr>
+				<td>姓名</td>
+				<td>{{ name }}</td>
+			</tr>
+			<tr>
+				<td>电话</td>
+				<td>{{ phone }}</td>
+			</tr>
+			<tr>
+				<td>车牌</td>
+				<td>{{ plate }}</td>
+			</tr>
+			<tr>
+				<td>到期时间</td>
+				<td>{{ endDateTime }}</td>
+			</tr>
+		</table>
+		
+	</div>
+</div>
+
+
+<script>
+var app = new Vue({
+	el : '#app',
+	data : {
+		name:'',
+		phone:'',
+		plate:'',
+		endDateTime:'',td_card:''
+	}
+});
+</script>
+</body>
+</html>
+
+

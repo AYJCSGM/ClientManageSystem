@@ -1,0 +1,36 @@
+
+.show_view_detail{
+/*设置 富广西编辑器的内容*/
+	background-color: #f8f8f8;
+	margin-bottom: 70px;
+}
+
+
+.show_view_detail img{
+	/*设置 富广西编辑器的内容-图片-直接宽100% 适应手机屏幕*/
+	width:100%;
+	background-color: #f8f8f8;
+}
+
+/*添加购物车和购买 */
+.buy_add_shop{
+	display: flex;
+	display: -webkit-flex;
+	color: white;
+}
+.buy_add_shop div:nth-child(1){
+	flex:1;
+	-webkit-flex:1; 
+	text-align: center; 
+	line-height: 50px;
+	background-color: #FF9800;
+	
+}
+.buy_add_shop div:nth-child(2){
+	flex:1;
+	-webkit-flex:1; 
+	text-align: center; 
+	line-height: 50px;
+	background-color: #FF0036;
+}
+/*添加购物车和购买 */

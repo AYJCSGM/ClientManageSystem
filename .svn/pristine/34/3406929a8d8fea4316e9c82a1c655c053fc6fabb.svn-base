@@ -1,0 +1,44 @@
+package com.java1234.service.vote;
+
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import org.springframework.stereotype.Service;
+import com.java1234.dao.ActivityTicketDao;
+import com.java1234.entity.vote.ActivityTicket;
+
+
+
+@Service("ticketService")
+public class ActivityTicketServiceImpl implements ActivityTicketService {
+	
+	
+	@Resource
+	private ActivityTicketDao activityTicketDao;
+	
+	@Override
+	public Integer add(ActivityTicket activityTicket) {
+		// TODO Auto-generated method stub
+		return activityTicketDao.add(activityTicket);
+	}
+
+	@Override
+	public List<ActivityTicket> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return activityTicketDao.list(map);
+	}
+	
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return activityTicketDao.getTotal(map);
+	}
+	
+	
+	@Override
+	public  List<ActivityTicket> getGroup(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return activityTicketDao.getGroup(map);
+	}
+
+}

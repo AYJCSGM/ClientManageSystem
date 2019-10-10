@@ -1,0 +1,61 @@
+package com.java1234.entity;
+
+import java.util.Date;
+
+
+public class ShopCart {
+	
+	
+	private Integer id;
+	private Integer goodsId; 
+	private Goods goods;
+	private Integer clientId;
+	private Client client  ;
+	private Date createDateTime;
+	
+	
+	
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public Integer getGoodsId() {
+		return goodsId;
+	}
+	public void setGoodsId(Integer goodsId) {
+		this.goodsId = goodsId;
+	}
+	public Goods getGoods() {
+		return goods;
+	}
+	public void setGoods(Goods goods) {
+		this.goods = goods;
+	}
+	public Integer getClientId() {
+		return clientId;
+	}
+	public void setClientId(Integer clientId) {
+		this.clientId = clientId;
+	}
+	public Client getClient() {
+		return client;
+	}
+	public void setClient(Client client) {
+		this.client = client;
+	}
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
+	}
+	
+	
+	
+	
+	
+	
+	
+}

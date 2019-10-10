@@ -1,0 +1,24 @@
+package com.java1234.service.business;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.business.XiaoShouTarget;
+
+public interface XiaoShouTargetService {
+	
+	
+	public Integer add(XiaoShouTarget xst);
+	
+	public Integer update(XiaoShouTarget xst);
+	
+	public Integer delete(Integer id);
+	
+	public List<XiaoShouTarget> list(Map<String,Object> map);
+	
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public XiaoShouTarget findById(Integer id);
+	
+	public  XiaoShouTarget find(Map<String,Object> map);
+}

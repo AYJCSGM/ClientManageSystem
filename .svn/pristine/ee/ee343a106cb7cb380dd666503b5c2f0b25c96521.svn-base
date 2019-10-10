@@ -1,0 +1,104 @@
+package com.java1234.entity;
+
+
+import java.util.Date;
+
+import com.java1234.entity.weixin.WeiXinUser;
+
+
+public class Client {
+	
+	private Integer id;
+	private String name;//真实姓名
+	private String phone;//电话
+	private String address;//地址
+	private Date createDateTime;//创建时间
+	private String remark;//备注
+	
+	////////微信信息/////////
+	private String openid;
+	private Integer weixin_user_id;
+	private WeiXinUser weiXinUser;
+	
+	//客户类型
+	private Integer clientTypeId;
+	private ClientType clientType;
+	
+	
+	
+	
+	public Integer getClientTypeId() {
+		return clientTypeId;
+	}
+	public void setClientTypeId(Integer clientTypeId) {
+		this.clientTypeId = clientTypeId;
+	}
+	public ClientType getClientType() {
+		return clientType;
+	}
+	public void setClientType(ClientType clientType) {
+		this.clientType = clientType;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	public String getOpenid() {
+		return openid;
+	}
+	public void setOpenid(String openid) {
+		this.openid = openid;
+	}
+	public Integer getWeixin_user_id() {
+		return weixin_user_id;
+	}
+	public void setWeixin_user_id(Integer weixin_user_id) {
+		this.weixin_user_id = weixin_user_id;
+	}
+	public WeiXinUser getWeiXinUser() {
+		return weiXinUser;
+	}
+	public void setWeiXinUser(WeiXinUser weiXinUser) {
+		this.weiXinUser = weiXinUser;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+}

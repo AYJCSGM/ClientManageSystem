@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.ConfigDao">
+	
+	<resultMap type="Config" id="ConfigResult">
+		<result property="id" column="id" />
+		<result property="remark" column="remark" />
+		<result property="pay_index" column="pay_index" />
+		<result property="title_" column="title_" />
+		<result property="desc_" column="desc_" />
+		<result property="wx_share_img" column="wx_share_img" />
+		
+		<result property="address" column="address" />
+		<result property="domain_title" column="domain_title" />
+		<result property="web_site" column="web_site" />
+		<result property="headStr" column="headStr" />
+		<result property="refund_index" column="refund_index" />
+		
+		<result property="bus_date" column="bus_date" />
+		<result property="bus_last_update" column="bus_last_update" />
+		<result property="bus_update_day" column="bus_update_day" />
+		
+		<result property="layuiStr" column="layuiStr" />
+		
+	</resultMap>
+	
+	
+	<update id="update" parameterType="Config">
+		update t_config
+		<set>
+			<if test="remark!=null    ">
+				remark=#{remark},
+			</if>
+			<if test="pay_index!=null    ">
+				pay_index=#{pay_index},
+			</if>
+			<if test="title_!=null    ">
+				title_=#{title_},
+			</if>
+			<if test="desc_!=null    ">
+				desc_=#{desc_},
+			</if>
+			<if test="wx_share_img!=null    ">
+				wx_share_img=#{wx_share_img},
+			</if>
+			<if test="address!=null    ">
+				address=#{address},
+			</if>
+			<if test="domain_title!=null    ">
+				domain_title=#{domain_title},
+			</if>
+			<if test="web_site!=null    ">
+				web_site=#{web_site},
+			</if>
+			
+			<if test="headStr!=null    ">
+				headStr=#{headStr},
+			</if>
+			<if test="refund_index!=null    ">
+				refund_index=#{refund_index},
+			</if>
+			<if test="bus_date!=null    ">
+				bus_date=#{bus_date},
+			</if>
+			<if test="bus_last_update!=null    ">
+				bus_last_update=#{bus_last_update},
+			</if>
+			<if test="bus_update_day!=null    ">
+				bus_update_day=#{bus_update_day},
+			</if>
+			<if test="layuiStr!=null    ">
+				layuiStr=#{layuiStr},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="findById" parameterType="Integer" resultMap="ConfigResult">
+		select * from t_config where id=#{id}
+	</select>
+	
+	
+	
+</mapper> 

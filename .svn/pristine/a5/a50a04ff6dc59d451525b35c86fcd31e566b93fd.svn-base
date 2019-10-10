@@ -1,0 +1,26 @@
+package com.java1234.controller.houtai;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+@Controller
+@RequestMapping("/houtai/refund")
+public class HouTai_Refund_Controller {
+	
+	
+	/**
+	 * 
+	 * /pc/refund/manage
+	 * 
+	 */
+	@RequestMapping("/manage")
+	public ModelAndView manage() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/admin/page/refund/refund_manage");
+		return mav;
+	}
+	
+	
+}
+

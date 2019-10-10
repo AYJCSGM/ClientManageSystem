@@ -1,0 +1,890 @@
+package com.java1234.util.weixin;
+
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.KeyStore;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.net.ssl.SSLContext;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.util.EntityUtils;
+import org.jdom.JDOMException;
+import com.google.gson.Gson;
+import com.java1234.entity.weixin.GZHMenu;
+import com.java1234.entity.weixin.WXNewsMessage;
+import com.java1234.entity.weixin.WXTextMessage;
+import com.java1234.http.HttpClient;
+import com.java1234.util.MD5Util;
+import com.java1234.util.XMLUtil;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+
+public class WeiXinUtil {
+	
+	public static void main(String[] args) {
+		int f =    (int) Math.ceil( Float.valueOf("30")/Float.valueOf("20")); 
+		System.out.println(f);
+		
+		System.out.println(getCustomNews("321","3213","321","3213","3213"));
+	}
+	
+	/**
+	 * 使用code 拿openid和access_token
+	 */
+	public  static String getOpenidUrl(String code) {
+		return "https://api.weixin.qq.com/sns/oauth2/access_token?"
+				+ "appid="+WeiXinConfig.appID+""
+				+ "&secret="+WeiXinConfig.APP_SECRET+""
+				+ "&code="+code+""
+				+ "&grant_type=authorization_code";
+	}
+	
+	/**
+	 * 使用openid 换取 用户资料
+	 */
+	public static String getWXUserInfoUrl(JSONObject accessToken_openid_obj) {
+		return "https://api.weixin.qq.com/sns/userinfo?"
+				+ "access_token="+accessToken_openid_obj.getString("access_token").toString()+""
+				+ "&openid="+accessToken_openid_obj.getString("openid").toString()+"";
+	}
+	
+	
+	/**
+	 * {"access_token":"ACCESS_TOKEN","expires_in":7200}
+	 * 拿到Access_token 有效时长2小时 120分
+	 * token.get("access_token").toString()
+	 * @return
+	 */
+	public static JSONObject getToken() {
+		Gson gson = new Gson();
+		JSONObject token = null ; 
+		String access_token_json = HttpClient.get(
+				"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+WeiXinConfig.appID+"&secret="+WeiXinConfig.APP_SECRET+"");
+		token = gson.fromJson(access_token_json, JSONObject.class);
+		return token;
+	}
+	
+	
+	/**
+	 * 这个ticket也需要定时 刷新 【一般存在缓存中】
+	 */
+	public static  JSONObject getJsapi_ticket(String access_token){
+		String result_json =  HttpClient.get("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token="+access_token+"&type=jsapi");
+		JSONObject ticket  = JSONObject.fromObject(result_json);
+		return ticket;
+		//ticket.get("ticket").toString()
+		/*		
+		{
+		    "errcode":0,
+		    "errmsg":"ok",
+		    "ticket":"bxLdikRXVbTPdHSM05e5u5sUoXNKd8-41ZO3MhKoyN5OfkWITDGgnr2fwJ0m9E8NYzWKVZvdVtaUgWvsdshFKA",
+		    "expires_in":7200   有效时长  2个小时
+		}
+		*/
+	}
+	
+	
+	
+	/*
+	 * 临时二维码，如果用户未关注  则让用户关注 。关于后，会推送我们设置的scene_id表明用户从哪里来的。
+	 * 
+	 * 
+	 * 这里临时二维码需要改动的是expire_seconds后面的数字，表示时间。最大值为30天，这里请换算成秒表示。
+	 * 还需改动的是scene_id，
+	 * 自行输入一个1-100000之间的整数（这个就是你的二维码参数了，就是用这个数字给二维码编号的意思，
+	 * 用户扫描二维码以后会返回这个数字给你，
+	 * 表明用户是用通过此渠道关注你的，这样就可以统计用户信息与不同渠道宣传效果。）
+	         {
+		      "expire_seconds": 10000,
+		      "action_name": "QR_SCENE",
+		      "action_info": {
+		          "scene": {
+		             "scene_id": 100000
+		          }
+		       }
+		      }
+	*/
+	public static String getTempTicketData(){
+		JSONObject ticket_data = new JSONObject();
+		JSONObject action_info = new JSONObject();
+		JSONObject scene = new JSONObject();
+		scene.put("scene_id", 100000);
+		action_info.put("scene", scene);
+		ticket_data.put("expire_seconds", 1800);
+		ticket_data.put("action_name", "QR_SCENE");
+		ticket_data.put("action_info", action_info);
+		return ticket_data.toString();
+	}
+	
+	
+	/**
+	 * 永久二维码
+	 * {
+	    "action_name": "QR_LIMIT_SCENE",
+	    "action_info": {
+	        "scene": {
+	            "scene_id": 1000   【1-100000】
+	        }
+	    }
+	}
+	 * 
+	 */
+	public static String getTicketData(int num){
+		JSONObject ticket_data = new JSONObject();
+		JSONObject action_info = new JSONObject();
+		JSONObject scene = new JSONObject();
+		scene.put("scene_id", num);
+		action_info.put("scene", scene);
+		ticket_data.put("action_name", "QR_LIMIT_SCENE");
+		ticket_data.put("action_info", action_info);
+		return ticket_data.toString();
+		
+	}
+	
+	
+	/**
+	 * 加密码 map内容
+	 * 
+	 * SortedMap<Object,Object> packageParams = new TreeMap<Object,Object>();  
+        packageParams.put("appid", appid);  
+        packageParams.put("mch_id", mch_id);  
+        packageParams.put("nonce_str", nonce_str);  
+        packageParams.put("body", body);  
+        packageParams.put("out_trade_no", out_trade_no);  
+        packageParams.put("total_fee", order_price);  
+        packageParams.put("spbill_create_ip", spbill_create_ip);  
+        packageParams.put("notify_url", notify_url);  
+        packageParams.put("trade_type", trade_type);  
+	 * @param characterEncoding  UTF-8
+	 * @param packageParams   上面的集合
+	 * @param API_KEY    商户的API密钥   =  商户的key 
+	 * @return
+	 */
+	 public static String createSign(String characterEncoding, SortedMap<Object, Object> packageParams, String API_KEY) {  
+	        StringBuffer sb = new StringBuffer();  
+	        Set es = packageParams.entrySet();  
+	        Iterator it = es.iterator();  
+	        while (it.hasNext()) {  
+	            Map.Entry entry = (Map.Entry) it.next();  
+	            String k = (String) entry.getKey();  
+	            String v = (String) entry.getValue();  
+	            if (null != v && !"".equals(v) && !"sign".equals(k) && !"key".equals(k)) {  
+	                sb.append(k + "=" + v + "&");  
+	            }
+	        }
+	        sb.append("key=" + API_KEY);  
+	        //System.out.println("map转str为"+sb.toString());
+	        String sign = MD5Util.MD5Encode(sb.toString(), characterEncoding).toUpperCase();  
+	        //String md5 = DigestUtils.md5Hex(sb.toString()).toUpperCase(); 用框架自带的也行。效果一样
+	        //System.out.println("md5编码并转成大写：:"+sign);
+	        return sign;  
+	    }
+	 
+
+			 
+	 /** 
+	     * @author 
+	     * @date 2016-4-22 
+	     * @Description：将请求参数转换为xml格式的string 
+	     * @param parameters 
+	     *            请求参数 
+	     * @return 
+	     */  
+	    public static String MapToXml(SortedMap<Object, Object> parameters) {  
+	        StringBuffer sb = new StringBuffer();  
+	        sb.append("<xml>");  
+	        Set es = parameters.entrySet();  
+	        Iterator it = es.iterator();  
+	        while (it.hasNext()) {  
+	            Map.Entry entry = (Map.Entry) it.next();  
+	            String k = (String) entry.getKey();  
+	            String v = (String) entry.getValue();  
+	            if ("attach".equalsIgnoreCase(k) || "body".equalsIgnoreCase(k) || "sign".equalsIgnoreCase(k)) {  
+	            	sb.append("<" + k + ">" + v + "</" + k + ">");  
+	                //sb.append("<" + k + ">" + "<![CDATA[" + v + "]]></" + k + ">");  
+	            } else {  
+	                sb.append("<" + k + ">" + v + "</" + k + ">");  
+	            }  
+	        }  
+	        sb.append("</xml>");  
+	        return sb.toString();  
+	    }
+	    
+	    
+	    /**
+	     * 元转成分
+	     */
+	    public static String yuantofen(String yuan) {
+			String fen = "";
+			try {
+				NumberFormat format = NumberFormat.getInstance();
+				Number number = format.parse(yuan);
+				double temp = number.doubleValue() * 100.0;
+				// 默认情况下GroupingUsed属性为true 不设置为false时,输出结果为2,012
+				format.setGroupingUsed(false);
+				// 设置返回数的小数部分所允许的最大位数
+				format.setMaximumFractionDigits(0);
+				fen = format.format(temp);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			return fen;
+		}
+	    
+	    
+	    /**
+	     * 随机产生count位的随机数(大小写字母和数字)
+	     * @param count
+	     */
+	    public static String CreateNoncestr(int count) {
+			String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			String res = "";
+			for (int i = 0; i < count; i++) {
+				Random rd = new Random();
+				res += chars.charAt(rd.nextInt(chars.length() - 1));
+			}
+			return res;
+		}
+	    
+	    
+	    /**
+	     * 将模板消息推送给用户
+	     * https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=ACCESS_TOKEN
+	     * data = 数据
+	     */
+	    public static String  pushTemplateMessages(String post_url,String data){
+	    	String result = null;
+	    	try {
+				result = HttpClient.post(post_url, data);
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	    	return result;
+	    }
+	    
+	    
+	    
+	    /**
+	     * 开启线程 发送模板消息
+	     * 为什么要开启线程，不影响 程序的正常运行，的考虑
+	     * 有时候 提交任务，加入了发送模板消息， 如果这里不开线程，会偶尔卡的。用户体验不好
+	     * 
+	     * post_url https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=token
+	     * data   
+	     * @param sendList
+	     */
+	    public static void  start_thread_push_Template_Messages(final List<JSONObject> sendList) {
+			final ExecutorService executorService = Executors.newFixedThreadPool(5);
+			executorService.execute(new Runnable() {
+				public void run() {
+					for(JSONObject obj : sendList){
+						WeiXinUtil.pushTemplateMessages(obj.getString("post_url"), obj.getString("data"));
+					}
+					executorService.shutdown();// 关闭
+				}
+			});
+		}
+	    
+	    
+	    
+	    
+	    
+	     
+	    
+	    
+	    /**
+	     * 
+	     * {"subscribe":1,
+	     * "openid":"ozuW6wwwX2UklAVDXbOnbGFLoPJg",
+	     * "nickname":"陈豪",
+	     * "sex":1,
+	     * "language":"zh_CN",
+	     * "city":"",
+	     * "province":"河南",
+	     * "country":"中国",
+	     * "headimgurl":"http:\/\/wx.qlogo.cn\/mmopen\/nibXUbvPWh0ENKnOKbEneJV6bQWIprkJ8uLcHaYxdlOboN5iad
+	     * MSyxicNTibvicKSDnJ11uoRVImnPGjjhkr1IgicU5nX0eIRbtAGib\/0",
+	     * "subscribe_time":1508375108,
+	     * "remark":"",
+	     * "groupid":0,
+	     * "tagid_list":[]}
+	     * 
+	     * @param access_token
+	     * @param openid
+	     * @return
+	     */
+	    public static JSONObject getUserInfo(String access_token,String openid){
+	    	String post_url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID";
+			post_url = post_url.replaceAll("ACCESS_TOKEN", access_token);
+			post_url = post_url.replaceAll("OPENID", openid);
+			String result = HttpClient.get(post_url) ; 
+			System.out.println(result);
+			JSONObject userInfo = JSONObject.fromObject(result);
+			return  userInfo;
+	    }
+	    
+	    
+	    /**
+	     * 
+	     * {
+	     * "total": 6, 
+	     * "count": 6, 
+	     * "data": {
+	     * "openid": [
+	     * "ozuW6w3xEQy5pbIax1nYUGKN3VBU", 
+	     *  "ozuW6w_CkHr4srrMvnTEcm9F8Tsk", 
+	     *  "ozuW6w7npazLqp4d16rkqTZGsnjc", 
+	     *  "ozuW6w4Xv-9mv3SxYF1MBjOjoOcc", 
+	     *  "ozuW6w2QvtT_0pOPUaFMfF-Wb-Cw", 
+	     *  "ozuW6wwwX2UklAVDXbOnbGFLoPJg"
+	     *  ]}, 
+	     *  "next_openid": "ozuW6wwwX2UklAVDXbOnbGFLoPJg"
+	     *  }
+	     * 
+	     * 
+	     *  如果拿到的用户列表没有数据，那么，count是0 
+	     *  {
+	     *  "total": 6, 
+	     *  "count": 0, 
+	     *  "next_openid": ""
+	     *  }
+	     * 
+	     * @param access_token
+	     * @param nextOpenid
+	     * @return
+	     */
+	    public static JSONObject getUserList(String access_token,String nextOpenid){
+	    	String post_url = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=ACCESS_TOKEN&next_openid=NEXT_OPENID";
+			post_url = post_url.replaceAll("ACCESS_TOKEN", access_token);
+			post_url = post_url.replaceAll("NEXT_OPENID", nextOpenid);
+			JSONObject userInfo = JSONObject.fromObject(HttpClient.get(post_url));
+			return  userInfo;
+	    }
+	    
+	    
+	    /**
+	     * {
+	     * "voice_count":COUNT,
+	     * "video_count":COUNT,
+	     * "image_count":COUNT,
+	     * "news_count":COUNT//这个是图文
+	     * }
+	     * 
+	     * @param access_token
+	     * @return
+	     */
+	    public static JSONObject getSuCaiTotal(String access_token){
+	    	String url = "https://api.weixin.qq.com/cgi-bin/material/get_materialcount?access_token=ACCESS_TOKEN";
+	    	url = url.replaceAll("ACCESS_TOKEN",access_token);
+	    	JSONObject obj = JSONObject.fromObject(HttpClient.get(url));
+			return  obj;
+	    }
+	    
+		
+		/**
+		 * 这个是客服消息  文本消息
+		 * 
+		 * 成功发送返回：{"errcode":0,"errmsg":"ok"}
+		 * 失败返回：{"errcode":45015,"errmsg":"response out of time limit or subscription is canceled hint: [uzQkSa0530ge31]"}
+		 * @return
+		 */
+		public static String getText(String openid,String content){
+			JSONObject client_message=new JSONObject();
+		    client_message.put("touser", openid);
+		    client_message.put("msgtype", "text");
+		    JSONObject json_content=new JSONObject();
+		    json_content.put("content", content);
+		    client_message.put("text", json_content);
+		    return client_message.toString();
+		}
+		
+		
+		
+		/**
+		 * 更新 微信公众号 自定义菜单
+		 * 
+		 * @param url      "https://api.weixin.qq.com/cgi-bin/menu/create?access_token="+token.getString("access_token");
+		 * @param menuStr  菜单的str
+		 * @return
+		 */
+		public static String updateMenu(String url,String menuStr){
+			String result = null ;
+			try {
+				result = HttpClient.post(url, menuStr);
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return result;
+		}
+		
+		
+		
+		/**
+		 * 获取预付id
+		 * @param notify_url 完成付款 微信回调的url
+		 * @param body  内容 
+		 * @param out_trade_no  订单号
+		 * @param total_fee  金额 元转成分
+		 * @param ip  用户的ip
+		 * @param trade_type  JSAPI公众号支付    NATIVE 扫码
+		 * @param openid  用户的openid
+		 */
+		public static Map<String, String>  getPrepayId(Map<String,Object> data) throws Exception{
+			SortedMap<Object, Object> parameters = new TreeMap<Object, Object>();
+			parameters.put("appid", WeiXinConfig.appID);
+			parameters.put("mch_id", WeiXinConfig.MCH_ID);
+			parameters.put("nonce_str", WeiXinUtil.CreateNoncestr(16));// 大小写混排16位
+			parameters.put("body","vip充值" );// 内容 128data.get("body")
+			parameters.put("detail", "vip充值");// 内容6000
+			parameters.put("out_trade_no", data.get("out_trade_no"));
+			parameters.put("total_fee",data.get("total_fee") );
+			parameters.put("spbill_create_ip",data.get("ip") );// 用户的ip,不是商户服务器IP
+			parameters.put("notify_url", data.get("notify_url"));// 支付成功 后微信服务器会访问这个地址
+			parameters.put("trade_type", data.get("trade_type"));
+			parameters.put("openid", data.get("openid")); // 用户的 openid 不是商户的openid
+			//NATIVE支付需要这个参数
+			if(data.get("product_id")!=null ){
+				parameters.put("product_id", data.get("product_id"));
+			}
+			String sign = WeiXinUtil.createSign("UTF-8", parameters, WeiXinConfig.API_KEY);// md5加密前面的数据
+			parameters.put("sign", sign);
+			// 把map弄成xml数据
+			String XMLData = WeiXinUtil.MapToXml(parameters);
+			String result = HttpClient.post(WeiXinConfig.PREPAY_ID_URL, XMLData);
+			Map<String, String> map = null;
+			try {
+				// 解析微信返回的xml信息，转换Map形式存储便于取值
+				map = XMLUtil.stringToMap(result);
+			} catch (JDOMException e) {
+				e.printStackTrace();
+			}
+			return map;
+		}
+		
+		
+		
+		public static SortedMap<Object, Object> getPayMap(Map<String, String> map){
+			SortedMap<Object, Object> params = new TreeMap<Object, Object>();
+			params.put("appId", WeiXinConfig.appID);
+			params.put("timeStamp", Long.toString(new Date().getTime()));
+			params.put("nonceStr", WeiXinUtil.CreateNoncestr(16));
+			params.put("package", "prepay_id=" + map.get("prepay_id"));
+			params.put("signType", "MD5");
+			String paySign = WeiXinUtil.createSign("UTF-8", params, WeiXinConfig.API_KEY);
+			params.put("package", "prepay_id=" + map.get("prepay_id")); // 这个packageValue不要加=号因为=号传到前台会变成u003d
+																		// 我们在前台拿到packagevalu后在前台加
+			params.put("paySign", paySign); // paySign的生成规则和Sign的生成规则一致
+			//params.put("sendUrl", notify_url); // 付款成功后跳转的页面
+			//String userAgent = req.getHeader("user-agent");
+			//System.out.println(userAgent);
+			//params.put("agent", userAgent);// 微信版本号，用于前面提到的判断用户手机微信的版本是否是5.0以上版本。
+			
+			return params;
+		}
+		
+		
+		
+		public static JSONObject getNode(GZHMenu menu){
+			JSONObject node = new JSONObject();
+			node.put("name", menu.getName());
+			node.put("type", menu.getType());
+			if(menu.getType().equals("view")){
+				node.put("url", menu.getUrl());
+			}else{
+				node.put("key", menu.getKey_());
+			}
+			return node;
+		}
+		
+		
+		/**
+		 * 这个加密码  是微信  分享 朋友聊天 窗口 使用的 js api  
+		 * @param str
+		 * @return
+		 */
+		public static String SHA1(String str) {
+	        try {
+	            MessageDigest digest = java.security.MessageDigest
+	                    .getInstance("SHA-1"); //如果是SHA加密只需要将"SHA-1"改成"SHA"即可
+	            digest.update(str.getBytes());
+	            byte messageDigest[] = digest.digest();
+	            // Create Hex String
+	            StringBuffer hexStr = new StringBuffer();
+	            // 字节数组转换为 十六进制 数
+	            for (int i = 0; i < messageDigest.length; i++) {
+	                String shaHex = Integer.toHexString(messageDigest[i] & 0xFF);
+	                if (shaHex.length() < 2) {
+	                    hexStr.append(0);
+	                }
+	                hexStr.append(shaHex);
+	            }
+	            return hexStr.toString();
+
+	        } catch (NoSuchAlgorithmException e) {
+	            e.printStackTrace();
+	        }
+	        return null;
+	    }
+		
+		
+		//String path = req.getSession().getServletContext().getRealPath("");//证书路径
+		// 将xml的string 以post发送给微信 并且加载证书
+		public static String sendPostAndLoadCA(String url, String param,
+				String CApath) {
+				
+			String result = "";
+			try {
+				// 指定读取证书格式为PKCS12
+				KeyStore keyStore = KeyStore.getInstance("PKCS12");
+				// 读取本机存放的PKCS12证书文件
+				FileInputStream instream = new FileInputStream(new File(CApath));
+				
+				// 指定PKCS12的密码(商户ID)
+				keyStore.load(instream, WeiXinConfig.MCH_ID.toCharArray());
+
+				SSLContext sslcontext = SSLContexts.custom()
+						.loadKeyMaterial(keyStore,  WeiXinConfig.MCH_ID.toCharArray())
+						.build();
+				// 指定TLS版本
+				SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+						sslcontext,
+						new String[] { "TLSv1" },
+						null,
+						SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+				// 设置httpclient的SSLSocketFactory
+				CloseableHttpClient httpclient = HttpClients.custom()
+						.setSSLSocketFactory(sslsf).build();
+				// 上面 是加载证书
+				// 上面 开始建立 post连接
+				HttpPost httppost = new HttpPost(url);
+				StringEntity entity = new StringEntity(param, "UTF-8");// 加入编码
+								   									   // 看看有没有乱码
+				httppost.setEntity(entity);
+				httppost.setHeader("Content-Type", "text/xml;charset=ISO-8859-1");
+				System.out.println("executing request " + httppost.getURI());
+				CloseableHttpResponse response = httpclient.execute(httppost);
+				try {
+					HttpEntity entity1 = response.getEntity();
+					if (entity != null) {
+
+						result = EntityUtils.toString(entity1, "UTF-8");
+					}
+				} finally {
+					response.close();
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			return result;
+		}
+		
+		
+		 /**
+		  * 根据map集合生成模板消息数据
+	     * 付款成功通知
+	     * **********************
+	     * {{first.DATA}}
+	     * 订单号：{{keyword1.DATA}}
+	     * 支付时间：{{keyword2.DATA}}
+	     * 支付金额：{{keyword3.DATA}}
+	     * {{remark.DATA}}
+	     * ************************
+	     * 您已经支付成功，摩椅自动开启．
+	     * 订单号：订单号
+	     * 支付时间：支付时间
+	     * 支付金额：支付金额
+	     * 感谢您的使用，如果遇到问题请致电13616083808.
+	     */
+	    public static String get_template_messages_data(Map<String,Object> map){
+	    	JSONObject send_data = new JSONObject();
+	    	JSONObject data = new JSONObject();
+	    	
+			send_data.put("touser", map.get("openid").toString());
+			send_data.put("template_id", map.get("template_id").toString());
+			//判断url是不是null
+			if(map.get("url")!=null){
+				send_data.put("url", map.get("url").toString());
+			}
+			if(map.get("first")!=null){
+				JSONObject first = new JSONObject();
+				first.put("value", map.get("first").toString());
+				data.put("first", first);
+			}
+			if(map.get("keyword1")!=null){
+				JSONObject keyword1 = new JSONObject();
+				keyword1.put("color", "#FF5722");
+				keyword1.put("value", map.get("keyword1").toString());
+				data.put("keyword1", keyword1);
+			}
+			if(map.get("keyword2")!=null){
+				JSONObject keyword2 = new JSONObject();
+				keyword2.put("color", "#FF5722");
+				keyword2.put("value", map.get("keyword2").toString());
+				data.put("keyword2", keyword2);
+			}
+			if(map.get("keyword3")!=null){
+				JSONObject keyword3 = new JSONObject();
+				keyword3.put("color", "#FF5722");
+				keyword3.put("value", map.get("keyword3").toString());
+				data.put("keyword3", keyword3);
+			}
+			if(map.get("keyword4")!=null){
+				JSONObject keyword4 = new JSONObject();
+				keyword4.put("color", "#FF5722");
+				keyword4.put("value", map.get("keyword4").toString());
+				data.put("keyword4", keyword4);
+			}
+			if(map.get("remark")!=null){
+				JSONObject remark = new JSONObject();
+				remark.put("color", "#173177");
+				remark.put("value", map.get("remark").toString());
+				data.put("remark", remark);
+			}
+			
+			send_data.put("data", data);
+			return send_data.toString();
+	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    /**
+	     * 
+	     * <xml>
+	     * <ToUserName>
+	     * <![CDATA[ozuW6wwwX2UklAVDXbOnbGFLoPJg]]>
+	     * </ToUserName>
+	     * <FromUserName>
+	     * <![CDATA[gh_85b9eebe6b3c]]>
+	     * </FromUserName>
+	     * <CreateTime>1508898229135</CreateTime>
+	     * <MsgType><![CDATA[text]]></MsgType>
+	     * <Content><![CDATA[9]]></Content>
+	     * </xml>
+	     * @param message
+	     * @return
+	     */
+	    public static String TextMessageToXML(WXTextMessage message){
+	    	StringBuffer sb = new StringBuffer();
+	    	sb.append("<xml>");  
+	    	
+	    	sb.append("<ToUserName>");  
+	    	sb.append("<![CDATA[" + message.getToUserName() + "]]>"); 
+	    	sb.append("</ToUserName>");  
+	    	
+	    	sb.append("<FromUserName>");  
+	    	sb.append("<![CDATA[" + message.getFromUserName() + "]]>"); 
+	    	sb.append("</FromUserName>");  
+	    	
+	    	sb.append("<CreateTime>");  
+	    	sb.append( message.getCreateTime()); 
+	    	sb.append("</CreateTime>");  
+	    	
+	    	sb.append("<MsgType>");  
+	    	sb.append("<![CDATA[" + message.getMsgType() + "]]>"); 
+	    	sb.append("</MsgType>");  
+	    	
+	    	sb.append("<Content>");  
+	    	sb.append("<![CDATA[" + message.getContent() + "]]>"); 
+	    	sb.append("</Content>");  
+	    	
+	    	sb.append("</xml>");  
+			return sb.toString();
+	    }
+	    
+
+/**
+ * 回复图文  消息
+ * @author Administrator
+ *
+ *<xml>
+    <ToUserName><![CDATA[oIDrpjqASyTPnxRmpS9O_ruZGsfk]]></ToUserName>
+    <FromUserName><![CDATA[gh_680bdefc8c5d]]></FromUserName>
+    <CreateTime>1359011899</CreateTime>
+    <MsgType><![CDATA[news]]></MsgType>
+    <Content><![CDATA[]]></Content>
+    <ArticleCount>1</ArticleCount>
+    <Articles>
+        <item>
+            <Title><![CDATA[[苹果产品信息查询]]></Title>
+            <Description><![CDATA[序列号：USE IMEI NUMBER
+IMEI号：358031058974471
+设备名称：iPhone 5C
+设备颜色：
+设备容量：
+激活状态：已激活
+电话支持：未过期[2014-01-13]
+硬件保修：未过期[2014-10-14]
+生产工厂：中国]]>
+    </Description>
+            <PicUrl><![CDATA[http://www.fangbei.org/weixin/weather/icon/banner.jpg]]></PicUrl>
+            <Url><![CDATA[]]></Url>
+        </item>
+    </Articles>
+    <FuncFlag>0</FuncFlag>
+</xml>
+ */
+	    public static String NewsMessageToXML(WXNewsMessage message){
+	    	StringBuffer sb = new StringBuffer();
+	    	sb.append("<xml>");  
+	    	
+	    	sb.append("<ToUserName>");  
+	    	sb.append("<![CDATA[" + message.getToUserName() + "]]>"); 
+	    	sb.append("</ToUserName>");  
+	    	
+	    	sb.append("<FromUserName>");  
+	    	sb.append("<![CDATA[" + message.getFromUserName() + "]]>"); 
+	    	sb.append("</FromUserName>");  
+	    	
+	    	sb.append("<CreateTime>");  
+	    	sb.append( message.getCreateTime()); 
+	    	sb.append("</CreateTime>");  
+	    	
+	    	sb.append("<MsgType>");  
+	    	sb.append("<![CDATA[" + message.getMsgType() + "]]>"); 
+	    	sb.append("</MsgType>");  
+	    	
+	    	sb.append("<Content>");  
+	    	sb.append("<![CDATA[" + message.getContent() + "]]>"); 
+	    	sb.append("</Content>");  
+	    	
+	    	sb.append("<ArticleCount>1</ArticleCount>");  
+	    	
+	    	sb.append("<Articles><item>"); 
+	    	
+	    	sb.append("<Title>");  
+	    	sb.append("<![CDATA[" + message.getTitle() + "]]>"); 
+	    	sb.append("</Title>");  
+	    	
+	    	sb.append("<Description>");  
+	    	sb.append("<![CDATA[" + message.getDescription() + "]]>"); 
+	    	sb.append("</Description>");
+	    	
+	    	sb.append("<PicUrl>");  
+	    	sb.append("<![CDATA[" + message.getPicUrl() + "]]>"); 
+	    	sb.append("</PicUrl>");
+	    	
+	    	sb.append("<Url><![CDATA["+message.getUrl()+"]]></Url>");  
+	    	sb.append("</item></Articles>");
+	    	sb.append("<FuncFlag>0</FuncFlag>");
+	    	sb.append("</xml>");  
+			return sb.toString();
+	    }
+	    
+	    
+	    
+	    /**
+	     *
+	     * 
+ {
+    "touser":"OPENID",
+    "msgtype":"news",
+    "news":{
+        "articles": [
+         {
+             "title":"Happy Day",
+             "description":"Is Really A Happy Day",
+             "url":"URL",
+             "picurl":"PIC_URL"
+         },
+         {
+             "title":"Happy Day",
+             "description":"Is Really A Happy Day",
+             "url":"URL",
+             "picurl":"PIC_URL"
+         }
+         ]
+    }
+}
+	     * @param openid
+	     * @param title
+	     * @param desc
+	     * @param img_url
+	     * @param url
+	     * @return
+	     */
+	public static String getCustomNews(String openid, String title, String desc, String img_url, String url) {
+		JSONObject data = new JSONObject();
+		data.put("touser", openid);
+		data.put("msgtype", "news");
+		
+		JSONArray articles = new JSONArray();
+		JSONObject  articleItem = new JSONObject();
+		articleItem.put("title", title);
+		articleItem.put("description", desc);
+		articleItem.put("url", url);
+		articleItem.put("picurl", img_url);
+		articles.add(articleItem);
+		
+		JSONObject articles_ = new JSONObject();
+		articles_.put("articles", articles);
+		
+		data.put("news", articles_);
+		
+		return data.toString();
+	}
+	
+	
+	/**
+	 *   发送客服 消息  【image图文   voice语音    video视频     music音乐    mpnews文章消息 图文     wxcard 发送卡券】
+	 *   媒体id
+	 *  openid
+	 *  post_url
+	 * @return 
+	 */
+	public static String set_client_message(String media_id,String openid,String post_url,String msgtype){
+		JSONObject data = new JSONObject();
+		JSONObject data_media = new JSONObject();
+		data_media.put("media_id", media_id);
+		
+		data.put("touser", openid);
+		data.put("msgtype", msgtype);
+		data.put(msgtype, data_media);
+		String resultJson = "";
+		try {
+			resultJson = HttpClient.post(post_url, data.toString());
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return resultJson;
+	}
+	
+	    
+	    
+}

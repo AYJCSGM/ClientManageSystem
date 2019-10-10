@@ -1,0 +1,16 @@
+package com.java1234.controller.weixin;
+
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+
+@Controller
+@RequestMapping("/wap/weixin")
+public class WAP_WeiXin_Controller {
+	
+	
+}

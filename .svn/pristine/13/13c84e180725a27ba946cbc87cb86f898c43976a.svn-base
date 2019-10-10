@@ -1,0 +1,62 @@
+package com.java1234.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.java1234.dao.FenLeiDao;
+import com.java1234.dao.ShopCartDao;
+import com.java1234.entity.ShopCart;
+import com.java1234.service.ShopCartService;
+
+
+
+
+@Service("shopCartService")
+public class ShopCartServiceImpl implements ShopCartService {
+
+	@Resource
+	private ShopCartDao shopCartDao;
+	
+	
+	@Override
+	public Integer add(ShopCart shopCart) {
+		// TODO Auto-generated method stub
+		return shopCartDao.add(shopCart);
+	}
+
+	@Override
+	public Integer update(ShopCart shopCart) {
+		// TODO Auto-generated method stub
+		return shopCartDao.update(shopCart);
+	}
+
+	@Override
+	public List<ShopCart> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return shopCartDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return shopCartDao.getTotal(map);
+	}
+
+	@Override
+	public ShopCart findById(Integer id) {
+		// TODO Auto-generated method stub
+		return shopCartDao.findById(id);
+	}
+
+	
+	@Override
+	public Integer delete(Integer id) {
+		// TODO Auto-generated method stub
+		return shopCartDao.delete(id);
+	}
+
+}

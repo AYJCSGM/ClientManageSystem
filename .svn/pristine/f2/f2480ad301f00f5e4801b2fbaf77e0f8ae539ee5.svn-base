@@ -1,0 +1,135 @@
+package com.java1234.entity.vote;
+
+import java.util.Date;
+import com.java1234.entity.User;
+
+
+public class ActivityWork {
+	
+	private Integer id;
+	private String name;//参赛人  或者 单位名称
+	private String desc_;//摘要
+	private Date createDateTime;
+	private String content;
+	
+	private Integer order_;//排名
+	private Integer num;//票数
+	
+	private Integer activityId;
+	private Activity activity;
+	
+	private String imgUrl;//图片
+	
+	private Integer createUserId;
+	private User createUser;
+	
+	private Integer isUse;
+	private Integer rowNum;//排名序号
+	private Integer numGap;//跟上一名的差票
+	 
+	private String url;//链接 
+	
+	
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public Integer getNumGap() {
+		return numGap;
+	}
+	public void setNumGap(Integer numGap) {
+		this.numGap = numGap;
+	}
+	public Integer getRowNum() {
+		return rowNum;
+	}
+	public void setRowNum(Integer rowNum) {
+		this.rowNum = rowNum;
+	}
+	public Integer getIsUse() {
+		return isUse;
+	}
+	public void setIsUse(Integer isUse) {
+		this.isUse = isUse;
+	}
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
+	}
+	public User getCreateUser() {
+		return createUser;
+	}
+	public void setCreateUser(User createUser) {
+		this.createUser = createUser;
+	}
+	public String getDesc_() {
+		return desc_;
+	}
+	public void setDesc_(String desc_) {
+		this.desc_ = desc_;
+	}
+	public Integer getOrder_() {
+		return order_;
+	}
+	public void setOrder_(Integer order_) {
+		this.order_ = order_;
+	}
+	public Integer getNum() {
+		return num;
+	}
+	public void setNum(Integer num) {
+		this.num = num;
+	}
+	public Integer getActivityId() {
+		return activityId;
+	}
+	public void setActivityId(Integer activityId) {
+		this.activityId = activityId;
+	}
+	public Activity getActivity() {
+		return activity;
+	}
+	public void setActivity(Activity activity) {
+		this.activity = activity;
+	}
+	public String getImgUrl() {
+		return imgUrl;
+	}
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+	
+	
+	
+	
+	
+	
+}

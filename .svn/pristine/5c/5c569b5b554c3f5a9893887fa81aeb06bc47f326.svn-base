@@ -1,0 +1,190 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<!-- 强制  高速模式 渲染网页    -->
+<meta name=”renderer” content=”webkit”>
+<meta http-equiv=”X-UA-Compatible” content=”IE=Edge,chrome=1″ >
+
+<!--添加  jq  支持加载-->
+<script	src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<!--添加  jq  支持加载-->
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+
+<!-- 加入移动布局 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+<!-- 加入移动布局 -->
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!--添加  本地 mui  支持-->
+<script src="${pageContext.request.contextPath}/static/mui/js/mui.min.js"></script>
+<link href="${pageContext.request.contextPath}/static/mui/css/mui.css" rel="stylesheet"/>
+<!--添加  本地  mui  支持-->
+
+<!--添加layer移动  弹出窗口的 插件支持-->
+<script src="${pageContext.request.contextPath}/static/layer_mobile/layer.js"></script>
+<!--添加layer移动  弹出窗口的 插件支持-->
+
+<!--添加index.css-->
+<link href="${pageContext.request.contextPath}/static/common/base/index.css" rel="stylesheet"/>
+<!--添加index.css-->
+
+<!--添加  js api-->
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<!--添加  js api-->
+
+<!--添加  微信分享js 自己扩展的  -->
+<script src="${pageContext.request.contextPath}/static/weixin_js/weixin_share.js"></script>
+<!--添加  微信分享js 自己扩展的  -->
+
+<title>首页-${config.domain_title}</title>
+<style type="text/css">
+</style>
+
+</head>
+<script type="text/javascript" charset="utf-8">
+
+var share_url;//分享连接
+var share_img_url;//分享图标
+var share_title= "${config.title_}";//分享标题
+var share_desc = "${config.desc_}";//分享摘要
+
+mui.init();
+
+//这里需要 添加输入 框的监听  如果有焦点了。把下面菜单 隐藏
+$(function() {
+	$("#home").addClass("active");
+	
+	//分享连接
+	var host = document.domain; 
+	share_url = window.location.href;
+	share_img_url = 'http://'+host+'${config.wx_share_img}';
+	weixin_share();
+	//分享连接
+});
+	
+
+</script>
+
+<body>
+<div class="mui-content">
+		<div id="slider" class="mui-slider">
+			<div class="mui-slider-group mui-slider-loop">
+				<!-- 额外增加的一个节点(循环轮播：第一个节点是最后一张轮播) -->
+				<div class="mui-slider-item mui-slider-item-duplicate">
+					<a href="${lunboList[lunboList.size()].url}">
+						<img src="${lunboList[lunboList.size()-1].imgUrl}">
+					</a>
+				</div>
+				
+				<c:forEach var="lunbo" items="${lunboList}" varStatus="status">
+					<!-- 第一张 -->
+					<div class="mui-slider-item">
+						<a href="${lunbo.url}">
+							<img src="${lunbo.imgUrl}">
+						</a>
+					</div>
+				</c:forEach>
+				
+				
+				<!-- 额外增加的一个节点(循环轮播：最后一个节点是第一张轮播) -->
+				<div class="mui-slider-item mui-slider-item-duplicate">
+					<a href="${lunboList[0].url}">
+						<img src="${lunboList[0].imgUrl}">
+					</a>
+				</div>
+			</div>
+			
+			
+			<div class="mui-slider-indicator">
+				<c:forEach var="lunbo" items="${lunboList}" varStatus="status">
+					<c:if test="${status.index==0}">
+						<div class="mui-indicator mui-active"></div>
+					</c:if>
+					<c:if test="${status.index!=0}">
+						<div class="mui-indicator"></div>
+					</c:if>
+				</c:forEach>
+			</div>
+			
+		</div>
+		<!-- 轮播结束 -->
+		
+		
+		<div class="fenlei">
+			<ul>
+				<c:forEach var="fenlei" items="${fenleiList}">
+					<li>
+						<a href="/wap/fenlei/${fenlei.id}">
+							<img src="${fenlei.imgUrl}" class="W">
+						</a>
+					</li>
+				</c:forEach>
+			</ul>
+			<!-- 清除浮动 -->
+			<div style=" clear:both;"></div>
+		</div>
+		<!-- 分类结束 -->
+		
+		
+		
+		<div style="background-color: white;">
+			<span style="border-left:5px solid #4CAF50;   display: inline-block;line-height: 45px;font-size:16px; padding-left: 5px; color:#4e4e4e; ">
+			推荐
+			</span>
+		</div>
+		<div class="tuijian"  style="margin-bottom: 70px;">
+			<ul>
+			
+				<c:forEach var="goods" items="${goodsList}">
+					<li onclick="window.location.href='/wap/goods/${goods.id}.html'">
+						<div style="width: 100%;">
+							<img style="width: 100%;" src="${goods.showImg}">
+						</div>
+						<div class="tuiguang_title">${goods.title}</div>
+						
+						<div class="tuijian_price">
+							¥${goods.price}
+						</div>
+						
+					</li>
+				</c:forEach>
+				
+				<!-- 
+				<li>  3029 11415   -    4300
+					<div style="width: 100%;">
+						<img style="width: 100%;" src="http://zhanggui.b0.upaiyun.com/upload_pic/com_thumb_20171124085912e62ac4375a176ee09ec7b.jpg">
+					</div>
+					<div class="tuijian_top">
+						<span class="">抢购中</span>
+						<span>¥1.25</span>
+					</div>
+					<div class="tuiguang_title">梦思香软装黄小米</div>
+					<div class="tuijian_time" id="time18292">
+					<span>0</span>天<span>8</span>时<span>4</span>分<span>54</span>秒
+					</div>
+				</li>
+				 -->
+				
+			</ul>
+		
+			<!-- 清除浮动 -->
+			<div style=" clear:both;"></div>
+		</div>
+		<!-- 推荐结束 -->
+</div>
+
+
+<!-- 底部菜单 -->
+<jsp:include page="common/fixed_btm.jsp"/>
+
+
+</body>
+</html>

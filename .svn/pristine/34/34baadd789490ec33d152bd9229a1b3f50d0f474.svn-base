@@ -1,0 +1,184 @@
+package com.java1234.controller.vote.admin;
+
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.java1234.entity.PageBean;
+import com.java1234.entity.vote.ActivityLunbo;
+import com.java1234.entity.vote.ActivityTicket;
+import com.java1234.entity.vote.ActivityWork;
+import com.java1234.entity.weixin.WeiXinUser;
+import com.java1234.service.vote.ActivityTicketService;
+import com.java1234.service.vote.ActivityWorkService;
+import com.java1234.util.DateUtil;
+import com.java1234.util.MyUtil;
+import com.java1234.util.ResponseUtil;
+import net.sf.json.JSONObject;
+
+
+@Controller
+@RequestMapping("/admin/activity/ticket")
+public class Admin_Activity_Ticket_Controller {
+	
+	@Resource
+	private ActivityTicketService  activityTicketService;
+	@Resource
+	private ActivityWorkService  activityWorkService;
+	
+	
+	/**
+	 * /admin/activity/ticket/add
+	 */
+	@RequestMapping("/add")
+	public String add(
+			@RequestParam(value="activityWorkId",required=false)String activityWorkId,
+			HttpServletResponse response,HttpServletRequest request,HttpSession session)throws Exception{
+		JSONObject obj = new JSONObject();
+        String webPath = request.getServletContext().getRealPath("");
+        
+		String openid = (String) session.getAttribute("openid");
+		String ip = MyUtil.getRemoteAddress(request);
+		ActivityWork activityWork   = activityWorkService.findById(Integer.parseInt(activityWorkId));
+		ActivityTicket  activityTicket =   new ActivityTicket();
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean flag =false;
+		boolean  flag_toupiao = false;
+		
+		//  0未使用  1使用中  2结束
+		switch (activityWork.getActivity().getState()) {
+		case 0:
+			obj.put("success", false);
+			obj.put("msg", "投票失败,投票活动未正式开启");
+			break;
+		case 1:
+			
+			if(activityWork.getActivity().getGuanzhu()==1){
+				//先判断 有没有关注
+				WeiXinUser wxUser = (WeiXinUser) session.getAttribute("weiXinUser");
+				if(wxUser.getSubscribe()==0){
+					//没有关注 
+					obj.put("success", false);
+					obj.put("code", 500);
+					obj.put("msg", "请关注后投票");
+					flag_toupiao = false;
+				}else{
+					flag_toupiao = true;
+				}
+			}else{
+				flag_toupiao = true;
+			}
+			
+			if(flag_toupiao){
+				//开始 投了  
+				activityTicket.setOpenid(openid);
+				activityTicket.setIp(ip);
+				activityTicket.setActivityWorkId(Integer.parseInt(activityWorkId));
+				activityTicket.setCreateDateTime(new Date());
+				activityTicket.setActivityId(activityWork.getActivity().getId());
+				activityTicket.setAgent(request.getHeader("User-Agent"));
+				
+				map.put("activityWorkId", activityWorkId);
+				map.put("openid", openid);
+				map.put("date1", DateUtil.formatDate(new Date(), "yyyy-MM-dd")+" 00:00:00");
+				map.put("date2", DateUtil.formatDate(new Date(), "yyyy-MM-dd")+" 23:59:59");
+				//针对这个作品  今天你投了几票           activityTicketList.size
+				List<ActivityTicket> activityTicketList = activityTicketService.list(map);
+				
+				//针对这个活动 今天  你一共 投了几个作品      persons.size
+				map.put("activityId", activityWork.getActivity().getId());
+				List<ActivityTicket> persons = activityTicketService.getGroup(map);
+				
+				if(activityTicketList.size()<activityWork.getActivity().getUserVote()){
+					//判断今天投了多少组。是否能继续投
+					if(persons.size()<activityWork.getActivity().getUserWork()){
+						flag = true;
+					}else if(persons.size()==activityWork.getActivity().getUserWork()){
+						//看一下  投的这票 是不是在我已投的范围内  有可能是投2个，但是还有一票没有投。
+						for(ActivityTicket ticket : persons){
+							if(activityWork.getId()==ticket.getActivityWorkId()){
+								flag = true;//在范围内，可以投
+							}
+						}
+						if(!flag){
+							obj.put("success", false);
+							obj.put("msg", "您今天已投了"+persons.size()+"个选手了,请明天再来投吧！");
+						}
+					}
+				}else{
+					obj.put("success", false);
+					obj.put("msg", "您今天已为该选手投过"+activityTicketList.size()+"票了,请明天再来投吧！");
+				}
+			}
+			
+			break;
+		case 2:
+			obj.put("success", false);
+			obj.put("msg", "投票失败,投票活动已结束");
+			break;
+		}
+		
+		if(flag){
+			//可以投
+			int i = activityTicketService.add(activityTicket);
+			if(i>0){
+				obj.put("success", true);
+				obj.put("msg", "投票成功");
+				activityWork.setNum(activityWork.getNum()+1);
+				activityWorkService.update(activityWork, webPath);
+			}
+		}
+		
+		ResponseUtil.write(response, obj.toString());
+		return null;
+	}
+	
+	
+	
+	
+	/**
+	 *    /admin/activity/ticket/list
+	 */
+	@RequestMapping("/list")
+	public String list(@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "limit", required = false) String rows,
+			@RequestParam(value = "q", required = false) String q, 
+			@RequestParam(value = "activityId", required = false) String activityId, 
+			@RequestParam(value = "activityWorkId", required = false) String activityWorkId, 
+			HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		PageBean pageBean = new PageBean(Integer.parseInt(page), Integer.parseInt(rows));
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("start", pageBean.getStart());
+		map.put("size", pageBean.getPageSize());
+		map.put("activityId", activityId);
+		map.put("activityWorkId", activityWorkId);
+		
+		List<ActivityTicket> list = activityTicketService.list(map);
+		Integer total = activityTicketService.getTotal(map);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm").create();
+		map.clear();
+		map.put("data", list);
+		map.put("count", total);
+		map.put("code", 0);
+		map.put("msg", "");
+		ResponseUtil.write(response, gson.toJson(map));
+		return null;
+	}
+	
+	
+	
+	
+	
+}

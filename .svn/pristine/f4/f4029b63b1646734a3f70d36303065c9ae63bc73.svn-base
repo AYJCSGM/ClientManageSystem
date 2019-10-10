@@ -1,0 +1,193 @@
+package com.java1234.controller.admin;
+
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.java1234.entity.FenLei;
+import com.java1234.entity.Goods;
+import com.java1234.entity.PageBean;
+import com.java1234.entity.Result;
+import com.java1234.entity.User;
+import com.java1234.service.GoodsService;
+import com.java1234.util.Base64Test;
+import com.java1234.util.DateUtil;
+import com.java1234.util.FileUtil;
+import com.java1234.util.ResponseUtil;
+import com.java1234.util.StringUtil;
+
+
+
+@Controller
+@RequestMapping("/admin/goods")
+public class AdminGoodsController {
+	
+
+	@Resource
+	private GoodsService goodsService;
+	
+	
+	
+	/**
+	 * /admin/directory/add
+	 */
+	@RequestMapping("/add")
+	public String add(Goods goods,@RequestParam(value = "imgData", required = false) String imgData, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("currentUser");
+		goods.setCreateUserId(currentUser.getId());
+		goods.setCreateDateTime(new Date());
+		//判断imgData是否为空，然后转为img   转存服务器
+		if(StringUtil.isNotEmpty(imgData)){
+			this.updateImgDataBase64(imgData, goods, request);
+		}
+		int resultTotal = goodsService.add(goods);
+		Result result = new Result();
+		Gson gson = new Gson();
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("添加成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("添加失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	/**
+	 * /admin/directory/update
+	 */
+	@RequestMapping("/update")
+	public String update(Goods goods  ,@RequestParam(value = "imgData", required = false) String imgData, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		
+		String webPath=request.getServletContext().getRealPath("/");
+		
+		//判断imgData是否为空，然后转为img   转存服务器
+		if(StringUtil.isNotEmpty(imgData)){
+			//删除之前的 缩略图
+			 Goods temp = goodsService.findById(goods.getId());
+			if(StringUtil.isNotEmpty(temp.getShowImg())){
+				FileUtil.deleteFile(webPath+temp.getShowImg());
+			}
+			//上传现在的图片
+			this.updateImgDataBase64(imgData, goods, request);
+		}
+		
+		
+		int resultTotal = goodsService.update(goods,webPath);
+		Result result = new Result();
+		Gson gson = new Gson();
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("修改成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("修改失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	/**
+	 * /admin/directory/list
+	 */
+	@RequestMapping("/list")
+	public String list(@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "limit", required = false) String rows,
+			@RequestParam(value = "q", required = false) String q, 
+			@RequestParam(value = "fenleiId", required = false) String fenleiId, 
+			HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		PageBean pageBean = new PageBean(Integer.parseInt(page), Integer.parseInt(rows));
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("start", pageBean.getStart());
+		map.put("size", pageBean.getPageSize());
+		map.put("q", StringUtil.formatLike(q));
+		map.put("fenleiId", fenleiId);
+		List<Goods> list = goodsService.list(map);
+		Integer total = goodsService.getTotal(map);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm").create();
+		map.clear();
+		map.put("data", list);
+		map.put("count", total);
+		map.put("code", 0);
+		map.put("msg", "");
+		ResponseUtil.write(response, gson.toJson(map));
+		return null;
+	}
+	
+	
+	/**
+	 * /admin/directory/delete
+	 */
+	@RequestMapping("/delete")
+	public String delete(@RequestParam(value = "ids", required = false) String ids, HttpServletResponse response
+			,HttpServletRequest request
+			)
+			throws Exception {
+		String[] idsStr = ids.split(",");
+		Gson gson = new Gson();
+		Result result = new Result();
+		
+		String webPath=request.getServletContext().getRealPath("/");
+		
+		for (int i = 0; i < idsStr.length; i++) {
+			goodsService.delete(Integer.parseInt(idsStr[i]),webPath);
+		}
+		
+		result.setSuccess(true);
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	/**
+	 * /admin/rule/findById
+	 */
+	@RequestMapping("/findById")
+	public String findById(
+			@RequestParam(value="id",required=false)String id,
+			HttpServletResponse response,HttpServletRequest request)throws Exception{
+		Gson gson = new Gson();
+		Goods goods   = goodsService.findById(Integer.parseInt(id));
+		ResponseUtil.write(response, gson.toJson(goods));
+		return null;
+	}
+	
+	
+	private  void   updateImgDataBase64(String imgData,Goods goods ,HttpServletRequest request ){
+		//取得根目录带d://dxxxxx/tomcat/ruzhou/
+		String webPath=request.getServletContext().getRealPath("");
+		// 定义根目录下面的文件夹
+		String folder = "/static/images/goods/show_img/";
+		String fileName = DateUtil.formatDate(new Date(), "yyyyMMddHHmmss")+".jpg";
+		//调用产生文件夹的方法     d://dxxxxx/tomcat/ruzhou/  +     static/images/goods/show_img/
+		FileUtil.makeDirs(webPath+folder);
+		imgData = imgData.replace("data:image/png;base64,", "");
+		Base64Test.GenerateImage(imgData, webPath+folder + fileName);
+		goods.setShowImg(folder + fileName);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+}

@@ -1,0 +1,61 @@
+package com.java1234.service.vote;
+
+
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import org.springframework.stereotype.Service;
+import com.java1234.dao.ActivityLunboDao;
+import com.java1234.entity.vote.Activity;
+import com.java1234.entity.vote.ActivityLunbo;
+import com.java1234.util.FileUtil;
+import com.java1234.util.StringUtil;
+
+
+@Service("activityLunboService")
+public class ActivityLunboServiceImpl implements ActivityLunboService   {
+	
+	@Resource
+	private ActivityLunboDao  activityLunboDao;
+	
+	@Override
+	public Integer add(ActivityLunbo activityLunbo) {
+		// TODO Auto-generated method stub
+		return activityLunboDao.add(activityLunbo);
+	}
+	
+	@Override
+	public Integer update(ActivityLunbo activityLunbo) {
+		// TODO Auto-generated method stub
+		return activityLunboDao.update(activityLunbo);
+	}
+	
+	@Override
+	public List<ActivityLunbo> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return activityLunboDao.list(map);
+	}
+	
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return activityLunboDao.getTotal(map);
+	}
+	
+	@Override
+	public ActivityLunbo findById(Integer id) {
+		// TODO Auto-generated method stub
+		return activityLunboDao.findById(id);
+	}
+	
+	@Override
+	public Integer delete(Integer id,String webPath) {
+		ActivityLunbo temp = activityLunboDao.findById(id);
+		int i = activityLunboDao.delete(id);
+		if(StringUtil.isNotEmpty(temp.getImgUrl())){
+			FileUtil.deleteFile(webPath+temp.getImgUrl());
+		}
+		return i;
+	}
+	
+}

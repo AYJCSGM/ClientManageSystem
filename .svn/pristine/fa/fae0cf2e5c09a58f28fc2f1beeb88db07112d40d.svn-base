@@ -1,0 +1,145 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<!-- 强制  高速模式 渲染网页    -->
+<meta name=”renderer” content=”webkit”>
+<meta http-equiv=”X-UA-Compatible” content=”IE=Edge,chrome=1″ >
+
+<!--添加  jq  支持加载-->
+<script	src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- 加入移动布局 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+<!-- 加入移动布局 -->
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!--添加  本地 mui  支持-->
+<script src="${pageContext.request.contextPath}/static/mui/js/mui.min.js"></script>
+<link href="${pageContext.request.contextPath}/static/mui/css/mui.css" rel="stylesheet"/>
+<!--添加  本地  mui  支持-->
+
+<!--添加layer移动  弹出窗口的 插件支持-->
+<script src="${pageContext.request.contextPath}/static/layer_mobile/layer.js"></script>
+<!--添加layer移动  弹出窗口的 插件支持-->
+
+<!--修改mui head-bar 变成绿色   -->
+<link href="${pageContext.request.contextPath}/static/common/base/alert_mui_bar.css" rel="stylesheet"/>
+<!--修改mui head-bar 变成绿色   -->
+
+<!--添加  vue.js 支持加载-->
+<script src="${pageContext.request.contextPath}/static/vue/vue.min.js"></script>
+<!--添加  vue.js 支持加载-->
+
+<!--添加  js api-->
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<!--添加  js api-->
+
+<!--添加  微信分享js 自己扩展的  -->
+<script src="${pageContext.request.contextPath}/static/weixin_js/weixin_share.js"></script>
+<!--添加  微信分享js 自己扩展的  -->
+
+
+<title>设置资料</title>
+
+<style type="text/css">
+</style>
+
+</head>
+
+<script type="text/javascript" charset="utf-8">
+	mui.init();
+	
+	var share_url;//分享连接
+	var share_img_url;//分享图标
+	var share_title= "设置资料";//分享标题
+	var share_desc = "设置资料";//分享摘要
+	
+	
+	var save_url = '${save_url}';
+	function save() {
+		layer.open({
+		    type: 2
+		    ,content: '保存中...'
+		    ,shadeClose:false
+		});
+		
+		$.post(save_url, {
+			name : app.name,
+			phone : app.phone,
+			address:app.address
+		}, function(result) {
+			 if(result.success){
+				 //询问框
+				  layer.open({
+				    content: '保存成功'
+				    ,btn: ['我知道了']
+				    ,yes: function(index){
+				    	 location.replace(location.href);
+				    }
+				  });
+				
+			 }
+		}, 'json');
+	}
+	
+	
+	$(function() {
+		//分享连接
+		var host = document.domain; 
+		share_url = window.location.href;
+		share_img_url = 'http://'+host+'${config.wx_share_img}';
+		weixin_share();
+		//分享连接
+	});
+	
+</script>
+
+<body>
+<header id="header" class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left "><span style="font-size: 16px; line-height: 20px; height: 20px;">返回</span></a>
+	<h1 class="mui-title">设置资料</h1>
+</header>
+
+<div class="mui-content" id="app">
+	
+	<form class="mui-input-group" style="margin-top: 15px;">
+		<div class="mui-input-row">
+			<label>姓名</label>
+			<input type="text" value="${client.name }" class="mui-input-clear" placeholder="请输入姓名" v-model="name" />
+		</div>
+		<div class="mui-input-row">
+			<label>电话</label>
+			<input type="text" value="${client.phone }" class="mui-input-clear" placeholder="请输入电话" v-model="phone" />
+		</div>
+	</form>
+	
+	<p style="margin-bottom: 0px; padding-left: 5px;">地址</p>
+	<div class="mui-input-row" style="margin: 10px 5px; margin-top: 0px;">
+		<textarea id="textarea" rows="5" placeholder="请输入地址" v-model="address">${client.address }</textarea>
+	</div>
+	
+	
+	<div style="padding: 0px 10px 0px 10px ;">
+		<button type="button" onclick="save()" class="mui-btn mui-btn-success mui-btn-block" style="padding: 4px 0;">保存</button>	
+	</div>
+	
+	
+</div>
+
+<script>
+var app = new Vue({
+	el : '#app',
+	data : {
+	}
+});
+</script>
+
+<!-- 底部菜单 -->
+<jsp:include page="/wap/common/fixed_btm.jsp"/>
+</body>
+</html>

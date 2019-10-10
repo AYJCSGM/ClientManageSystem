@@ -1,0 +1,28 @@
+package com.java1234.service.xiche;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.Client;
+import com.java1234.entity.xiche.Member;
+
+public interface MemberService {
+
+	public Integer add(Member   member );
+	
+	public Integer update(Member   member);
+	
+	public List<Member> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public Member findById(Integer id);
+	
+	public Integer delete(Integer id);
+	
+	public Member find(Map<String,Object> map);
+	
+	public Member findByCard(String card);
+	
+	
+	
+}

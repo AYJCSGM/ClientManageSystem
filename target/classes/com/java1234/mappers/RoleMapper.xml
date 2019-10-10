@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.RoleDao">
+		
+	<resultMap type="Role" id="RoleResult">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="createDateTime" column="createDateTime" />
+		<result property="remark" column="remark" />
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="Role">
+		insert into t_role values(null,#{name},#{createDateTime},#{remark})
+	</insert>
+	
+	<update id="update" parameterType="Client">
+		update t_role
+		<set>
+			<if test="name!=null ">
+				name=#{name},
+			</if>
+			<if test="remark!=null ">
+				remark=#{remark},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="RoleResult">
+		select * from t_role
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  or remark like #{q} or address like #{q}  or phone like #{q} or carno like #{q} ) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="clientTypeId!=null and clientTypeId!='' ">
+		 		and clientTypeId =  #{clientTypeId} 
+			</if>
+		</where>
+		order by id DESC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select	count(*) from t_role
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  or remark like #{q} or address like #{q}  or phone like #{q} or carno like #{q} ) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="clientTypeId!=null and clientTypeId!='' ">
+		 		and clientTypeId =  #{clientTypeId} 
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="RoleResult">
+		select * from t_role where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_role where id=#{id}
+	</delete>
+	
+</mapper> 

@@ -1,0 +1,138 @@
+package com.java1234.service.weixin;
+
+
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+import com.java1234.dao.ClientDao;
+import com.java1234.dao.ConfigDao;
+import com.java1234.dao.WeiXinUserDao;
+import com.java1234.entity.Client;
+import com.java1234.entity.Config;
+import com.java1234.entity.weixin.WeiXinUser;
+import com.java1234.util.MyUtil;
+import com.java1234.util.StringUtil;
+import com.java1234.util.weixin.WeiXinUtil;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+
+
+@Service("weiXinUserService")
+public class WeiXinUserServiceImpl implements WeiXinUserService {
+	
+	@Resource
+	private WeiXinUserDao  weiXinUserDao;
+	@Resource
+	private ConfigDao  configDao;
+	@Resource
+	private ClientDao  clientDao;
+	
+	public Integer add(WeiXinUser wxuser) {
+		return weiXinUserDao.add(wxuser);
+	}
+	
+	public Integer update(WeiXinUser wxuser) {
+		return weiXinUserDao.update(wxuser);
+	}
+	
+	public List<WeiXinUser> list(Map<String, Object> map) {
+		return weiXinUserDao.list(map);
+	}
+
+	public Integer getTotal(Map<String, Object> map) {
+		return weiXinUserDao.getTotal(map);
+	}
+	
+	public WeiXinUser findById(Integer id) {
+		return weiXinUserDao.findById(id);
+	}
+	
+	public Integer delete(Integer id) {
+		return weiXinUserDao.delete(id);
+	}
+	
+	public WeiXinUser findByOpenId(String openid) {
+		return weiXinUserDao.findByOpenId(openid);
+	}
+	
+	
+	public void add_tongbu_weixin_user(String access_token,String next_openid){
+		JSONObject userListObj = WeiXinUtil.getUserList(access_token, next_openid);
+		next_openid = userListObj.getString("next_openid");
+		int count = userListObj.getInt("count");
+		if(count==0){
+			return ;
+		}
+		JSONObject userListData =userListObj.getJSONObject("data");
+		JSONArray openidList = userListData.getJSONArray("openid");
+		
+		for(int i=0;i<openidList.size();i++){
+			this.addWXUser(openidList.get(i).toString());
+		}
+		if(StringUtil.isNotEmpty(next_openid)){
+			add_tongbu_weixin_user(access_token,next_openid);
+		}
+	}
+	
+	
+	public void addWXUser(String openid) {
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();  
+        ServletContext servletContext = webApplicationContext.getServletContext(); 
+		JSONObject token = (JSONObject)  servletContext.getAttribute("token");
+		JSONObject wxuserinfo = WeiXinUtil.getUserInfo(token.getString("access_token"), openid);
+		
+		WeiXinUser wxuser = new WeiXinUser();
+		wxuser.setSubscribe(wxuserinfo.getInt("subscribe"));
+		wxuser.setOpenid(wxuserinfo.getString("openid"));
+		
+		try {
+			String sstr = URLEncoder.encode(wxuserinfo.get("nickname").toString());
+			wxuser.setNickname(URLDecoder.decode(sstr, "gb2312"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		wxuser.setSex(wxuserinfo.getInt("sex"));
+		wxuser.setLanguage(wxuserinfo.getString("language"));
+		wxuser.setCity(wxuserinfo.getString("city"));
+		wxuser.setProvince(wxuserinfo.getString("province"));
+		wxuser.setCountry(wxuserinfo.getString("country"));
+		wxuser.setHeadimgurl(wxuserinfo.getString("headimgurl"));
+		wxuser.setSubscribe_time(MyUtil.longToDate(wxuserinfo.getInt("subscribe_time")*1000L, "yyyy-MM-dd HH:mm"));
+		wxuser.setRemark(wxuserinfo.getString("remark"));
+		wxuser.setGroupid(wxuserinfo.getInt("groupid"));
+		
+		
+		//不存在添加，存在=更新
+		WeiXinUser temp_wxuser = weiXinUserDao.findByOpenId(wxuser.getOpenid());
+		if(temp_wxuser==null){
+			weiXinUserDao.add(wxuser);
+			Client client = new Client();
+			client.setOpenid(wxuser.getOpenid());
+			client.setWeixin_user_id(wxuser.getId());
+			client.setCreateDateTime(new Date());
+			clientDao.add(client);
+		}else{
+			//存在=更新数据
+			wxuser.setId(temp_wxuser.getId());
+			weiXinUserDao.update(wxuser);
+		}
+	}
+	
+	
+	@Override
+	public WeiXinUser findByOpenidState(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return weiXinUserDao.findByOpenidState(map);
+	}
+	
+}

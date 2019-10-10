@@ -1,0 +1,47 @@
+package com.java1234.entity.business;
+
+import java.math.BigDecimal;
+
+public class XiaoShouTarget {
+	
+	public Integer id;
+	private String month;//月份
+	private String name;//名称  企业  政府采购
+	private BigDecimal done_jine;//  完成 金额多少
+	private Integer order_;
+	
+	public String getMonth() {
+		return month;
+	}
+	public void setMonth(String month) {
+		this.month = month;
+	}
+	public Integer getOrder_() {
+		return order_;
+	}
+	public void setOrder_(Integer order_) {
+		this.order_ = order_;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	 
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public BigDecimal getDone_jine() {
+		return done_jine;
+	}
+	public void setDone_jine(BigDecimal done_jine) {
+		this.done_jine = done_jine;
+	}
+	
+	
+	
+}

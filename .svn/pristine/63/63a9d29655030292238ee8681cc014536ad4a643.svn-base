@@ -1,0 +1,121 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport"	content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no" />
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+${config.headStr}
+
+${config.layuiStr}
+
+<style>
+</style>
+
+<script>
+function save(){
+	var refund_jine = $("#refund_jine").val();
+	var refund_desc = $("#refund_desc").val();
+	
+	$.post('/dingdan/refund',{dingdanId:'${dingdan.id}',refund_jine:refund_jine,refund_desc:refund_desc},function(result){
+		if(result.success){
+			//询问框
+			layer.confirm('退款成功', {
+			  btn: ['好','我知道了'] //按钮
+			}, function(){
+				window.parent.closeDlg("退款成功！");
+			}, function(){
+				window.parent.closeDlg("退款成功！");
+			});
+			
+		}else{
+			layer.msg(result.msg);
+		}
+	},'json');
+	
+}
+
+</script>
+
+</head>
+<body id="app">
+
+<div class="layui-form">
+  <table class="layui-table">
+    <colgroup>
+      <col width="200">
+      <col>
+    </colgroup>
+    <thead>
+      <tr>
+        <th></th>
+        <th></th>
+      </tr> 
+    </thead>
+    
+    <tbody>
+      <tr>
+        <td>订单号</td>
+        <td>${dingdan.out_trade_no }</td>
+      </tr>
+      
+      <tr>
+        <td>标题</td>
+        <td>${dingdan.title }</td>
+      </tr>
+      
+      <tr>
+        <td>姓名</td>
+        <td>${dingdan.name }</td>
+      </tr>
+      
+      <tr>
+        <td>电话</td>
+        <td>${dingdan.phone }</td>
+      </tr>
+      
+      <tr>
+        <td>地址</td>
+        <td>${dingdan.address }</td>
+      </tr>
+      
+       <tr>
+        <td>金额</td>
+        <td>${dingdan.jine }</td>
+      </tr>
+      
+       <tr>
+        <td>退款金额</td>
+        <td style="padding: 0px;"> <input style="  border:none;  height: 100%; width: 100%;" type="text" id="refund_jine" />   </td>
+      </tr>
+       <tr>
+        <td>退款原因</td>
+        <td  style="padding: 0px;"><input style="  border:none; height: 100%; width: 100%;" type="text" id="refund_desc" /></td>
+      </tr>
+      
+      </tbody>
+      </table>
+      
+      <button onclick="save()" class="layui-btn">提交</button>
+</body>
+
+<script>
+	layui.use([ 'laydate', 'laypage', 'layer', 'table', 'carousel',
+			'upload', 'element' ], function() {
+		var laydate = layui.laydate //日期
+		, laypage = layui.laypage //分页
+		layer = layui.layer //弹层
+		, table = layui.table //表格
+		, carousel = layui.carousel //轮播
+		, upload = layui.upload //上传
+		, element = layui.element; //元素操作
+	});
+</script>
+
+</html>

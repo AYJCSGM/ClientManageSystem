@@ -1,0 +1,84 @@
+package com.java1234.service.impl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+import com.java1234.dao.LinkDao;
+import com.java1234.entity.Link;
+import com.java1234.service.LinkService;
+import com.java1234.util.FileUtil;
+import com.java1234.util.HtmlUtil;
+import com.java1234.util.StringUtil;
+
+
+@Service("linkService")
+public class LinkServiceImpl implements LinkService {
+	
+	@Resource
+	private LinkDao linkDao;
+	
+	@Override
+	public Integer add(Link link) {
+		 return linkDao.add(link);
+	}
+	
+	
+	@Override
+	public Integer update(Link link,String webPath) {
+		Link origin = this.findById(link.getId());
+		int i = linkDao.update(link);
+		//·ÀÖ¹ ¸üÐÂisUse topÊ±°ÑÍ¼Æ¬É¾³ýµô
+		String this_now_html = "";
+		if(link.getContent()==null){
+			this_now_html = origin.getContent();
+		}else{
+			this_now_html = link.getContent();
+		}
+		//·ÀÖ¹ ¸üÐÂisUse topÊ±°ÑÍ¼Æ¬É¾³ýµô
+		HtmlUtil.update_html_del_img(origin.getContent(), this_now_html, webPath);
+		return i;
+	}
+	
+
+	@Override
+	public List<Link> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return linkDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return linkDao.getTotal(map);
+	}
+	
+	@Override
+	public Link findById(Integer id) {
+		// TODO Auto-generated method stub
+		return linkDao.findById(id);
+	}
+	
+	@Override
+	public Integer delete(Integer id,String webPath) {
+		Link origin  = this.findById(id);
+		int i = linkDao.delete(id);
+		if (i > 0) {
+			//É¾³ýhtmlÖÐµÄÍ¼Æ¬
+			HtmlUtil.delete_html_all_img(origin.getContent(), webPath);
+			//É¾³ý ËõÂÔÍ¼Æ¬
+			if(StringUtil.isNotEmpty(origin.getImg_url())){
+				FileUtil.deleteFile(webPath+origin.getImg_url());
+			}
+		}
+		return i;
+		
+		
+		        
+	}
+
+}

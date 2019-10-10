@@ -1,0 +1,114 @@
+package com.java1234.service.business;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import org.springframework.stereotype.Service;
+import com.java1234.dao.XiaoShouDao;
+import com.java1234.entity.business.XiaoShou;
+import com.java1234.http.HttpClient;
+import com.java1234.util.DateUtil;
+
+import net.sf.json.JSONObject;
+
+
+
+@Service("xiaoShouService")
+public class XiaoShouServiceImpl implements XiaoShouService {
+
+	
+	@Resource
+	private XiaoShouDao xiaoShouDao;
+	
+	@Override
+	public Integer add(XiaoShou xiaoshou) {
+		// TODO Auto-generated method stub
+		return xiaoShouDao.add(xiaoshou);
+	}
+
+	@Override
+	public List<XiaoShou> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return xiaoShouDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return xiaoShouDao.getTotal(map);
+	}
+	
+	@Override
+	public Integer delete(Integer flow_id) {
+		// TODO Auto-generated method stub
+		return xiaoShouDao.delete(flow_id);
+	}
+	
+	
+	@Override
+	public Integer syn(Map<String, Object> map) {
+		String result ="";
+		if(map.get("date1")!=null){
+			result = HttpClient.get("http://47.93.220.101:8086/?date1="+map.get("date1").toString()+"&date2="+map.get("date2").toString()+"");
+		}else{
+			result = HttpClient.get("");
+		}
+		/*System.out.println(result);*/
+		JSONObject  data = JSONObject.fromObject(result);
+		/*System.out.println(data.size());*/
+		XiaoShou xiaoshou = null ; 
+		XiaoShou t_xiaoshou = null ; 
+		for(int i=1;i<=data.size();i++ ){
+			xiaoshou = new XiaoShou();
+			JSONObject obj = data.getJSONObject(i+"");
+			xiaoshou.setFlow_id(Integer.parseInt(obj.get("flow_id").toString()));
+			xiaoshou.setTrans_no(obj.get("trans_no").toString());
+			BigDecimal sheet_amt = new BigDecimal(obj.get("sheet_amt").toString());
+			xiaoshou.setSheet_amt(sheet_amt);
+			xiaoshou.setVoucher_no(obj.get("voucher_no").toString());
+			xiaoshou.setSup_name(obj.get("sup_name").toString());
+			try {
+				//     2018-01-03 14:43:15.310×ª³Édate
+				xiaoshou.setOper_date(DateUtil.formatString(obj.get("oper_date").toString(), "yyyy-MM-dd HH:mm:ss")  );
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			t_xiaoshou = xiaoShouDao.findByFlowId(xiaoshou.getFlow_id());
+			if(t_xiaoshou==null){
+				xiaoShouDao.add(xiaoshou);
+			}else{
+				t_xiaoshou=null;
+			}
+		}
+		return 1;
+	}
+	
+	@Override
+	public XiaoShou findByFlowId(Integer flow_id) {
+		// TODO Auto-generated method stub
+		return xiaoShouDao.findByFlowId(flow_id);
+	}
+
+	
+	
+	/**
+	 * SELECT * FROM `t_bussiness_xiaoshou` GROUP BY trans_no
+	 * @return
+	 */
+	@Override
+	public List<XiaoShou> trans_no_list() {
+		// TODO Auto-generated method stub
+		return xiaoShouDao.trans_no_list();
+	}
+
+	
+	@Override
+	public XiaoShou tongji(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return xiaoShouDao.tongji(map);
+	}
+	 
+	
+	
+}

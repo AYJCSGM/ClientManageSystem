@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.ClientDao">
+	
+	<resultMap type="Client" id="ClientResult">
+		<result property="id" column="id" />
+		<result property="carno" column="carno" />
+		<result property="name" column="name" />
+		<result property="sex" column="sex" />
+		<result property="phone" column="phone" />
+		<result property="address" column="address" />
+		<result property="balance" column="balance" />
+		<result property="createDateTime" column="createDateTime" />
+		<result property="remark" column="remark" />
+		<result property="clientTypeId" column="clientTypeId" />
+		<result property="createUserId" column="createUserId" />
+		
+		<association property="clientType" column="clientTypeId"
+			select="com.java1234.dao.ClientTypeDao.findById"></association>
+		<association property="createUser" column="createUserId"
+			select="com.java1234.dao.UserDao.findById"></association>
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="Client">
+		insert into t_client values(null,#{carno},#{name},#{sex},#{phone},#{address},#{balance},#{createDateTime},#{remark},#{clientTypeId},#{createUserId})
+	</insert>
+	
+	<update id="update" parameterType="Client">
+		update t_client
+		<set>
+			<if test="name!=null ">
+				name=#{name},
+			</if>
+			<if test="carno!=null ">
+				carno=#{carno},
+			</if>
+			<if test="sex!=null ">
+				sex=#{sex},
+			</if>
+			<if test="phone!=null ">
+				phone=#{phone},
+			</if>
+			<if test="address!=null ">
+				address=#{address},
+			</if>
+			<if test="balance!=null ">
+				balance=#{balance},
+			</if>
+			<if test="createDateTime!=null ">
+				createDateTime=#{createDateTime},
+			</if>
+			<if test="remark!=null ">
+				remark=#{remark},
+			</if>
+			<if test="clientTypeId!=null ">
+				clientTypeId=#{clientTypeId},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="ClientResult">
+		select * from t_client
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  or remark like #{q} or address like #{q}  or phone like #{q} or carno like #{q} ) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="clientTypeId!=null and clientTypeId!='' ">
+		 		and clientTypeId =  #{clientTypeId} 
+			</if>
+		</where>
+		order by id DESC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select	count(*) from t_client
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  or remark like #{q} or address like #{q}  or phone like #{q} or carno like #{q} ) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="clientTypeId!=null and clientTypeId!='' ">
+		 		and clientTypeId =  #{clientTypeId} 
+			</if>
+		</where>
+	</select>
+	
+	<select id="list_heji" parameterType="Map" resultMap="ClientResult">
+		select sum(t.balance) balance from (
+		select * from t_client
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  or remark like #{q} or address like #{q}  or phone like #{q} or carno like #{q} ) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="clientTypeId!=null and clientTypeId!='' ">
+		 		and clientTypeId =  #{clientTypeId} 
+			</if>
+		</where>
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+		) t
+	</select>
+	
+	
+	
+	
+	
+	<select id="findById" parameterType="Integer" resultMap="ClientResult">
+		select * from t_client where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_client where id=#{id}
+	</delete>
+	
+</mapper> 

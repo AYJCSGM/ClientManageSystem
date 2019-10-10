@@ -1,0 +1,60 @@
+.lunbo{
+	height:400px;
+	overflow:hidden;
+	position:relative;
+	min-width: 1164px;
+}
+
+.lunbo ul{
+	margin: 0;
+    padding: 0;
+    border: 0;
+	list-style-type: none;
+	width: 100%;
+    height: 400px;
+    min-width: 1164px;
+}
+
+.lunbo ul li{
+	list-style-type: none;
+	width: 100%;
+    height: 400px;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    position: absolute;
+    margin: 0px auto;
+    cursor: pointer;
+}
+
+.lunbo .tab{
+    height: 33px;
+    position: absolute;
+	bottom:0px;
+    z-index: 9;
+    line-height: 24px;
+	overflow:hidden;/*加个overflowhide  防止它第一行排不满他排下一行*/
+}
+
+.lunbo .tab a{
+	 font-family: "Helvitica Neue",Helvitica,Arial,"Hiragino Sans GB","Microsoft YaHei",
+"Arial Regular","Microsoft JhengHei",sans-serif;
+	text-decoration:none;
+	color:#000;
+	padding-left:8px;
+	padding-right:8px;
+    height:33px;  
+    background:#E3DEE1;
+    opacity: 0.8;
+    text-align:center;
+    line-height: 33px;
+    margin-left:2px;
+    display: block;
+    float:left;
+	font-size:14px;
+}
+
+.lunbo .tab .lunbo_tab_a_this{
+	background: #FF8800;
+	color: #fff; 
+} 
+

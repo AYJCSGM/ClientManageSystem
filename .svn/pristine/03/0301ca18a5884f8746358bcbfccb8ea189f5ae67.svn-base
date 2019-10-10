@@ -1,0 +1,43 @@
+package com.java1234.entity.weixin;
+
+/**
+ * 消息接受者 类型
+ * 不同的消息 接受者不同
+ * 
+ * @author Administrator
+ *
+ */
+public class ReceiveType {
+	
+	private Integer id;
+	private String name;
+	private Integer order_;
+	private String template_id;//不同的公众号 模板消息id不同
+	
+	public String getTemplate_id() {
+		return template_id;
+	}
+	public void setTemplate_id(String template_id) {
+		this.template_id = template_id;
+	}
+	public Integer getOrder_() {
+		return order_;
+	}
+	public void setOrder_(Integer order_) {
+		this.order_ = order_;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	
+}

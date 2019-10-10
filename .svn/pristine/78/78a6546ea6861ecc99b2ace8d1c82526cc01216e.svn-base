@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.ClientDao">
+	
+	<resultMap type="Client" id="ClientResult">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="phone" column="phone" />
+		<result property="address" column="address" />
+		<result property="createDateTime" column="createDateTime" />
+		<result property="remark" column="remark" />
+		<result property="openid" column="openid" />
+		<result property="weixin_user_id" column="weixin_user_id" />
+		<result property="clientTypeId" column="clientTypeId" />
+		
+		<association property="clientType" column="clientTypeId"
+			select="com.java1234.dao.ClientTypeDao.findById"></association>
+			
+		<association property="weiXinUser" column="weixin_user_id"
+			select="com.java1234.dao.WeiXinUserDao.findById"></association>
+			
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="Client">
+		insert into t_client values(null,#{name},#{phone},#{address},#{createDateTime},#{remark},#{openid},#{weixin_user_id},#{clientTypeId})
+	</insert>
+	
+	<update id="update" parameterType="Client">
+		update t_client
+		<set>
+			<if test="name!=null ">
+				name=#{name},
+			</if>
+			<if test="phone!=null ">
+				phone=#{phone},
+			</if>
+			<if test="address!=null ">
+				address=#{address},
+			</if>
+			<if test="createDateTime!=null ">
+				createDateTime=#{createDateTime},
+			</if>
+			<if test="remark!=null ">
+				remark=#{remark},
+			</if>
+			<if test="clientTypeId!=null ">
+				clientTypeId=#{clientTypeId},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	
+	<select id="list" parameterType="Map" resultMap="ClientResult">
+		select * from t_client
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  or remark like #{q} or address like #{q}  or phone like #{q} or openid like #{q}) 
+			</if>
+			<if test="nickname!=null and nickname!='' ">
+		 		and weixin_user_id  IN (SELECT id FROM t_weixin_user  WHERE nickname like  #{nickname} )
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="clientTypeId!=null and clientTypeId!='' ">
+		 		and clientTypeId =  #{clientTypeId} 
+			</if>
+		</where>
+		order by id DESC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select	count(*) from t_client
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  or remark like #{q} or address like #{q}  or phone like #{q} or openid like #{q}) 
+			</if>
+			<if test="nickname!=null and nickname!='' ">
+		 		and weixin_user_id  IN (SELECT id FROM t_weixin_user  WHERE nickname like  #{nickname} )
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="clientTypeId!=null and clientTypeId!='' ">
+		 		and clientTypeId =  #{clientTypeId} 
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="ClientResult">
+		select * from t_client where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_client where id=#{id}
+	</delete>
+	
+	<select id="findByWXUserId" parameterType="Integer" resultMap="ClientResult">
+		select * from t_client where weixin_user_id=#{wxId}
+	</select>
+	
+	<select id="finbByOpenid" parameterType="String" resultMap="ClientResult">
+		select * from t_client where openid=#{openid}
+	</select>
+	
+	
+</mapper> 

@@ -1,0 +1,44 @@
+package com.java1234.service.weixin;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.java1234.dao.News_Dao;
+import com.java1234.entity.weixin.News_;
+
+
+
+@Service("news_Service")
+public class News_ServiceImpl implements News_Service {
+	
+
+	@Resource
+	private News_Dao news_Dao;
+	
+	
+	@Override
+	public Integer add(News_ news_) {
+		// TODO Auto-generated method stub
+		return news_Dao.add(news_);
+	}
+
+	@Override
+	public Integer delete(Integer id) {
+		// TODO Auto-generated method stub
+		return news_Dao.delete(id);
+	}
+
+	@Override
+	public News_ findByMediaId(String media_id) {
+		// TODO Auto-generated method stub
+		return news_Dao.findByMediaId(media_id);
+	}
+	
+	@Override
+	public Integer deleteAll(Integer id) {
+		// TODO Auto-generated method stub
+		return news_Dao.deleteAll(id);
+	}
+
+}

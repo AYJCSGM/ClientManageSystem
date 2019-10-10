@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.MemberDao">
+	
+	<resultMap type="Member" id="MemberResult">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="phone" column="phone" />
+		<result property="password" column="password" />
+		<result property="plate" column="plate" />
+		<result property="endDateTime" column="endDateTime" />
+		<result property="openid" column="openid" />
+		<result property="card" column="card" />
+		<result property="remark" column="remark" />
+	</resultMap>
+	
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="Member">
+		insert into t_xc_member values(null,#{name},#{phone},#{password},#{plate}
+		,#{endDateTime},#{openid},#{card},#{remark})
+	</insert>
+	
+	<update id="update" parameterType="Member">
+		update t_xc_member
+		<set>
+			<if test="name!=null ">
+				name=#{name},
+			</if>
+			<if test="phone!=null ">
+				phone=#{phone},
+			</if>
+			<if test="password!=null ">
+				password=#{password},
+			</if>
+			<if test="plate!=null ">
+				plate=#{plate},
+			</if>
+			<if test="endDateTime!=null ">
+				endDateTime=#{endDateTime},
+			</if>
+			<if test="openid!=null ">
+				openid=#{openid},
+			</if>
+			<if test="card!=null ">
+				card=#{card},
+			</if>
+			<if test="remark!=null ">
+				remark=#{remark},
+			</if>
+			
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="MemberResult">
+		select * from t_xc_member
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q} or phone like #{q} or plate like #{q} or openid like #{q} or card like #{q} or remark like #{q} ) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+		</where>
+		order by id DESC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select	count(*) from t_xc_member
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q} or phone like #{q} or plate like #{q} or openid like #{q} or card like #{q} or remark like #{q} ) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="isUse!=null and isUse!='' ">
+		 		and isUse =  #{isUse} 
+			</if>
+		</where>
+	</select>
+	
+	
+	<select id="findById" parameterType="Integer" resultMap="MemberResult">
+		select * from t_xc_member where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_xc_member where id=#{id}
+	</delete>
+	
+	<select id="find" parameterType="Map" resultMap="MemberResult">
+		select * from t_xc_member
+		<where>
+			<if test="card!=null and card!=''">
+				and card = #{card}
+			</if>
+			<if test="password!=null and password!='' ">
+		 		and password = #{password}
+			</if>
+		</where>
+	</select>
+	
+	
+	<select id="findByCard" parameterType="String" resultMap="MemberResult">
+		select * from t_xc_member where card=#{card}
+	</select>
+	
+	
+</mapper> 

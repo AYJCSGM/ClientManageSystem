@@ -1,0 +1,74 @@
+package com.java1234.controller.weixin;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.java1234.entity.weixin.GZHMenu;
+import com.java1234.service.weixin.GZHMenuService;
+import com.java1234.util.StringUtil;
+
+
+@Controller
+@RequestMapping("/houtai/gzhmenu")
+public class HouTai_GZHMenu_Controller {
+	
+	@Resource
+	private GZHMenuService gzhMenuService;
+	
+	
+	/**
+	 *         /gzhmenu/pc/manage
+	 */
+	@RequestMapping("/manage")
+	public ModelAndView manage(@RequestParam(value = "father", required = false) String father) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		if(StringUtil.isEmpty(father)){
+			mav.addObject("table_url", "/admin/gzhmenu/list?father=-1");
+		}else {
+			mav.addObject("table_url", "/admin/gzhmenu/list?father="+father);
+		}
+		mav.setViewName("/admin/page/gzhmenu/gzhmenu_manage");
+		return mav;
+	}
+	
+	
+	
+	/**
+	 *         /gzhmenu/pc/add
+	 */
+	@RequestMapping("/add")
+	public ModelAndView add(@RequestParam(value = "father", required = false) String father) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("btn_text", "Ìí¼Ó");
+		mav.addObject("father", father);
+		mav.addObject("save_url", "/admin/gzhmenu/add");
+		mav.setViewName("/admin/page/gzhmenu/add_or_update");
+		return mav;
+	}
+	
+	
+	
+	@RequestMapping("/edit")
+	public ModelAndView edit(@RequestParam(value = "id", required = false) String id,@RequestParam(value = "father", required = false) String father, HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		GZHMenu gzhMenu     = gzhMenuService.findById(Integer.parseInt(id));
+		mav.addObject("gzhmenu", gzhMenu);
+		mav.addObject("father", father);
+		mav.addObject("btn_text", "ÐÞ¸Ä");
+		mav.addObject("save_url", "/admin/gzhmenu/update?id=" + id);
+		mav.setViewName("/admin/page/gzhmenu/add_or_update");
+		return mav;
+	}
+	
+	
+	
+	
+	
+	
+}

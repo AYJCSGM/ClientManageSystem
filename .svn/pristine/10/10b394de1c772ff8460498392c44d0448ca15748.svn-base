@@ -1,0 +1,36 @@
+package com.java1234.controller.wap;
+
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+import com.java1234.entity.Link;
+import com.java1234.service.LinkService;
+
+
+@Controller
+@RequestMapping("/wap/link")
+public class WAP_Link_Controller {
+	
+	@Resource
+	private LinkService  linkService;
+	
+	/**
+	 * /wap/link/55
+	 */
+	@RequestMapping("/{id}")
+	public ModelAndView post(@PathVariable("id") Integer id, HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		Link link      = linkService.findById(id);
+		mav.addObject("link", link);
+		mav.setViewName("/wap/link/link_view");
+		return mav;
+	}
+	
+	
+}
+
+

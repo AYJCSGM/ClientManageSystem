@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.News_Dao">
+	
+	
+	<resultMap type="News_" id="News_Result">
+		<result property="id" column="id" />
+		<result property="media_id" column="media_id" />
+		
+		<!-- <collection property="sucaiItemList"  column="media_id" select="com.java1234.dao.SuCaiItemDao.listByMediaId" ></collection>
+	 -->
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="News_">
+		insert into t_news values(null,#{media_id})
+	</insert>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_news where id = #{id}
+	</delete>
+	
+	<select id="findByMediaId" parameterType="String" resultMap="News_Result">
+		select * from t_news where  media_id = #{media_id}
+	</select>
+	
+	<delete id="deleteAll" parameterType="Integer">
+		delete from t_news 
+	</delete>
+	
+</mapper> 

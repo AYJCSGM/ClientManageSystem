@@ -1,0 +1,60 @@
+package com.java1234.controller.wap;
+
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+import com.java1234.entity.Goods;
+import com.java1234.service.GoodsService;
+
+@Controller
+@RequestMapping("/wap/goods")
+public class WAP_Goods_Controller {
+	
+
+	@Resource
+	private GoodsService  goodsService;
+	
+	/**
+	 * 接受id查看商品
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/{id}")
+	public ModelAndView see_id(@PathVariable("id") Integer id, HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		Goods goods = goodsService.findById(id);
+		mav.addObject("goods", goods);
+		mav.setViewName("/wap/goods/view");
+		return mav;
+	}
+	
+	
+	/**
+	 * 确定订单--创建订单--付款
+	 * 购买商品
+	 * @return /wap/goods/buy/{id}
+	 * @throws Exception
+	 */
+	@RequestMapping("/buy/{id}")
+	public ModelAndView buy(@PathVariable("id") Integer id, HttpServletRequest request,HttpSession session) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		
+		//展示 商品详情 和 姓名 地址
+		Goods goods = goodsService.findById(id);
+		mav.addObject("goods", goods);
+		mav.setViewName("/wap/goods/buy");
+		return mav;
+	}
+	
+	
+	
+	
+	
+}

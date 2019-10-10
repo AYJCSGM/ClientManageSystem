@@ -1,0 +1,95 @@
+package com.java1234.entity.vote;
+
+import java.util.Date;
+import com.java1234.entity.User;
+
+public class ActivityLunbo {
+	
+	private Integer id;
+	private String title;//标题
+	private String url;//跳转的url
+	private String imgUrl;//图片url
+	private Integer isUse;//是否使用  0不使用  1使用
+	private Integer order_;//排序号
+	
+	private Integer createUserId;
+	private User createUser;
+	private Date createDateTime;
+	
+	private Integer activityId;
+	private Activity activity;
+	
+	
+	
+	
+	public Integer getActivityId() {
+		return activityId;
+	}
+	public void setActivityId(Integer activityId) {
+		this.activityId = activityId;
+	}
+	public Activity getActivity() {
+		return activity;
+	}
+	public void setActivity(Activity activity) {
+		this.activity = activity;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public String getImgUrl() {
+		return imgUrl;
+	}
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
+	}
+	public Integer getIsUse() {
+		return isUse;
+	}
+	public void setIsUse(Integer isUse) {
+		this.isUse = isUse;
+	}
+	public Integer getOrder_() {
+		return order_;
+	}
+	public void setOrder_(Integer order_) {
+		this.order_ = order_;
+	}
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
+	}
+	public User getCreateUser() {
+		return createUser;
+	}
+	public void setCreateUser(User createUser) {
+		this.createUser = createUser;
+	}
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
+	}
+	
+	
+	
+	
+}

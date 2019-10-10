@@ -1,0 +1,26 @@
+package com.java1234.service.vote;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.vote.ActivityWork;
+
+
+public interface ActivityWorkService {
+	
+	public Integer add(ActivityWork work);
+	
+	public Integer update(ActivityWork work,String webPath);
+	
+	public List<ActivityWork> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public ActivityWork findById(Integer id);
+	
+	public Integer delete(Integer id,String webPath);
+	
+	public List<ActivityWork> pm(Integer activityId);
+
+	public List<ActivityWork> listRowNum(Map<String,Object> map);
+	
+}

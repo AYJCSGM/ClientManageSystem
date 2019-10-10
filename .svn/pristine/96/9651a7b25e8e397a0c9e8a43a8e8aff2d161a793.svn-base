@@ -1,0 +1,44 @@
+package com.java1234.controller.vote.houtai;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+@Controller
+@RequestMapping("/houtai/activity/ticket")
+public class HouTai_Activity_Ticket_Controller {
+	
+	
+	/**
+	 * /houtai/activity/ticket/manage?activityId=1
+	 */
+	@RequestMapping("/manage")
+	public ModelAndView manage(@RequestParam(value = "activityId", required = false) String activityId) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		mav.addObject("table_url", "/admin/activity/ticket/list?activityId="+activityId);
+		mav.addObject("activityId", activityId);
+		
+		mav.setViewName("/admin/page/vote/activity/ticket/ticket_manage");
+		return mav;
+	}
+	
+	
+	/**
+	 * /houtai/activity/ticket/manage?activityId=1
+	 */
+	@RequestMapping("/manage2")
+	public ModelAndView manage2(@RequestParam(value = "activityWorkId", required = false) String activityWorkId) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		mav.addObject("table_url", "/admin/activity/ticket/list?activityWorkId="+activityWorkId);
+		mav.addObject("activityWorkId", activityWorkId);
+		
+		mav.setViewName("/admin/page/vote/activity/ticket/ticket_manage");
+		return mav;
+	}
+	
+	
+	
+}

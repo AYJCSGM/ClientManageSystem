@@ -1,0 +1,37 @@
+package com.java1234.service.business;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.business.XiaoShou;
+
+
+public interface XiaoShouService {
+	
+	public Integer add(XiaoShou xiaoshou);
+	
+	public List<XiaoShou> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public Integer delete(Integer id);
+	
+	public XiaoShou findByFlowId(Integer flow_id);
+	
+	public Integer syn(Map<String,Object> map);
+	
+	/**
+	 * SELECT * FROM `t_bussiness_xiaoshou` GROUP BY trans_no
+	 * @return
+	 */
+	public List<XiaoShou> trans_no_list();
+	
+	
+	/**
+	 * 按日期   客户类型统计
+	 * @param map
+	 * @return
+	 */
+	public XiaoShou tongji(Map<String,Object> map);
+	
+	
+}

@@ -1,0 +1,226 @@
+package com.java1234.entity.vote;
+
+import java.util.Date;
+import com.java1234.entity.User;
+
+
+/**
+ * 投票活动
+ */
+public class Activity {
+	
+	private Integer id;
+	private String name;//活动名称
+	private Date startDateTime;//开始时间
+	private Date endDateTime;//截止时间
+	private String desc_;//介绍
+	
+	private Integer createUserId;
+	private User createUser;
+	private Date createDateTime;
+	
+	private Integer state;//是否使用此活动   0未使用  1使用中  2结束
+	private Integer click_;//活动 总  点击次数 
+	private Integer userVote;//用户对一个作品能投多少票
+	private Integer userWork;//用户能投多少个作品
+	
+	private String url;//复制链接   添加公众号开户活动
+	
+	private Integer interval_;//间隔几小时 可以重新投票
+	
+	private String wx_share_title;
+	private String wx_share_desc;
+	private String wx_share_img;
+	
+	private String rule_;//投票 规则
+	
+	//详情页
+	private String content;
+	
+	private String color_;//颜色 
+	private String click_color;
+	
+	private String erweima;//公众号二维码
+	
+	private Integer guanzhu;//1强制 关注  0不强制
+	
+	private String guanzhu_tip;//关于提醒 图片
+	
+	
+	public String getGuanzhu_tip() {
+		return guanzhu_tip;
+	}
+	public void setGuanzhu_tip(String guanzhu_tip) {
+		this.guanzhu_tip = guanzhu_tip;
+	}
+	public Integer getGuanzhu() {
+		return guanzhu;
+	}
+	public void setGuanzhu(Integer guanzhu) {
+		this.guanzhu = guanzhu;
+	}
+	public String getErweima() {
+		return erweima;
+	}
+	public void setErweima(String erweima) {
+		this.erweima = erweima;
+	}
+	public String getClick_color() {
+		return click_color;
+	}
+	public void setClick_color(String click_color) {
+		this.click_color = click_color;
+	}
+	public String getColor_() {
+		return color_;
+	}
+	public void setColor_(String color_) {
+		this.color_ = color_;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+	public String getRule_() {
+		return rule_;
+	}
+	public void setRule_(String rule_) {
+		this.rule_ = rule_;
+	}
+	public String getWx_share_title() {
+		return wx_share_title;
+	}
+	public void setWx_share_title(String wx_share_title) {
+		this.wx_share_title = wx_share_title;
+	}
+	public String getWx_share_desc() {
+		return wx_share_desc;
+	}
+	public void setWx_share_desc(String wx_share_desc) {
+		this.wx_share_desc = wx_share_desc;
+	}
+	public String getWx_share_img() {
+		return wx_share_img;
+	}
+	public void setWx_share_img(String wx_share_img) {
+		this.wx_share_img = wx_share_img;
+	}
+	public Integer getInterval_() {
+		return interval_;
+	}
+	public void setInterval_(Integer interval_) {
+		this.interval_ = interval_;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public Integer getClick_() {
+		return click_;
+	}
+	public void setClick_(Integer click_) {
+		this.click_ = click_;
+	}
+	
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public Date getStartDateTime() {
+		return startDateTime;
+	}
+
+
+	public void setStartDateTime(Date startDateTime) {
+		this.startDateTime = startDateTime;
+	}
+
+
+	public Date getEndDateTime() {
+		return endDateTime;
+	}
+
+
+	public void setEndDateTime(Date endDateTime) {
+		this.endDateTime = endDateTime;
+	}
+
+
+	public String getDesc_() {
+		return desc_;
+	}
+
+
+	public void setDesc_(String desc_) {
+		this.desc_ = desc_;
+	}
+
+
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
+
+
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
+	}
+
+
+	public User getCreateUser() {
+		return createUser;
+	}
+
+
+	public void setCreateUser(User createUser) {
+		this.createUser = createUser;
+	}
+
+
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+
+
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
+	}
+	public Integer getState() {
+		return state;
+	}
+	public void setState(Integer state) {
+		this.state = state;
+	}
+	public Integer getUserVote() {
+		return userVote;
+	}
+	public void setUserVote(Integer userVote) {
+		this.userVote = userVote;
+	}
+	public Integer getUserWork() {
+		return userWork;
+	}
+	public void setUserWork(Integer userWork) {
+		this.userWork = userWork;
+	}
+
+
+	 
+	
+	
+	
+	
+}
+
+

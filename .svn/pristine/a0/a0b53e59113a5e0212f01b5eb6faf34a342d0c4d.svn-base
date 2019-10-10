@@ -1,0 +1,160 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<!-- 强制  高速模式 渲染网页    -->
+<meta name=”renderer” content=”webkit”>
+<meta http-equiv=”X-UA-Compatible” content=”IE=Edge,chrome=1″ >
+
+<!--添加  jq  支持加载-->
+<script	src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- 加入移动布局 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+<!-- 加入移动布局 -->
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--添加  本地 mui  支持-->
+<script src="${pageContext.request.contextPath}/static/mui/js/mui.min.js"></script>
+<link href="${pageContext.request.contextPath}/static/mui/css/mui.css" rel="stylesheet"/>
+<!--添加  本地  mui  支持-->
+<!--添加layer移动  弹出窗口的 插件支持-->
+<script src="${pageContext.request.contextPath}/static/layer_mobile/layer.js"></script>
+<!--添加layer移动  弹出窗口的 插件支持-->
+
+<!--改变顶部  head-bar变成绿色-->
+<link href="${pageContext.request.contextPath}/static/common/base/alert_mui_bar.css" rel="stylesheet"/>
+
+<!--本页的css js-->
+<link href="${pageContext.request.contextPath}/static/common/shopcart/shopcart.css" rel="stylesheet"/>
+<script src="${pageContext.request.contextPath}/static/common/shopcart/shopcart.js"></script>
+
+<!--添加  js api-->
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<!--添加  js api-->
+
+<!--添加  微信分享js 自己扩展的  -->
+<script src="${pageContext.request.contextPath}/static/weixin_js/weixin_share.js"></script>
+<!--添加  微信分享js 自己扩展的  -->
+
+<title>购物车-${config.domain_title}</title>
+
+</head>
+<script type="text/javascript" charset="utf-8">
+var ids_len = 0;//选中的个数
+var ids_str ;//ids 的内容   12,55,22
+
+var share_url;//分享连接
+var share_img_url;//分享图标
+var share_title= "购物车-${config.domain_title}";//分享标题
+var share_desc = "${config.desc_}";//分享摘要
+
+$(function(){
+	var host = document.domain; 
+	share_url = window.location.href;
+	share_img_url = 'http://'+host+'/static/images/base/shopCart.png';
+	weixin_share();
+});
+
+
+
+function getCheckBokLen(){
+	ids_len = $("input[type='checkbox']:checked").length;
+	var cb_obj = $("input:checkbox");
+	ids_str = "";
+	for(var i=0;i<cb_obj.length;i++){
+		if(cb_obj[i].checked){
+			ids_str+=cb_obj[i].value+',';
+		}
+	}
+	ids_str = ids_str.substring(0,ids_str.length-1);
+	
+	$("#selectNum").html(ids_len);
+	
+	console.log(ids_len);
+	console.log(ids_str);
+}
+
+function jiesuan(){
+	window.location.href="/wap/dingdan/create?ids="+ids_str+"&source=shopCart"
+}
+
+
+//启动定时器
+timer = setInterval(getCheckBokLen,1000);
+
+
+</script>
+
+<style type="text/css">
+.pay_btn{
+	width:80%;
+	font-family: Helvetica, sans-serif;
+	font-size: 15px !important;
+	border-radius: 5px!important;
+	cursor: pointer;
+	background: #0A9221;
+	font-weight: bold;
+	color: white;
+	padding: 7px 40px 7px 40px;
+	display: inline-block;
+	cursor: pointer;
+}
+</style>
+
+
+<body>
+<header id="header" class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left "><span style="font-size: 16px; line-height: 20px; height: 20px;">返回</span></a>
+	<h1 class="mui-title">购物车</h1>
+</header>
+
+
+<div class="mui-content">
+	<div class="shop_list">
+		  
+		<!-- <div class="shop_item">
+			<div style="width: 40px;padding-top: 40px; text-align: center;">
+				<input type="checkbox" id="1" value="1"  style="zoom:150%"  /> 
+			</div>
+			<div style="width: 100px;" onclick="window.location.href='/wap/goods/1.html'">
+				<img style="width: 100%;" src="/static/images/base/001.png" />
+			</div>
+			<div style="flex:1;-webkit-flex:1; padding-left: 10px;">
+				<div class="shop_item_title">金针菇约 1斤/份</div>
+				<div>
+					<span style="font-size: 13px; color: #ef4706;  font-weight: bold;">¥</span>
+					<span style="letter-spacing: 1px; color: #ef4706;  font-weight: bold;">12.00</span>
+				</div>
+			</div>
+			<div style="width: 40px; text-align: center; padding-top: 35px;">
+				<span class="shop_item_btn_del" onclick="shop_del(1)">删除</span>
+			</div>
+		</div> -->
+		
+		 
+	</div>
+</div>
+
+
+<div style="background-color:white; position: fixed; width:100%; height:50px;  border-top:1px solid #ddd; bottom:56px;  display: flex;display: -webkit-flex;">
+	<div style="flex:1;-webkit-flex:1; padding: 17px 0px 5px 7px; ">
+		选中<span id="selectNum" style="color: red; font-weight: bold;">0</span>个
+	</div>
+	
+	
+	<div style=" width: 150px; text-align: center; padding-top: 8px;">
+		<div class="pay_btn" onclick="jiesuan()">结算</div>
+	</div>
+	
+	
+</div>
+
+<!-- 底部菜单 -->
+<jsp:include page="/wap/common/fixed_btm.jsp"/>
+		
+</body>
+</html>

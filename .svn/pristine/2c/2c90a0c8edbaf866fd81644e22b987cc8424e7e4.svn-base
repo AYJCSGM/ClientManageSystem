@@ -1,0 +1,174 @@
+
+/*公共代码 */
+.wrap {
+	min-width: 1200px;
+}
+
+.wrap .model {
+	background-color: black;
+}
+.wrap .model .content {
+	width: 1200px;
+	margin: 0 auto;
+	position: relative;
+}
+
+.wrap .model .content .model_title {
+	margin-bottom: 10px;
+}
+.wrap .model .content .model_title span:nth-child(1) {
+	letter-spacing:2px;
+	font-size: 27px;
+	display: inline-block;
+	color: #d2cccc;
+	vertical-align: middle;
+}
+.model_title_a{
+	vertical-align: middle;
+	margin-left:40px;
+	padding: 0px 10px 0px 10px;
+	font-size: 13px;
+	border-radius: 15px;
+	display: inline-block; 
+	cursor: pointer;
+	border: 1px solid #4CAF50;
+	color: #4CAF50;
+}
+
+
+.wrap .model .content .model_content {
+	position:relative;
+}
+/*公共代码 */
+
+.video_list{
+}
+.video_list .item{
+	width:24.99%; 
+	display: inline-block; 
+	float: left;
+}
+.video_list .item_title{
+	color: white;
+	font-size: 14px;
+	line-height: 21px;
+    height: 21px;
+    overflow:hidden;
+	font-family: "Helvitica Neue",Helvitica,Arial,"Hiragino Sans GB","Microsoft YaHei","Arial Regular","Microsoft JhengHei",sans-serif;
+}
+
+/* 页面底部css  业务 关于我们  联系我们  称为info */
+.food_info{
+	margin-bottom: 20px;
+}
+
+.food_info_item{
+	vertical-align:top;
+	display: inline-block; 
+	width: 200px;
+}
+
+.food_info_item h3{
+	color: white; 
+	margin-bottom: 10px;
+	font-size: 17px;
+}
+
+.food_info_item a{
+	color:#848282;
+	display: block;
+	margin-bottom: 5px;
+}
+
+.food_info_item a:hover{
+	text-decoration:underline;
+}
+
+
+.food_info_item .pic_div{
+	width: 150px; 
+	height: 150px;
+}
+
+.food_info_item .pic_div img{
+	width: 100%; 
+	height: 100%;
+}
+
+/* 页面底部css  业务 关于我们  联系我们  称为info */
+
+/* 友情 链接  css */
+.link_list{
+}
+
+.link_list a{
+	white-space:nowrap;
+	color:#848282;
+	line-height:33px;
+	padding: 0px 11px 0px 11px;
+}
+
+
+.link_list a:hover{
+	text-decoration:underline;
+}
+/* 友情 链接  css */
+
+
+/* 视频list1   css  鼠标移上面会出现个边框 */
+.video_list1{
+	overflow: hidden;
+}
+.video_list1 .item{
+	width:19.99%; 
+	display: inline-block; 
+	float: left;
+}
+.video_list1 .item a{
+	border: 3px solid #222;
+}
+.video_list1 .item a:hover{
+	border: 3px solid #009688;
+}
+/* 视频list1 css 鼠标移上面会出现个边框 */
+
+
+/* 视频list2   css */
+.video_list2{
+	overflow: hidden;
+}
+.video_list2 .item{
+	width:24.99%; 
+	display: inline-block; 
+	float: left;
+}
+.video_list2 .item a{
+	display: block; 
+	width: 100%; 
+	height: 100%; 
+	position: relative;
+}
+
+.video_list2 .item .img_title{
+	 position: absolute; 
+	 width: 100%;
+	 bottom: 2px; 
+	 text-shadow:5px 2px 6px #000;  
+	 height: 41px; 
+	 overflow: hidden;
+}
+
+.video_list2 .item img{
+    transition: all .2s ease;
+    -webkit-transition: all .2s ease;
+    -ms-transition: all .2s ease;
+    -moz-transition: all .2s ease;
+}
+.video_list2 .item img:hover{
+	trasform: translateZ(0) scale(1.03,1.03);
+    -webkit-transform: translateZ(0) scale(1.03,1.03);
+    -ms-transform: translateZ(0) scale(1.03,1.03);
+    -moz-transform: translateZ(0) scale(1.03,1.03);
+}
+
+/* 视频list2   css */

@@ -1,0 +1,32 @@
+package com.java1234.util.business;
+
+import net.sf.json.JSONObject;
+
+
+public class Util {
+	
+	public static void main(String[] args) {
+		
+		
+	}
+	
+	
+	
+	public static String getMonths(String month){
+		if("01,02,03".indexOf(month)!=-1){
+			return "01,02,03";
+		}
+		if("04,05,06".indexOf(month)!=-1){
+			return "04,05,06";
+		}
+		if("07,08,09".indexOf(month)!=-1){
+			return "07,08,09";
+		}
+		if("10,11,12".indexOf(month)!=-1){
+			return "10,11,12";
+		}
+		return null;
+	}
+	
+	
+}

@@ -1,0 +1,74 @@
+package com.java1234.entity;
+
+import java.util.Date;
+
+/**
+ * 类似 老城优选的商品分类
+ * 一行3个图片 
+ * 有行距
+ * @author Administrator
+ */
+public class FenLei {
+	private Integer id;
+	private String name;//名子
+	private String imgUrl;
+	private Integer order_;
+	private Integer isUse;
+	
+	private Integer createUserId;
+	private User createUser;
+	private Date createDateTime;
+	
+	
+
+	public Integer getIsUse() {
+		return isUse;
+	}
+	public void setIsUse(Integer isUse) {
+		this.isUse = isUse;
+	}
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
+	}
+	public User getCreateUser() {
+		return createUser;
+	}
+	public void setCreateUser(User createUser) {
+		this.createUser = createUser;
+	}
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getImgUrl() {
+		return imgUrl;
+	}
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
+	}
+	public Integer getOrder_() {
+		return order_;
+	}
+	public void setOrder_(Integer order_) {
+		this.order_ = order_;
+	}
+	
+	
+}

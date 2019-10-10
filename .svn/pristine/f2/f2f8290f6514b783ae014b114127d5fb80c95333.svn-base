@@ -1,0 +1,288 @@
+package com.java1234.controller.business;
+
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import com.java1234.entity.business.XiaoShou;
+import com.java1234.entity.business.XiaoShouTarget;
+import com.java1234.service.ConfigService;
+import com.java1234.service.business.XiaoShouService;
+import com.java1234.service.business.XiaoShouTargetService;
+import com.java1234.util.DateUtil;
+import com.java1234.util.ResponseUtil;
+import com.java1234.util.business.Util;
+import net.sf.json.JSONObject;
+
+
+@Controller
+@RequestMapping("/xiaoshou")
+
+public class XiaoShou_Controller {
+	
+	
+	@Resource
+	private XiaoShouTargetService xiaoShouTargetService;
+	
+	@Resource
+	private XiaoShouService xiaoShouService;
+	@Resource
+	private ConfigService configService;
+	
+	
+	/**
+	 * /xiaoshou/huizong
+	 * 汇总页面使用的是    本月 本季度  完成比
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/huizong")
+	public ModelAndView huizong() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/admin/bussiness/huizong");
+		return mav;
+	}
+	
+	
+	/**
+	 * /xiaoshou/fenxi
+	 * 分析页面使用的是 1月 2月 3月  4月 ...12月
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/fenxi")
+	public ModelAndView fenxi() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/admin/bussiness/fenxi");
+		return mav;
+	}
+	
+	
+	/**
+	 * 
+	 * /xiaoshou/tongji
+	 * 接受年月 然后传加  数据 
+	 * @param year 2018  2018
+	 * @param month   2 3 4 5 6  
+	 */
+	@RequestMapping("/tongji")
+	public String tongji(@RequestParam(value = "year", required = false) String year,
+			@RequestParam(value = "month", required = false) String month,   HttpServletResponse response)
+			throws Exception {
+		
+		//yyyy-MM-dd HH:mm:ss
+		String date = year+"-"+month;
+		
+		String date1 = date+"-01 00:00:00";
+		String date2 = DateUtil.getDays(date)+" 23:59:59";
+		
+		//
+		List<JSONObject> list = new ArrayList<JSONObject>();
+		
+		JSONObject item1 = new JSONObject();
+		item1.put("name", "政府采购");
+		item1.put("like", "C%");
+		list.add(item1);
+		JSONObject item2 = new JSONObject();
+		item2.put("name", "思迅软件");
+		item2.put("like", "R%");
+		list.add(item2);
+		JSONObject item3 = new JSONObject();
+		item3.put("name", "企业");
+		item3.put("like", "Q%");
+		list.add(item3);
+		JSONObject item4 = new JSONObject();
+		item4.put("name", "同行");
+		item4.put("like", "T%");
+		list.add(item4);
+		JSONObject item5 = new JSONObject();
+		item5.put("name", "财务软件");
+		item5.put("like", "Y%");
+		list.add(item5);
+		JSONObject item6 = new JSONObject();
+		item6.put("name", "散户");
+		item6.put("like", "S%");
+		list.add(item6);
+		
+		JSONObject item7 = new JSONObject();
+		item7.put("name", "公司自用");
+		item7.put("like", "Z%");
+		list.add(item7);
+		
+		JSONObject item8 = new JSONObject();
+		item8.put("name", "合计");
+		list.add(item8);
+		
+		
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("date1", date1);
+		map.put("date2", date2);
+		
+		XiaoShou xiaoshou = null;
+		
+		for(JSONObject item : list){
+			if(item.get("like")!=null){
+				map.put("sup_name", item.get("like").toString());
+			}else{
+				map.put("sup_name", null);
+			}
+			
+			xiaoshou = xiaoShouService.tongji(map);
+			if(xiaoshou!=null){
+				item.put("jine", xiaoshou.getSheet_amt());
+			}else {
+				item.put("jine", "0");
+			}
+		}
+		
+		JSONObject result = new JSONObject();
+		result.put("data", list.toString());
+		result.put("success", true);
+		
+		ResponseUtil.write(response, result.toString());
+		return null;
+	}
+	
+	
+	/**
+	 * /xiaoshou/mouth   返回现在是几月
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping("/mouth")
+	public String mouth(HttpServletResponse response, HttpServletRequest request) throws Exception {
+		String mouth = DateUtil.formatDate(new Date(), "MM");
+		//02   ，去0 返回   2
+		//从数据库拿 月份。  可以自定义月份。
+		ResponseUtil.write(response, mouth);
+		return null;
+	}
+	
+	
+	/**
+	 * 
+	 * http://localhost/xiaoshou/get/huizong?year=2018&month=02&name=政府采购
+	 * 
+	 * /xiaoshou/get/huizong?year=2018&month=02&name=政府采购
+	 * 
+	 * @param year 2018
+	 * @param month  04
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/get/huizong")
+	public String get_huizong(@RequestParam(value = "year", required = false) String year,
+			@RequestParam(value = "month", required = false) String month,
+			@RequestParam(value = "name", required = false) String name,   HttpServletResponse response)
+			throws Exception {
+		Map<String,Object> map = new HashMap<String,Object>();
+		name = name.replaceAll("\r|\n", "");
+		month = month.replaceAll("\r|\n", "");
+		map.put("month", month);
+		map.put("name", name.trim());
+		XiaoShouTarget xst = xiaoShouTargetService.find(map);
+		
+		JSONObject result = new JSONObject();
+		
+		//取出 本月 计划完成 
+		System.out.println("取出  本月  计划完成 "+xst.getDone_jine());
+		result.put("curr_month1", xst.getDone_jine());
+		
+		String sup_name = "";
+		
+		System.out.println("【】【】【】"+name);
+		System.out.println(name.length());
+		
+		switch (name) {
+		case "政府采购":
+			sup_name = "C%";
+			break;
+		case "思迅软件":
+			sup_name = "R%";
+			break;
+		case "企业":
+			sup_name = "Q%";
+			break;
+		case "财务软件":
+			sup_name = "Y%";
+			break;
+		case "钱客多":
+			sup_name = "K%";
+			break;
+		case "同行":
+			sup_name = "T%";
+			break;
+		case "加油站软件":
+			sup_name = "J%";
+			break;
+		}
+		
+		//yyyy-MM-dd HH:mm:ss
+		String date = year+"-"+month;
+		String date1 = date+"-01 00:00:00";
+		String date2 = DateUtil.getDays(date)+" 23:59:59";
+		
+		map.put("date1", date1);
+		map.put("date2", date2);
+		map.put("sup_name", sup_name);
+		
+		XiaoShou xiaoshou = xiaoShouService.tongji(map);
+		
+		if(xiaoshou!=null){
+			result.put("curr_month2", xiaoshou.getSheet_amt());
+			//取出 本月 已完成
+			System.out.println("取出来 当月完成"+xiaoshou.getSheet_amt());
+		}else {
+			result.put("curr_month2", "0");
+		}
+		
+		//取出 季度  计划完成
+		
+		//写一个方法 。传入 2018-01   传出  2018-01-01 00：
+		String months = Util.getMonths(month);
+		
+		String[] monthArray = months.split(",");
+		
+		BigDecimal jihua_jine = new BigDecimal("0");
+		for (int i = 0; i < monthArray.length; i++) {
+			map.put("month", Integer.parseInt(monthArray[i]));
+			xst = xiaoShouTargetService.find(map);
+			//累计加
+			jihua_jine = jihua_jine.add(xst.getDone_jine());
+		}
+		System.out.println("本季度需要完成"+jihua_jine);
+		result.put("curr_jidu1", jihua_jine);
+		//计算本季度已完成多少
+		
+		date1 = year+"-"+monthArray[0]+"-01 00:00:00";
+		date2 = DateUtil.getDays(year+"-"+monthArray[2])+" 23:59:59";
+		map.put("date1", date1);
+		map.put("date2", date2);
+		map.put("sup_name", sup_name);
+		xiaoshou = xiaoShouService.tongji(map);
+		
+		if(xiaoshou!=null){
+			result.put("curr_jidu2", xiaoshou.getSheet_amt());
+			//取出 本季度  已完成
+			System.out.println("取出来  本季度 已 完成"+xiaoshou.getSheet_amt());
+		}else {
+			result.put("curr_jidu2", "0");
+		}
+		
+		
+		ResponseUtil.write(response, result.toString());
+		return null;
+	}
+	
+}

@@ -1,0 +1,22 @@
+package com.java1234.dao;
+
+import com.java1234.entity.weixin.News_;
+
+public interface News_Dao {
+	
+	public Integer add(News_ news_);
+	
+	public Integer delete(Integer id);
+	
+	public News_ findByMediaId(String media_id);
+	
+	
+	/**
+	 * É¾³ýÈ«²¿
+	 * @param id
+	 * @return
+	 */
+	public Integer deleteAll(Integer id);
+	
+	
+}

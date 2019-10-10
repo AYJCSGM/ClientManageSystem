@@ -1,0 +1,40 @@
+package com.java1234.service.impl;
+
+
+import java.util.List;
+import javax.annotation.Resource;
+import org.springframework.stereotype.Service;
+
+import com.java1234.dao.DingDanInfoDao;
+import com.java1234.entity.DingDanInfo;
+import com.java1234.service.DingDanInfoService;
+
+
+
+@Service("dingDanInfoService")
+public class DingDanInfoServiceImpl implements DingDanInfoService {
+
+	
+	@Resource
+	private DingDanInfoDao dingDanInfoDao;
+	
+	@Override
+	public Integer add(DingDanInfo info) {
+		// TODO Auto-generated method stub
+		return dingDanInfoDao.add(info);
+	}
+	
+	@Override
+	public List<DingDanInfo> list(Integer dingdanId) {
+		// TODO Auto-generated method stub
+		return dingDanInfoDao.list(dingdanId);
+	}
+	
+	
+	@Override
+	public Integer deleteByDingDanId(Integer dingdanId) {
+		// TODO Auto-generated method stub
+		return dingDanInfoDao.deleteByDingDanId(dingdanId);
+	}
+
+}

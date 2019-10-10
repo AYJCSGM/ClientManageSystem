@@ -1,0 +1,319 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<!-- 开启高速模式    -->
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<!-- 开启高速模式 -->
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+<!-- 加入移动布局 -->
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no" />
+<!-- 加入移动布局 -->
+
+<!--添加  jq  支持加载-->
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<!--添加 jq 支持加载-->
+
+<!--添加 layui  支持加载-->
+<link rel="stylesheet"	href="${pageContext.request.contextPath}/static/layui-v2.1.5/layui/css/layui.css">
+<script	src="${pageContext.request.contextPath}/static/layui-v2.1.5/layui/layui.js"></script>
+<!--添加 layui  支持加载-->
+
+<script>
+	var save_url = '${save_url}';
+	
+	function save() {
+		//loading
+		var index = layer.load(1, {
+			shade : [ 0.1, '#fff' ]
+		//0.1透明度的白色背景
+		});
+		
+		var menuStr = $("#menuStr").val();
+		
+		$.post(save_url, {
+			menuStr : menuStr
+		}, function(result) {
+			if (result.success) {
+				//调用 父窗口的  关闭所有窗口 并且刷新 页面
+				layer.closeAll();
+				layer.msg(result.msg);
+			} else {
+				layer.closeAll();
+				layer.msg(result.msg);
+			}
+		}, 'json');
+	}
+</script>
+<style>
+html, body {
+}
+.layui-form-item {
+	margin-bottom: 3px;
+}
+</style>
+</head>
+<body>
+	<div style="padding: 10px;">
+		<form class="layui-form layui-form-pane">
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">菜单字符串</label>
+				<div class="layui-input-block">
+					<textarea placeholder="请输入菜单字符串" rows="20" class="layui-textarea" id="menuStr">${config.menuStr }</textarea>
+				</div>
+			</div>
+		</form>
+		<div class="site-demo-button" style="margin-top: 20px;">
+			<button id="save" onclick="save()"
+				class="layui-btn site-demo-layedit" data-type="content">提交微信公众号菜单</button>
+		</div>
+	</div>
+
+<p>范例如下:</p>
+<pre style="white-space: pre-wrap; font-stretch: normal; font-size: 12px; font-family: &quot;MicroSoft YaHei&quot;, &quot;Courier New&quot;, &quot;Andale Mono&quot;, monospace; padding: 5px 10px; border: 1px solid rgb(204, 204, 204); color: rgb(51, 51, 51); line-height: 20px; word-wrap: break-word; border-radius: 3px; margin-left: 10px;"> {
+     &quot;button&quot;:[
+     {	
+          &quot;type&quot;:&quot;click&quot;,
+          &quot;name&quot;:&quot;今日歌曲&quot;,
+          &quot;key&quot;:&quot;V1001_TODAY_MUSIC&quot;
+      },
+      {
+           &quot;name&quot;:&quot;菜单&quot;,
+           &quot;sub_button&quot;:[
+           {	
+               &quot;type&quot;:&quot;view&quot;,
+               &quot;name&quot;:&quot;搜索&quot;,
+               &quot;url&quot;:&quot;http://www.soso.com/&quot;
+            },
+            {
+                 &quot;type&quot;:&quot;miniprogram&quot;,
+                 &quot;name&quot;:&quot;wxa&quot;,
+                 &quot;url&quot;:&quot;http://mp.weixin.qq.com&quot;,
+                 &quot;appid&quot;:&quot;wx286b93c14bbf93aa&quot;,
+                 &quot;pagepath&quot;:&quot;pages/lunar/index&quot;
+             },
+            {
+               &quot;type&quot;:&quot;click&quot;,
+               &quot;name&quot;:&quot;赞一下我们&quot;,
+               &quot;key&quot;:&quot;V1001_GOOD&quot;
+            }]
+       }]
+ }</pre>
+<p>
+    <br/>
+</p>
+
+<p style="margin: 0px 10px; padding-bottom: 14px; font-size: 14px; white-space: normal; line-height: 1.5; word-wrap: break-word; color: rgb(51, 51, 51); font-family: &quot;Microsoft Yahei&quot;, 宋体, Tahoma, Arial; background-color: rgb(255, 255, 255);">
+    <span style="font-weight: 700;">其他新增按钮类型的请求示例</span>
+</p>
+<pre style="white-space: pre-wrap; font-stretch: normal; font-size: 12px; font-family: &quot;MicroSoft YaHei&quot;, &quot;Courier New&quot;, &quot;Andale Mono&quot;, monospace; padding: 5px 10px; border: 1px solid rgb(204, 204, 204); color: rgb(51, 51, 51); line-height: 20px; word-wrap: break-word; border-radius: 3px; margin-left: 10px;">{
+    &quot;button&quot;: [
+        {
+            &quot;name&quot;: &quot;扫码&quot;, 
+            &quot;sub_button&quot;: [
+                {
+                    &quot;type&quot;: &quot;scancode_waitmsg&quot;, 
+                    &quot;name&quot;: &quot;扫码带提示&quot;, 
+                    &quot;key&quot;: &quot;rselfmenu_0_0&quot;, 
+                    &quot;sub_button&quot;: [ ]
+                }, 
+                {
+                    &quot;type&quot;: &quot;scancode_push&quot;, 
+                    &quot;name&quot;: &quot;扫码推事件&quot;, 
+                    &quot;key&quot;: &quot;rselfmenu_0_1&quot;, 
+                    &quot;sub_button&quot;: [ ]
+                }
+            ]
+        }, 
+        {
+            &quot;name&quot;: &quot;发图&quot;, 
+            &quot;sub_button&quot;: [
+                {
+                    &quot;type&quot;: &quot;pic_sysphoto&quot;, 
+                    &quot;name&quot;: &quot;系统拍照发图&quot;, 
+                    &quot;key&quot;: &quot;rselfmenu_1_0&quot;, 
+                   &quot;sub_button&quot;: [ ]
+                 }, 
+                {
+                    &quot;type&quot;: &quot;pic_photo_or_album&quot;, 
+                    &quot;name&quot;: &quot;拍照或者相册发图&quot;, 
+                    &quot;key&quot;: &quot;rselfmenu_1_1&quot;, 
+                    &quot;sub_button&quot;: [ ]
+                }, 
+                {
+                    &quot;type&quot;: &quot;pic_weixin&quot;, 
+                    &quot;name&quot;: &quot;微信相册发图&quot;, 
+                    &quot;key&quot;: &quot;rselfmenu_1_2&quot;, 
+                    &quot;sub_button&quot;: [ ]
+                }
+            ]
+        }, 
+        {
+            &quot;name&quot;: &quot;发送位置&quot;, 
+            &quot;type&quot;: &quot;location_select&quot;, 
+            &quot;key&quot;: &quot;rselfmenu_2_0&quot;
+        },
+        {
+           &quot;type&quot;: &quot;media_id&quot;, 
+           &quot;name&quot;: &quot;图片&quot;, 
+           &quot;media_id&quot;: &quot;MEDIA_ID1&quot;
+        }, 
+        {
+           &quot;type&quot;: &quot;view_limited&quot;, 
+           &quot;name&quot;: &quot;图文消息&quot;, 
+           &quot;media_id&quot;: &quot;MEDIA_ID2&quot;
+        }
+    ]
+}</pre>
+<p style="margin: 0px 10px; padding-bottom: 14px; font-size: 14px; white-space: normal; line-height: 1.5; word-wrap: break-word; color: rgb(51, 51, 51); font-family: &quot;Microsoft Yahei&quot;, 宋体, Tahoma, Arial; background-color: rgb(255, 255, 255);">
+    <span style="font-weight: 700;">参数说明</span>
+</p>
+<table cellspacing="0" cellpadding="4" align="center" width="640px">
+    <tbody>
+        <tr class="firstRow thead" style="background-color: rgb(244, 245, 249); border-left-width: 0px;">
+            <th class="table_cell" style="padding: 10px 32px; font-weight: 400; line-height: 20px; border-left-width: 0px; border-left-color: rgb(231, 231, 235); border-bottom-color: rgb(231, 231, 235); text-align: left; min-width: 80px; width: 120px;">
+                参数
+            </th>
+            <th class="table_cell" style="padding: 10px 32px; font-weight: 400; line-height: 20px; border-left-color: rgb(231, 231, 235); border-bottom-color: rgb(231, 231, 235); text-align: left; min-width: 80px; width: 120px;">
+                是否必须
+            </th>
+            <th class="table_cell" style="padding: 10px 32px; font-weight: 400; line-height: 20px; border-left-color: rgb(231, 231, 235); border-bottom-color: rgb(231, 231, 235); text-align: left; min-width: 80px;">
+                说明
+            </th>
+        </tr>
+        <tr>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                button
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                是
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                一级菜单数组，个数应为1~3个
+            </td>
+        </tr>
+        <tr>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                sub_button
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                否
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                二级菜单数组，个数应为1~5个
+            </td>
+        </tr>
+        <tr>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                type
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                是
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                菜单的响应动作类型，view表示网页类型，click表示点击类型，miniprogram表示小程序类型
+            </td>
+        </tr>
+        <tr>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                name
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                是
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                菜单标题，不超过16个字节，子菜单不超过60个字节
+            </td>
+        </tr>
+        <tr>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                key
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                click等点击类型必须
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                菜单KEY值，用于消息接口推送，不超过128字节
+            </td>
+        </tr>
+        <tr>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                url
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                view、miniprogram类型必须
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                网页<span style="word-break: break-all; font-size: 16px;">链接，用户点击菜单可打开链接，不超过1024字节。<span style="word-break: break-all;">type为miniprogram时，不支持小程序的老版本客户端将打开本url。</span></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                media_id
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                media_id类型和view_limited类型必须
+            </td>
+            <td class="table_cell" style="padding: 10px 32px; min-width: 80px;">
+                调用新增永久素材接口返回的合法media_id
+            </td>
+        </tr>
+        <tr>
+            <td class="table_cell" colspan="1" rowspan="1" style="padding: 10px 32px; min-width: 80px;">
+                appid<br style="word-break: break-all;"/>
+            </td>
+            <td class="table_cell" colspan="1" rowspan="1" style="padding: 10px 32px; min-width: 80px;">
+                miniprogram类型必须
+            </td>
+            <td class="table_cell" colspan="1" rowspan="1" style="padding: 10px 32px; min-width: 80px;">
+                小程序的appid（仅认证公众号可配置）
+            </td>
+        </tr>
+        <tr>
+            <td class="table_cell" colspan="1" rowspan="1" style="padding: 10px 32px; min-width: 80px;">
+                <p style="word-break: break-all; padding-bottom: 14px;">
+                    pagepath
+                </p>
+            </td>
+            <td class="table_cell" colspan="1" rowspan="1" style="padding: 10px 32px; min-width: 80px;">
+                miniprogram类型必须
+            </td>
+            <td class="table_cell" colspan="1" rowspan="1" style="padding: 10px 32px; min-width: 80px;">
+                小程序的页面路径<br/><br/>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p>
+    <br/>
+</p>
+
+
+
+
+<script>
+		layui.use([ 'laydate', 'laypage', 'layer', 'table', 'carousel',
+				'upload', 'element' ], function() {
+			var laydate = layui.laydate //日期
+			, laypage = layui.laypage //分页
+			layer = layui.layer //弹层
+			, table = layui.table //表格
+			, carousel = layui.carousel //轮播
+			, upload = layui.upload //上传
+			, element = layui.element; //元素操作
+			
+			
+			
+		});
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>${title}</title>
+
+${config.headStr}
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+<!-- 加入移动布局 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+<!-- 加入移动布局 -->
+
+<!--添加  jq  支持加载-->
+<script	src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<!--添加 jq 支持加载-->
+
+<!--添加 layui  支持加载-->
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/static/layui-v2.1.5/layui/css/layui.css">
+<script
+	src="${pageContext.request.contextPath}/static/layui-v2.1.5/layui/layui.js"></script>
+<!--添加 layui  支持加载-->
+
+</head>
+<style>
+html{height: 100%;}
+
+.row{
+display: flex;
+display: -webkit-flex;
+}
+.item{
+	overflow: hidden; 
+	flex:1;
+	-webkit-flex:1;
+	font-weight: bold;
+	line-height: 42px; 
+	font-size: 30px; 
+	border: 2px solid #ab9d9d;
+	text-align: center;
+}
+
+</style>
+<script>
+var year = ${config.bus_date};
+
+var month = 1;
+var max_month = 12 ; 
+
+$(function(){
+	loadData();
+});
+
+
+function loadData(){
+	$.post('/xiaoshou/tongji',{year:year,month:month},function(result){
+		var str = "";
+		if(result.success){
+			str = str+ '<div class="row" ><div class="item">'+month+'月</div>';
+			for(var j=0;j<result.data.length;j++){
+				str = str+'<div class="item">'+result.data[j].jine+'</div>';
+			}
+			str = str+ '</div>';
+			$(".list").append(str);
+			if(month<max_month){
+				month++;
+				loadData();
+			}
+		}
+	},'json');
+}
+
+
+</script>
+<body style="height: 100%; width: 100%;">
+<div style="height: 100%; width: 100%; background-color:#2196F3;  overflow: hidden;">
+	<div style="font-size: 30px; line-height: 88px; text-align: center; color:#FFEB3B; font-weight: bold;">${config.bus_date}年销售统计分析表</div>
+	
+	<div class="list" style="border: 2px solid #ab9d9d;  ;">
+		<div class="row" >
+			<div class="item">
+			</div>
+			<div class="item">
+				政府采购
+			</div>
+			<div class="item">
+				思迅软件
+			</div>
+			<div class="item">
+				企业
+			</div>
+			<div class="item">
+				同行
+			</div>
+			<div class="item">
+				财务软件
+			</div>
+			<div class="item">
+				散户
+			</div>
+			<div class="item">
+				公司自用
+			</div>
+			<div class="item">
+				合计
+			</div>
+		</div>
+		
+		 
+	</div>
+	
+</div>
+
+
+
+<script>
+layui.use([ 'laydate', 'laypage', 'layer', 'table', 'carousel',
+		'upload', 'element' ], function() {
+	var laydate = layui.laydate //日期
+	, laypage = layui.laypage //分页
+	layer = layui.layer //弹层
+	, table = layui.table //表格
+	, carousel = layui.carousel //轮播
+	, upload = layui.upload //上传
+	, element = layui.element; //元素操作
+
+});
+</script>
+</body>
+</html>

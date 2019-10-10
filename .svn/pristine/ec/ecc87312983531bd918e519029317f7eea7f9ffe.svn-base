@@ -1,0 +1,85 @@
+package com.java1234.service.weixin;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+
+import com.java1234.entity.DingDan;
+import com.java1234.entity.weixin.Receive;
+import com.java1234.entity.weixin.ReceiveType;
+import com.java1234.util.DateUtil;
+import com.java1234.util.weixin.WeiXinUtil;
+
+import net.sf.json.JSONObject;
+
+@Service("weiXinService")
+public class WeiXinServiceImpl implements WeiXinService {
+	
+	@Resource
+	private ReceiveService receiveService;
+	@Resource
+	private ReceiveTypeService receiveTypeService;
+	
+	
+	/**
+	 * 
+	* {{first.DATA}}
+	支付金额：{{keyword1.DATA}}
+	支付方式：{{keyword2.DATA}}
+	支付详情：{{keyword3.DATA}}
+	支付时间：{{keyword4.DATA}}
+	{{remark.DATA}}
+	你好，处方支付成功。
+	支付金额：11
+	支付方式：微信支付
+	支付详情：处方缴费
+	支付时间：2014年7月21日 18:36
+	感谢你的使用。
+	 */
+	public void push_pay_ok_template_msg(DingDan dingdan) {
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		JSONObject token = (JSONObject) servletContext.getAttribute("token");
+		
+		ReceiveType receiveType = receiveTypeService.findById(1);
+		
+		Map<String,Object> map = new HashMap<String,Object>();
+		
+		//推送消息  付款成功
+		String post_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="+token.getString("access_token");
+		
+		map.put("receiveTypeId", "1");
+		List<Receive> receiveList = receiveService.list(map);
+		List<JSONObject> sendList = new ArrayList<JSONObject>();
+		
+		map.put("template_id", receiveType.getTemplate_id());
+		map.put("first", "支付成功提醒");
+		map.put("keyword1", dingdan.getJine()+"元");
+		map.put("keyword2", "微信支付");
+		map.put("keyword3", dingdan.getTitle());
+		map.put("keyword4", DateUtil.formatDate(dingdan.getPayDateTime(), "yyyy-MM-dd HH:mm"));
+		
+		map.put("remark", "客户姓名:"+dingdan.getClient().getName()+"\n客户电话:"+dingdan.getClient().getPhone());
+		
+		JSONObject data ; 
+		for (Receive receive: receiveList) {
+			map.put("openid", receive.getOpenid());
+			data = new JSONObject();
+			data.put("post_url", post_url);
+			data.put("data", WeiXinUtil.get_template_messages_data(map));
+			sendList.add(data);
+		}
+		
+		WeiXinUtil.start_thread_push_Template_Messages(sendList);
+		//推送消息  付款成功
+	}
+	
+}

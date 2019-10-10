@@ -1,0 +1,24 @@
+package com.java1234.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import com.java1234.entity.ShopCart;
+
+public interface ShopCartDao {
+
+	
+	public Integer add(ShopCart shopCart);
+	
+	public Integer update(ShopCart shopCart);
+	
+	public List<ShopCart> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public ShopCart findById(Integer id);
+	
+	public Integer delete(Integer id);
+	
+	
+}

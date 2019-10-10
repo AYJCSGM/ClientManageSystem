@@ -1,0 +1,25 @@
+package com.java1234.dao;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.weixin.ClickEvent;
+
+
+public interface ClickEventDao {
+	
+	
+	public Integer add(ClickEvent clickEvent);
+	
+	public Integer update(ClickEvent clickEvent);
+	
+	public List<ClickEvent> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public ClickEvent findById(Integer id);
+	
+	public List<ClickEvent> findByEventKey(String eventKey);
+	
+	public Integer delete(Integer id);
+	
+}

@@ -1,0 +1,168 @@
+package com.java1234.service.weixin;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+
+import com.java1234.dao.ClickEventDao;
+import com.java1234.dao.ConfigDao;
+import com.java1234.dao.TextEventDao;
+import com.java1234.entity.Config;
+import com.java1234.entity.weixin.ClickEvent;
+import com.java1234.entity.weixin.TextEvent;
+import com.java1234.entity.weixin.WXNewsMessage;
+import com.java1234.entity.weixin.WXTextMessage;
+import com.java1234.util.weixin.WeiXinUtil;
+
+import net.sf.json.JSONObject;
+
+
+@Service("textEventService")
+public class TextEventServiceImpl implements TextEventService {
+
+	@Resource
+	private TextEventDao textEventDao;
+	
+	@Resource
+	private ConfigDao configDao;
+	
+	
+	@Override
+	public Integer add(TextEvent textEvent) {
+		// TODO Auto-generated method stub
+		return textEventDao.add(textEvent);
+	}
+
+	@Override
+	public Integer update(TextEvent textEvent) {
+		// TODO Auto-generated method stub
+		return textEventDao.update(textEvent);
+	}
+
+	@Override
+	public List<TextEvent> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return textEventDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return textEventDao.getTotal(map);
+	}
+
+	@Override
+	public TextEvent findById(Integer id) {
+		// TODO Auto-generated method stub
+		return textEventDao.findById(id);
+	}
+	
+	@Override
+	public List<TextEvent>  findByContent(String content) {
+		// TODO Auto-generated method stub
+		return textEventDao.findByContent(content);
+	}
+	
+	@Override
+	public Integer delete(Integer id) {
+		// TODO Auto-generated method stub
+		return textEventDao.delete(id);
+	}
+	
+
+	@Override
+	public String doingWeiXinText(Map<String, Object> requestMap) {
+		
+		String content = requestMap.get("Content").toString();
+		
+		
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		JSONObject token = (JSONObject) servletContext.getAttribute("token");
+		
+		List<TextEvent> textEventList = textEventDao.findByContent(content);
+		
+		for(TextEvent textEvent :textEventList){
+			if(textEvent.getMessageType()==2){
+				String post_url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token="+token.getString("access_token");
+				WeiXinUtil.set_client_message(textEvent.getMedia_id(), requestMap.get("FromUserName").toString(), post_url, textEvent.getMedia_type());
+			}
+		}
+		
+		String RespXml = null ;
+		
+		for(TextEvent textEvent :textEventList){
+			
+			if(textEvent.getMessageType()==0){
+				WXTextMessage text = new WXTextMessage();
+				text.setToUserName(requestMap.get("FromUserName").toString());//这个是用户的openid
+				text.setFromUserName(requestMap.get("ToUserName").toString());
+				text.setContent(textEvent.getDesc_());
+				text.setMsgType("text");
+				text.setCreateTime(new Date().getTime()+"");
+				RespXml = WeiXinUtil.TextMessageToXML(text);
+				break;
+			}
+			
+			if(textEvent.getMessageType()==1){
+				Config config = configDao.findById(1);
+				WXNewsMessage news = new WXNewsMessage();
+				news.setToUserName(requestMap.get("FromUserName").toString());//这个是用户的openid
+				news.setFromUserName(requestMap.get("ToUserName").toString());
+				news.setTitle(textEvent.getTitle());
+				news.setDescription(textEvent.getDesc_());//标题图片下面是这个
+				news.setContent("内容:"+textEvent.getDesc_());//这个不会显示
+				news.setMsgType("news");
+				news.setCreateTime(new Date().getTime()/1000);
+				news.setPicUrl(config.getWeb_site()+textEvent.getThumbnail());
+				news.setUrl(textEvent.getUrl());
+				RespXml = WeiXinUtil.NewsMessageToXML(news);
+				break;
+			}
+		}
+		
+		if(RespXml==null){
+			textEventList = textEventDao.findByContent("无");
+			for(TextEvent textEvent :textEventList){
+				if(textEvent.getMessageType()==0){
+					WXTextMessage text = new WXTextMessage();
+					text.setToUserName(requestMap.get("FromUserName").toString());//这个是用户的openid
+					text.setFromUserName(requestMap.get("ToUserName").toString());
+					text.setContent(textEvent.getDesc_());
+					text.setMsgType("text");
+					text.setCreateTime(new Date().getTime()+"");
+					RespXml = WeiXinUtil.TextMessageToXML(text);
+					break;
+				}
+				
+				if(textEvent.getMessageType()==1){
+					//返回图文的二维码
+					Config config = configDao.findById(1);
+					
+					WXNewsMessage news = new WXNewsMessage();
+					news.setToUserName(requestMap.get("FromUserName").toString());//这个是用户的openid
+					news.setFromUserName(requestMap.get("ToUserName").toString());
+					news.setTitle(textEvent.getTitle());
+					news.setDescription(textEvent.getDesc_());//标题图片下面是这个
+					news.setContent("内容:"+textEvent.getDesc_());//这个不会显示
+					news.setMsgType("news");
+					news.setCreateTime(new Date().getTime()/1000);
+					news.setPicUrl(config.getWeb_site()+textEvent.getThumbnail());
+					news.setUrl(textEvent.getUrl());
+					RespXml = WeiXinUtil.NewsMessageToXML(news);
+					break;
+				}
+			}
+		}
+		
+		return RespXml;
+	}
+
+}

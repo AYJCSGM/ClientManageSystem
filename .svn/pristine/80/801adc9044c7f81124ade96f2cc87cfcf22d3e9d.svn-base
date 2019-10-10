@@ -1,0 +1,51 @@
+
+.goods_list{
+	margin-bottom: 90px;
+}
+
+.goods_item{
+	display: flex;
+	display: -webkit-flex;
+	background-color: white;
+}
+.goods_item_left_img{
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+.goods_item_right{
+	position:relative;
+	
+	flex:1;
+	-webkit-flex:1;
+}
+.goods_item_right:after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    content: '';
+    -webkit-transform: scaleY(.5);
+    transform: scaleY(.5);
+    background-color: #c8c7cc;
+}
+
+.goods_item_right_title{
+	max-height: 65px;
+    overflow: hidden;
+	letter-spacing:1px;
+	padding: 5px 5px 5px 5px; 
+	font-size: 13px;
+	font-family: "Helvitica Neue",Helvitica,Arial,"Hiragino Sans GB","Microsoft YaHei","Arial Regular","Microsoft JhengHei",sans-serif;
+}
+.goods_item_right_price{	
+	padding: 5px 5px 5px 5px; 
+}
+.goods_item_right_address{
+	padding: 5px 5px 5px 5px; 
+	font-size: 14px; 
+	letter-spacing: 1px;
+	font-size: 12px; 
+	color:#4e4e4e;
+}

@@ -1,0 +1,89 @@
+package com.java1234.entity;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+/**
+ * 退款记录表
+ * @author Administrator
+ *
+ */
+public class Refund {
+	
+	private Integer id;
+	private String openid;
+	private Integer state;//  1退款成功   2退款失败
+	private String out_trade_no;//购买 订单号
+	private String out_refund_no;//退款 订单号
+	private Date createDateTime;//创建时间
+	private BigDecimal refund_jine;//退款金额
+	private String refund_desc;//退款原因
+	private String ip;//退款ip
+	private String result_;//回调内容
+	
+	
+	
+	public String getOut_refund_no() {
+		return out_refund_no;
+	}
+	public void setOut_refund_no(String out_refund_no) {
+		this.out_refund_no = out_refund_no;
+	}
+	public String getOpenid() {
+		return openid;
+	}
+	public void setOpenid(String openid) {
+		this.openid = openid;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public Integer getState() {
+		return state;
+	}
+	public void setState(Integer state) {
+		this.state = state;
+	}
+	public String getOut_trade_no() {
+		return out_trade_no;
+	}
+	public void setOut_trade_no(String out_trade_no) {
+		this.out_trade_no = out_trade_no;
+	}
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
+	}
+	public BigDecimal getRefund_jine() {
+		return refund_jine;
+	}
+	public void setRefund_jine(BigDecimal refund_jine) {
+		this.refund_jine = refund_jine;
+	}
+	public String getRefund_desc() {
+		return refund_desc;
+	}
+	public void setRefund_desc(String refund_desc) {
+		this.refund_desc = refund_desc;
+	}
+	public String getIp() {
+		return ip;
+	}
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+	public String getResult_() {
+		return result_;
+	}
+	public void setResult_(String result_) {
+		this.result_ = result_;
+	}
+	
+	
+	
+}

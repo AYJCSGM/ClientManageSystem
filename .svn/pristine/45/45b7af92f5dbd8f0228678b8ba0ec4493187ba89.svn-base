@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.MessageDao">
+	
+	<resultMap type="Message" id="MessageResult">
+		<result property="id" column="id" />
+		<result property="ip" column="ip" />
+		<result property="nickName" column="nickName" />
+		<result property="content" column="content" />
+		<result property="createDateTime" column="createDateTime" />
+		<result property="openid" column="openid" />
+		<result property="isUse" column="isUse" />
+	</resultMap>
+	
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="Message">
+		insert into t_xc_message values(null,#{ip},#{nickName},#{content},#{createDateTime}
+		,#{openid},#{isUse})
+	</insert>
+	
+	<update id="update" parameterType="Message">
+		update t_xc_message
+		<set>
+			<if test="ip!=null ">
+				ip=#{ip},
+			</if>
+			<if test="nickName!=null ">
+				nickName=#{nickName},
+			</if>
+			<if test="content!=null ">
+				content=#{content},
+			</if>
+			<if test="createDateTime!=null ">
+				createDateTime=#{createDateTime},
+			</if>
+			<if test="openid!=null ">
+				openid=#{openid},
+			</if>
+			<if test="isUse!=null ">
+				isUse=#{isUse},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="MessageResult">
+		select * from t_xc_message
+		<where>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="isUse!=null and isUse!='' ">
+		 		and isUse = #{isUse} 
+			</if>
+		</where>
+		order by id DESC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select	count(*) from t_xc_message
+		<where>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="isUse!=null and isUse!='' ">
+		 		and isUse = #{isUse} 
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="MessageResult">
+		select * from t_xc_message where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_xc_message where id=#{id}
+	</delete>
+	
+</mapper> 

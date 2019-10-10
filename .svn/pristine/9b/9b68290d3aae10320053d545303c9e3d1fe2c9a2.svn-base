@@ -1,0 +1,89 @@
+package com.java1234.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.java1234.entity.Client;
+import com.java1234.entity.xiche.Member;
+import com.java1234.service.ClientService;
+import com.java1234.service.xiche.MemberService;
+import com.java1234.util.ResponseUtil;
+
+import net.sf.json.JSONObject;
+
+
+
+@Controller
+@RequestMapping("/member")
+public class MemberController {
+
+	
+	
+	@Resource
+	private MemberService memberService;
+	
+	
+	/**
+	 *   /client/find
+	 */
+	@RequestMapping("/find")
+	public String find(Member member ,HttpServletResponse response,HttpServletRequest request)throws Exception{
+		JSONObject result = new JSONObject();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("card", member.getCard());
+		map.put("password", member.getPassword());
+		
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm").create();
+		
+		Member member_data = memberService.find(map);
+		if(member_data!=null){
+			result.put("success", true);
+			result.put("data", gson.toJson(member_data));
+		}else{
+			result.put("success", false);
+		}
+		
+		System.out.println(result.toString());
+		
+		ResponseUtil.write(response,result.toString());
+		return null;
+	}
+	
+	
+	
+	/**
+	 *   /client/findByCard
+	 */
+	@RequestMapping("/findByCard")
+	public String find(@RequestParam(value = "card", required = false) String card,HttpServletResponse response,HttpServletRequest request)throws Exception{
+		JSONObject result = new JSONObject();
+		
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm").create();
+		Member member_data = memberService.findByCard(card);
+		
+		if(member_data!=null){
+			result.put("success", true);
+			result.put("data", gson.toJson(member_data));
+		}else{
+			result.put("success", false);
+		}
+		
+		System.out.println(result.toString());
+		
+		ResponseUtil.write(response,result.toString());
+		return null;
+	}
+	
+	
+	
+}

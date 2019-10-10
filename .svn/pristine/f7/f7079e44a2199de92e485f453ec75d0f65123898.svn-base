@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.ClickEventDao">
+	
+	<resultMap type="ClickEvent" id="ClickEventResult">
+		<result property="id" column="id" />
+		<result property="eventKey" column="eventKey" />
+		<result property="messageType" column="messageType" />
+		<result property="title" column="title" />
+		<result property="desc_" column="desc_" />
+		<result property="thumbnail" column="thumbnail" />
+		<result property="url" column="url" />
+		<result property="order_" column="order_" />
+		<result property="media_id" column="media_id" />
+		<result property="media_type" column="media_type" />
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="ClickEvent">
+		insert into t_click_event values(null,#{eventKey},#{messageType},#{title},#{desc_},#{thumbnail},#{url},#{order_},#{media_id},#{media_type})
+	</insert>
+	
+	<update id="update" parameterType="ClickEvent">
+		update t_click_event
+		<set>
+			<if test="eventKey!=null ">
+				eventKey=#{eventKey},
+			</if>
+			<if test="messageType!=null ">
+				messageType=#{messageType},
+			</if>
+			<if test="title!=null ">
+				title=#{title},
+			</if>
+			<if test="desc_!=null ">
+				desc_=#{desc_},
+			</if>
+			<if test="thumbnail!=null ">
+				thumbnail=#{thumbnail},
+			</if>
+			<if test="url!=null ">
+				url=#{url},
+			</if>
+			<if test="order_!=null ">
+				order_=#{order_},
+			</if>
+			<if test="media_id!=null ">
+				media_id=#{media_id},
+			</if>
+			<if test="media_type!=null ">
+				media_type=#{media_type},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	
+	<select id="list" parameterType="Map" resultMap="ClickEventResult">
+		select * from t_click_event
+		<where>
+			<if test="q!=null and q!=''">
+				and (title like #{q}     or desc_ like #{q} ) 
+			</if>
+			<if test="messageType!=null and messageType!='' ">
+		 		and messageType  =   #{messageType}
+			</if>
+		</where>
+		order by order_ ASC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from t_click_event
+		<where>
+			<if test="q!=null and q!=''">
+				and (title like #{q}     or desc_ like #{q} ) 
+			</if>
+			<if test="messageType!=null and messageType!='' ">
+		 		and messageType  =   #{messageType}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="ClickEventResult">
+		select * from t_click_event where id=#{id}
+	</select>
+	
+	<select id="findByEventKey" parameterType="String" resultMap="ClickEventResult">
+		select * from t_click_event where eventKey=#{eventKey}
+	</select>
+	
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_click_event where id=#{id}
+	</delete>
+	
+	
+	
+	
+</mapper> 

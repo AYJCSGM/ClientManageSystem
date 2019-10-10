@@ -1,0 +1,24 @@
+package com.java1234.service.vote;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.vote.Activity;
+
+public interface ActivityService {
+
+	
+	public Integer add(Activity activity);
+	
+	public Integer update(Activity activity,String webPath);
+	
+	public List<Activity> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public Activity findById(Integer id);
+	
+	public Integer delete(Integer id,String webPath);
+	
+	public Integer getTotalNum(Integer id);
+	
+}

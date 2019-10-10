@@ -1,0 +1,392 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>${title}</title>
+
+
+<!-- 强制  高速模式 渲染网页    -->
+<meta name=”renderer” content=”webkit”>
+<meta http-equiv=”X-UA-Compatible” content=”IE=Edge,chrome=1″ >
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+<!-- 加入移动布局 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+<!-- 加入移动布局 -->
+
+<!--添加  jq  支持加载-->
+<script	src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<!--添加 jq 支持加载-->
+
+<!--添加 layui  支持加载-->
+<link rel="stylesheet"	href="${pageContext.request.contextPath}/static/layui-v2.1.5/layui/css/layui.css">
+<script	src="${pageContext.request.contextPath}/static/layui-v2.1.5/layui/layui.js"></script>
+<!--添加 layui  支持加载-->
+
+<!-- 引入manage 的基础css -->
+<link href="${pageContext.request.contextPath}/static/common/manage/base.css" rel="stylesheet"/>
+<!-- 引入manage 的基础css -->
+</head>
+<style>
+body{
+	padding-top: 10px;
+}
+.layui-table-view {
+	margin: 0px 0 !important;
+}
+/*修改table里复选框  有点靠上*/
+.layui-table-cell .layui-form-checkbox {
+    top: 6px;
+}
+.layui-table-toolbar{
+	overflow: hidden;
+	width: 100%;
+}
+
+
+/*修复单元格元素，单选框在我的layui-v2.1.5  有点向上的bug 原始是8px改为0px  再宽一点。原始不是60  */
+.layui-form-switch{
+	width: 60px;
+	margin-top: 0px;
+}
+
+</style>
+<body>
+<script>
+//用户选中的行ids = 1,2,3,5   len=4
+var blobal_ids;
+var blobal_ids_len;
+//用户选中的行ids = 1,2,3,5   len=4
+var w ;//窗口的宽
+var h ;//窗口的高
+
+function getTableSelected(){
+	var selected = table.checkStatus("table");
+	if(selected.data.length<1){
+		layer.msg('请选择内容!');
+		return;
+	}
+	var ids = "";
+	if(selected.data.length>0){
+		$.each(selected.data,function(i,val){
+			ids = ids+val.id+",";
+		});
+	}
+	//去掉最后的逗号,
+	ids = ids.substring(0,ids.length-1);
+	blobal_ids = ids;
+	blobal_ids_len = selected.data.length;
+}
+
+//检测定义的宽和高，是否合适。
+function checkWindow(){
+	console.log("文档的宽是:"+document.body.offsetWidth);
+	console.log("文档的高是:"+document.body.offsetHeight);
+	console.log("窗口的宽是:"+$(window).width());
+	console.log("窗口的高是:"+$(window).height());
+	
+	if(h>document.body.offsetHeight){
+		h = (document.body.offsetHeight-50);
+	}
+	if(w>(document.body.offsetWidth-50)){
+		w = (document.body.offsetWidth-60);
+	}
+}
+
+//打开添加窗口
+function add(){
+	w = 800;
+	h = 1200;
+	checkWindow();
+	layer.open({
+	  type: 2,
+	  title: '添加',
+	  shadeClose: true,
+	  shade: 0.8,
+	  area: [w+'px', h+'px'],
+	  content: '/goods/pc/add' //iframe的url
+	});
+}
+
+
+//打开编辑窗口
+function open_edit(id){
+	w = 800;
+	h = 1200;
+	checkWindow();
+	layer.open({
+	  type: 2,
+	  title: '修改',
+	  shadeClose: true,
+	  shade: 0.8,
+	  area: [w+'px', h+'px'],
+	  content: '/goods/pc/edit?id='+id //iframe的url
+	});
+}
+
+function seeImg(url){
+	w = 700;
+	h = 600;
+	checkWindow();
+	//iframe层
+	layer.open({
+	  type: 2,
+	  title: '查处图片',
+	  shadeClose: true,
+	  shade: 0.8,
+	  area: [w+'px', h+'px'],
+	  content: "${pageContext.request.contextPath}"+url //iframe的url
+	});
+}
+
+//子窗口调用 的  关闭窗口方法 
+function closeDlg(msg){
+	 layer.closeAll();
+	 layer.msg(msg);
+	 reload_data();
+}
+
+//相当前刷新  重新加载
+function reload_data(){
+	var fenleiId = $("#fenleiId").val();
+	var q = $("#q").val();
+	/*
+	if(isUse=='全部'){
+		isUse='';
+	}*/
+	
+	table.reload('table', {
+		 where: {
+			 fenleiId:fenleiId
+			 ,q:q
+	        }
+    });
+}
+
+
+
+function delSelected(){
+	blobal_ids="";
+	blobal_ids_len=0;
+	getTableSelected();
+	if(blobal_ids_len>0){
+		//询问框
+		layer.confirm('您是否要删除这'+blobal_ids_len+'个吗？', {
+		  btn: ['确定删除','取消'] //按钮
+		}, function(){
+			del(blobal_ids);
+		}, function(){
+			layer.msg('您选择了取消');
+		});
+	}
+}
+
+function del(ids){
+	var index = layer.load(1, {
+		  shade: [0.1,'#fff'] //0.1透明度的白色背景
+	});
+	$.post('/admin12nbo/delete',{ids:ids},function(result){
+		if(result.success){
+			layer.closeAll();
+			layer.msg('删除成功');
+			reload_data();
+		}else{
+			layer.closeAll();
+			layer.msg(result.msg);
+		}
+	},'json');
+}
+
+function update(id,isUse){
+	$.post('/admin/goods/update',{id:id,isUse:isUse},function(result){
+		if(result.success){
+			layer.msg('修改成功');
+		}else{
+			layer.msg('修改失败');
+		}
+	},'json');
+}
+
+function update2(id,pos){
+	$.post('/admin/goods/update',{id:id,pos:pos},function(result){
+		if(result.success){
+			layer.msg('修改成功');
+		}else{
+			layer.msg('修改失败');
+		}
+	},'json');
+}
+
+</script>
+
+<div class="layui-form" style="min-width:1000px;"    >
+<div class="layui-table-toolbar" style="margin-bottom: 10px; ">
+	<div class="layui-btn-group">
+		<button onclick="add()"  class="layui-btn layui-btn-small"><i class="layui-icon">&#xe654;</i>添加</button>
+		<button onclick="delSelected()" class="layui-btn layui-btn-small"><i class="layui-icon">&#xe640;</i>删除</button>
+		<button class="layui-btn layui-btn-small" onclick="reload_data()"><i class="layui-icon">&#x1002;</i>刷新</button>
+ 	 </div>
+</div>
+
+<div class="layui-form layui-form-pane" style="margin-bottom: 10px; "  >
+	  <div class="layui-form-item" style="margin-bottom: 1px; min-width:1051px;">
+	  		 <label class="layui-form-label" style="width: 90px;">分类</label>
+		     <div class="layui-input-inline" style="width: 124px;margin-right:0px;">
+		      <select id="fenleiId">
+		         <option value="">全部</option>
+		      	<c:forEach var="fenlei" items="${fenleiList}" >
+		        	<option value="${fenlei.id}">${fenlei.name}</option>
+		      	</c:forEach>
+		      </select>
+		    </div>
+		    <label class="layui-form-label" style="width: 97px;">模糊查询</label>
+		    <div class="layui-input-inline" style="  width: 150px; margin-right: -1px;">
+		      <input class="layui-input" id="q" onkeydown="if(event.keyCode==13) reload_data()" placeholder="模糊查询" ">
+		    </div>
+		    <div class="layui-input-inline" style="  width: 113px;">
+		    	<a class="layui-btn" onclick="reload_data()">查询</a>
+		    </div>
+	  </div>
+</div>
+
+<table class="layui-hide"   id="table" lay-filter="table"></table>
+</div>
+
+<script type="text/html" id="table_bar">
+<div class="layui-btn-group">
+	<a class="layui-btn layui-btn-mini" lay-event="edit">修改</a>
+</div>
+</script>
+
+<script type="text/html" id="format_createUser">
+  {{#  if(d.createUserId != null){ }}
+	 {{d.createUser.trueName}}
+  {{#  } else { }}
+  {{#  } }}
+</script>
+
+<script type="text/html" id="format_isUse">
+  <input type="checkbox" name="isUse" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="tp_isUse" {{ d.isUse == 1 ? 'checked' : '' }}>
+</script>
+
+<script type="text/html" id="format_pos">
+  <input type="checkbox" name="pos" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="tp_pos" {{ d.pos == 1 ? 'checked' : '' }}>
+</script>
+
+<script type="text/html" id="format_imgUrl">
+  {{#  if(d.showImg!= null){ }}
+   <img style="width: 40px; height: 40px;" alt="" src="{{d.showImg}} " onclick="seeImg('{{d.showImg}}')" />
+  {{#  } else { }}
+    <er>没有</er>   
+  {{#  } }}
+</script>
+
+<script type="text/html" id="format_fenlei">
+  {{#  if(d.fenleiId != null){ }}
+      {{ d.fenlei.name}}
+  {{#  } else { }}
+       <er>没有</er>   
+  {{#  } }}
+</script>
+
+
+<script>
+		layui.use([ 'laydate', 'laypage', 'layer', 'table', 'carousel',
+				'upload', 'element' ], function() {
+			var laydate = layui.laydate //日期
+			, laypage = layui.laypage //分页
+			layer = layui.layer //弹层
+			, table = layui.table //表格
+			, carousel = layui.carousel //轮播
+			, upload = layui.upload //上传
+			, element = layui.element //元素操作
+			,form = layui.form; 
+			  table.render({
+			    elem: '#table'
+			    ,url: '/admin/goods/list',
+			    height: 'full-100',
+			   cols: [[
+			      {checkbox: true, fixed: true}
+			      ,{field:'id', title: 'ID', width:50 }
+			      ,{field:'title', title: '标题', width:120 }
+			      ,{field:'price', title: '价格', width:70 }
+			      ,{field:'spec', title: '规格', width:80}
+			      ,{field:'kucun', title: '库存', width:80}
+			      ,{field:'sales', title: '销量', width:80}
+			      ,{field:'order_', title: '排序', width:80}
+			      ,{field:'isUse', title: '是否上架', width:100,templet: '#format_isUse', unresize: true }
+			      ,{field:'pos', title: '推荐商品', width:100,templet: '#format_pos', unresize: true }
+			      ,{field:'showImg', title: '封面图片', width:100 ,templet: '#format_imgUrl'  }
+			      ,{field:'fenleiId', title: '分类', width:100, templet: '#format_fenlei'}
+			      
+			      
+			      ,{field:'createUser', title: '创建人', width:80, templet: '#format_createUser'}
+			      ,{field:'createDateTime', title: '创建时间', width:150}
+			      ,{fixed:'right', width:160,title: '操作',  toolbar: '#table_bar'}
+			    ]]
+			    ,id: 'table'
+			    ,page: true
+			    ,limits:[10,50,100,200,500,1000],
+			   limit:100
+			  });
+			    
+			//监听工具条 table_bar
+				table.on('tool(table)', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+					var data = obj.data //获得当前行数据
+					, layEvent = obj.event; //获得 lay-event 对应的值
+					if (layEvent === 'directoryManage') {
+						//layer.msg('查看操作' + data.id);
+						directoryManage(data.id)
+					} else if (layEvent === 'see_hongbao') {
+						see_hongbao(data.id);
+					} else if (layEvent === 'edit') {
+						//layer.msg('编辑操作' + data.id);
+						open_edit(data.id);
+					} else if(layEvent === 'see_pay_list'){
+						open_pay_list(data.id);
+					}else if(layEvent ==='see_wxuser_info'){
+						see_wxuser_info(data.weixin_user_id);
+					}
+
+				});
+			
+			
+				//监听是否使用 操作
+				  form.on('switch(tp_isUse)', function(obj){
+				    //layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
+				    if(obj.elem.checked){
+				    	update(this.value,1);
+				    }else{
+				    	update(this.value,0);
+				    }
+				  });
+				
+				
+				//监听是否使用 操作
+				  form.on('switch(tp_pos)', function(obj){
+				    //layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
+				    if(obj.elem.checked){
+				    	update2(this.value,1);
+				    }else{
+				    	update2(this.value,0);
+				    }
+				  });
+				
+				
+				
+				
+				//重新加载
+				reload_data();
+				
+		});
+</script>
+
+
+</body>
+</html>

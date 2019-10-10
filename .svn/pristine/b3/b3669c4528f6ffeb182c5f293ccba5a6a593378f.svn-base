@@ -1,0 +1,26 @@
+package com.java1234.dao;
+
+
+import java.util.List;
+import java.util.Map;
+
+import com.java1234.entity.LunBo;
+
+public interface LunBoDao {
+	
+	
+	public Integer add(LunBo  lunBo);
+	
+	public Integer update(LunBo  lunBo);
+	
+	public List<LunBo> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public LunBo findById(Integer id);
+	
+	public Integer delete(Integer id);
+	
+	
+	
+}

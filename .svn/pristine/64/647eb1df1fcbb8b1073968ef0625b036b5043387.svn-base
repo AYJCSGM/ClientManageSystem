@@ -1,0 +1,196 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+<!-- shiro标签 授权   -->
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<!--  shiro标签 授权 -->
+
+<style>
+</style>
+<script>
+	//同步solr引擎库
+	function synSolr(){
+		//loading层
+		var index = layer.load(1, {
+		  shade: [0.1,'#fff'] //0.1透明度的白色背景
+		});
+		
+		$.post("/admin/system/solr/tongbu", {}, function(result) {
+			if (result.success) {
+				layer.closeAll();
+				layer.msg('同步成功');
+			} else {
+				layer.closeAll();
+				layer.msg('同步失败');
+			}
+		}, 'json');
+		
+	}
+	
+	//更新微信菜单到公众号
+	function syn_wx_gzh_menu() {
+		$.post("/admin/gzhmenu/syn", {}, function(result) {
+			if (result.success) {
+				layer.msg('更新公众号菜单，成功');
+			} else {
+				layer.msg(result.msg);
+			}
+		}, 'json');
+	}
+	
+
+	function hide_left_menu() {
+		$("#left_menu").toggle();
+		//判断display  是啥  display: none;  display: block;
+		var display_ = $("#left_menu").css("display");
+		if (display_ == 'none') {
+			$("#main_scroll").css("padding-left", "0px");
+			left_width = 0 ;
+		} else {
+			$("#main_scroll").css("padding-left", "200px");
+			left_width =200;
+		}
+		set_layui_tab_item_height();
+		set_layui_tab_item_width();
+	}
+	
+	//全屏和退出全屏
+	function toggleFullScreen() {  
+	    if (!document.fullscreenElement && // alternative standard method  
+	        !document.mozFullScreenElement && !document.webkitFullscreenElement) {// current working methods  
+	        if (document.documentElement.requestFullscreen) {  
+	            document.documentElement.requestFullscreen();  
+	        } else if (document.documentElement.mozRequestFullScreen) {  
+	            document.documentElement.mozRequestFullScreen();  
+	        } else if (document.documentElement.webkitRequestFullscreen) {  
+	            document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);  
+	        }  
+	    } else {  
+	        if (document.cancelFullScreen) {  
+	            document.cancelFullScreen();  
+	        } else if (document.mozCancelFullScreen) {  
+	            document.mozCancelFullScreen();  
+	        } else if (document.webkitCancelFullScreen) {  
+	            document.webkitCancelFullScreen();  
+	        }  
+	    }  
+	} 
+	
+	function open_gzh_erweima_dlg(){
+		layer.open({
+			  type: 2,
+			  title: '公众号二维码',
+			  shadeClose: true,
+			  shade: 0.8,
+			  area: ['400px', '400px'],
+			  content: '/static/images/base/公众号二维码.jpg'
+			}); 
+	}
+	
+	function init_left_menu(){
+		$.post("/admin/user/update", {menuIds:'6,61001,61002,61005,61010,10,101008,101013,101015,101018,101019,101020,101021,101022,13,131007,131020,17,171000,171005,21,211005,211009,991005,991010,991015',id:'3'}, function(result) {
+			if (result.success) {
+				layer.msg('恢复成功');
+				location.replace(location.href);
+			} else {
+				layer.msg(result.msg);
+			}
+		}, 'json');
+	}
+
+	
+</script>
+
+<style>
+/* 顶部 导航整块的间距取消   默认20 */
+.layui-nav{
+	padding: 0 0px;
+}
+/* 顶部 导航 菜单 之间 间距15  默认20 */
+.layui-nav .layui-nav-item a {
+    padding: 0 15px;
+}
+</style>
+
+<div style="height: 60px; width: 100%; background-color: #23262E; display: flex; display: -webkit-flex;">
+	<div style="width: 200px; text-align: center; vertical-align: middle;">
+		<a  target="_blank" style="display: block;" href="javascript:void()"><img alt="图标" style="vertical-align: middle;  "
+			src="/static/images/base/main_logo.png"></a>
+	</div>
+	
+	
+	
+	<div style="flex: 1; -webkit-flex: 1; ">
+		<ul class="layui-nav">
+
+			<li class="layui-nav-item"><a href="javascript:;"
+				onclick="hide_left_menu()">切换侧边导航</a></li>
+
+			<li class="layui-nav-item"><a href="/admin/main">刷新页面</a></li>
+			
+			
+			<li class="layui-nav-item "><a
+				href="javascript:void();">系统设置</a>
+				<dl class="layui-nav-child">
+					<dd>
+						<a href="javascript:open_gzh_erweima_dlg();">查看公众号二维码</a>
+					</dd>
+					<dd>
+						<a href="javascript:syn_wx_gzh_menu();">同步公从号菜单</a>
+					</dd>
+				</dl>
+			</li>
+ 			 
+			<li class="layui-nav-item"><a onclick="toggleFullScreen()">全屏/退出</a></li>
+			
+			<li class="layui-nav-item"><a href="javascript:;">qq14496453</a></li>
+			
+		</ul>
+	</div>
+	
+	
+	<div style="  border-left: 1px solid #befffe; color: #c2c2c2;  background-color: #393D49;">
+		<ul class="layui-nav">
+			<li class="layui-nav-item"><a href="javascript:;"
+				class="admin-header-user"> <img
+					src="/static/images/base/default_head_img.jpg"
+					style="width: 40px; height: 40px; border-radius: 100%;"> <span>${currentUser.trueName }</span>
+					<span class="layui-nav-more"></span></a>
+				<dl class="layui-nav-child my_top_menu layui-anim layui-anim-upbit">
+					<dd>
+						<a href="javascript:void(0);">个人信息</a>
+					</dd>
+					<dd>
+						<a href="javascript:void(0);">修改密码</a>
+					</dd>
+					
+					<dd>
+						<a href="/user/logout">注销</a>
+					</dd>
+				</dl></li>
+		</ul>
+
+
+	</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+

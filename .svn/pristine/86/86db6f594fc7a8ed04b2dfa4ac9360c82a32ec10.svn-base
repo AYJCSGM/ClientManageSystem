@@ -1,0 +1,94 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+
+<style>
+
+.footer {
+	background-color:${activity.color_};
+    width: 100%;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    z-index: 9;
+}
+
+
+.footer_list{
+	list-style:none;
+	margin:0px;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: flex;
+}
+
+.footer_list_item{
+	padding:5px 0px 5px 0px;
+	display:block;
+	color: #555;
+	-webkit-box-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+.footer_list_item:HOVER{
+	background-color: ${activity.click_color};
+}
+
+.footer_list_item_img{
+}
+
+.footer_list_item_name{
+	margin-top:8px;
+	text-align: center; 
+	font-size: 14px; 
+	font-weight: bold; 
+	font-family: 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif; 
+	color: white;
+}
+</style>
+
+<script>
+var activityId = '${activity.id}';
+
+//这里需要 添加输入 框的监听  如果有焦点了。把下面菜单 隐藏
+$(function() {
+	
+	var inputs = $(":text");
+	var textarea = $("textarea");
+	textarea.focus(function() {
+		//失去焦点  隐藏 下面的菜单
+		$(".footer").hide();
+	});
+	textarea.blur(function() {
+		//失去焦点  显示下面的菜单
+		$(".footer").show();
+	});
+	inputs.focus(function() {
+		//失去焦点  隐藏 下面的菜单
+		$(".footer").hide();
+	});
+	inputs.blur(function() {
+		//失去焦点  显示下面的菜单
+		$(".footer").show();
+	});
+});
+</script>
+
+
+<div class="footer">
+	<div class="footer_list">
+		 <a href="/wap/activity/${activity.id}.html" class="footer_list_item">
+			<div style="text-align: center;"><img style="width: 20px;" src="/static/images/vote/home.png"></div>
+			<div class="footer_list_item_name">首页</div>
+		</a>
+		<a href="/wap/activity/detail/${activity.id}.do" class="footer_list_item">
+			<div style="text-align: center; "><img style="width: 20px;" src="/static/images/vote/detail.png"></div>
+			<div class="footer_list_item_name">详情</div>
+		</a>
+		<a href="/wap/activity/pm/${activity.id}.sss"  class="footer_list_item">
+			<div style="text-align: center;"><img style="width: 20px;" src="/static/images/vote/pai_ming.png"></div>
+			<div class="footer_list_item_name">排名</div>
+		</a>
+	</div>  
+</div>
+

@@ -1,0 +1,115 @@
+package com.java1234.entity.weixin;
+
+
+/**
+ * 
+<xml>
+    <ToUserName><![CDATA[oIDrpjqASyTPnxRmpS9O_ruZGsfk]]></ToUserName>
+    <FromUserName><![CDATA[gh_680bdefc8c5d]]></FromUserName>
+    <CreateTime>1359011899</CreateTime>
+    <MsgType><![CDATA[news]]></MsgType>
+    <Content><![CDATA[]]></Content>
+    <ArticleCount>1</ArticleCount>
+    <Articles>
+        <item>
+            <Title><![CDATA[[苹果产品信息查询]]></Title>
+            <Description><![CDATA[序列号：USE IMEI NUMBER
+IMEI号：358031058974471
+设备名称：iPhone 5C
+设备颜色：
+设备容量：
+激活状态：已激活
+电话支持：未过期[2014-01-13]
+硬件保修：未过期[2014-10-14]
+生产工厂：中国]]>
+    </Description>
+            <PicUrl><![CDATA[http://www.fangbei.org/weixin/weather/icon/banner.jpg]]></PicUrl>
+            <Url><![CDATA[]]></Url>
+        </item>
+    </Articles>
+    <FuncFlag>0</FuncFlag>
+</xml>
+ *
+ */
+public class WXNewsMessage {
+	private String ToUserName;
+	private String FromUserName;
+	private Long CreateTime;
+	private String MsgType;
+	private String Content;
+	private String ArticleCount;
+	private String Title;
+	private String Description;
+	private String PicUrl;
+	private String Url;
+	private String  FuncFlag;
+	public String getToUserName() {
+		return ToUserName;
+	}
+	public void setToUserName(String toUserName) {
+		ToUserName = toUserName;
+	}
+	public String getFromUserName() {
+		return FromUserName;
+	}
+	public void setFromUserName(String fromUserName) {
+		FromUserName = fromUserName;
+	}
+
+
+	
+	public Long getCreateTime() {
+		return CreateTime;
+	}
+	public void setCreateTime(Long createTime) {
+		CreateTime = createTime;
+	}
+	public String getMsgType() {
+		return MsgType;
+	}
+	public void setMsgType(String msgType) {
+		MsgType = msgType;
+	}
+	public String getContent() {
+		return Content;
+	}
+	public void setContent(String content) {
+		Content = content;
+	}
+	public String getArticleCount() {
+		return ArticleCount;
+	}
+	public void setArticleCount(String articleCount) {
+		ArticleCount = articleCount;
+	}
+	public String getTitle() {
+		return Title;
+	}
+	public void setTitle(String title) {
+		Title = title;
+	}
+	public String getDescription() {
+		return Description;
+	}
+	public void setDescription(String description) {
+		Description = description;
+	}
+	public String getPicUrl() {
+		return PicUrl;
+	}
+	public void setPicUrl(String picUrl) {
+		PicUrl = picUrl;
+	}
+	public String getUrl() {
+		return Url;
+	}
+	public void setUrl(String url) {
+		Url = url;
+	}
+	public String getFuncFlag() {
+		return FuncFlag;
+	}
+	public void setFuncFlag(String funcFlag) {
+		FuncFlag = funcFlag;
+	}
+}

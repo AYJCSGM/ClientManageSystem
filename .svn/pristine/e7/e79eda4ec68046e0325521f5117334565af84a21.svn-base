@@ -1,0 +1,161 @@
+package com.java1234.controller.wap;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.java1234.entity.Client;
+import com.java1234.entity.DingDan;
+import com.java1234.entity.DingDanInfo;
+import com.java1234.entity.FenLei;
+import com.java1234.entity.Goods;
+import com.java1234.service.ClientService;
+import com.java1234.service.DingDanService;
+import com.java1234.service.GoodsService;
+
+@Controller
+@RequestMapping("/wap/dingdan")
+public class WAP_DingDan_Controller {
+	
+
+	@Resource
+	private GoodsService  goodsService;
+	@Resource
+	private ClientService  clientService;
+	@Resource
+	private DingDanService  dingDanService;
+	
+	
+	/**
+	 * /wap/dingdan/create
+	 * 创建订单   确认页面
+	 * @param ids  商品ids   goodsId 有可能是多个商品
+	 * @param source  来源 判断来自哪里  购物车还是直接点来的shop
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	
+	@RequestMapping("create")
+	public ModelAndView create(@RequestParam(value = "ids", required = false) String ids,@RequestParam(value = "source", required = false) String source,
+			HttpServletRequest request,HttpSession session) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		String[] idsStr = ids.split(",");
+		Goods goods;
+		List<Goods> goodsList = new ArrayList<Goods>() ; 
+		for (int i = 0; i < idsStr.length; i++) {
+			goods = goodsService.findById(Integer.parseInt(idsStr[i]));
+			goodsList.add(goods);
+		}
+		
+		mav.addObject("goodsList", goodsList);
+		mav.addObject("source", source);
+		mav.addObject("ids", ids);
+		
+		
+		String openid = (String) session.getAttribute("openid");
+		Client client = clientService.finbByOpenid(openid);
+		mav.addObject("client", client);
+		session.setAttribute("client", client);
+		
+		
+		mav.setViewName("/wap/dingdan/createDingDan");
+		return mav;
+	}
+	
+	/**
+	 *   /wap/dingdan/pay/{id}
+	 * @param id  订单id
+	 * @param request
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("pay/{id}")
+	public ModelAndView pay(@PathVariable("id") Integer id, HttpServletRequest request,HttpSession session) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		DingDan dingdan = dingDanService.findById(id);
+		mav.addObject("dingdan", dingdan);
+		
+		String openid = (String) session.getAttribute("openid");
+		
+		//是你的订单
+		if(dingdan.getOpenid().equals(openid)){
+			mav.setViewName("/wap/dingdan/pay");
+			return mav;
+		}else{
+			//返回跳转首页的页面
+			mav.setViewName("/wap/weixin/oauth2");
+			return mav;
+		}
+	}
+	
+	/**
+	 * /wap/dingdan/my?state=0
+	 *  
+	 * @param state=9全部订单  0待付款订单   1已付款订单
+	 */
+	@RequestMapping("my")
+	public ModelAndView my(@RequestParam(value = "state", required = false) String state, HttpServletRequest request,HttpSession session) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		String openid = (String) session.getAttribute("openid");
+		mav.addObject("state", state);
+		if("9".equals(state)){
+			mav.addObject("title", "全部订单");
+		}
+		if("0".equals(state)){
+			mav.addObject("title", "待付款订单");
+		}
+		if("1".equals(state)){
+			mav.addObject("title", "已付款订单");
+		}
+		if("3".equals(state)){
+			mav.addObject("title", "已取消订单");
+		}
+		mav.setViewName("/wap/dingdan/my_dingdan");
+		return mav;
+	}
+	
+	
+	/**
+	 * 
+	 * @return 订单详情
+	 * @throws Exception
+	 */
+	@RequestMapping("detail/{id}")
+	public ModelAndView detail(@PathVariable("id") Integer id, HttpServletRequest request,HttpSession session) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		DingDan dingdan = dingDanService.findById(id);
+		mav.addObject("dingdan", dingdan);
+		String openid = (String) session.getAttribute("openid");
+		
+		//订单订单详情的总数量 
+		int num = 0 ; 
+		for(DingDanInfo info:dingdan.getInfo()){
+			num += info.getNum();
+		}
+		//订单订单详情的总数量 
+		
+		
+		mav.setViewName("/wap/dingdan/detail");
+		mav.addObject("goodsNum", num);
+		mav.setViewName("/wap/dingdan/detail");
+		return mav;
+	}
+	
+	
+	
+}

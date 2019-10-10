@@ -1,0 +1,74 @@
+package com.java1234.entity.xiche;
+
+import java.util.Date;
+
+public class Member {
+	
+	private Integer id;
+	private String name;
+	private String phone;
+	private String password;
+	private String plate;//车牌
+	private Date endDateTime;//会员到期时间
+	private String openid;
+	private String card;
+	private String remark;
+	
+	
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public String getPlate() {
+		return plate;
+	}
+	public void setPlate(String plate) {
+		this.plate = plate;
+	}
+	public Date getEndDateTime() {
+		return endDateTime;
+	}
+	public void setEndDateTime(Date endDateTime) {
+		this.endDateTime = endDateTime;
+	}
+	public String getOpenid() {
+		return openid;
+	}
+	public void setOpenid(String openid) {
+		this.openid = openid;
+	}
+	public String getCard() {
+		return card;
+	}
+	public void setCard(String card) {
+		this.card = card;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	
+	
+}

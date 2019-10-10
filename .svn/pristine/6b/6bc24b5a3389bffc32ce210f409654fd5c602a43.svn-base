@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.ActivityDao">
+	
+	<resultMap type="Activity" id="ActivityResult">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="startDateTime" column="startDateTime" />
+		<result property="endDateTime" column="endDateTime" />
+		<result property="desc_" column="desc_" />
+		<result property="createUserId" column="createUserId" />
+		<result property="createDateTime" column="createDateTime" />
+		<result property="state" column="state" />
+		<result property="click_" column="click_" />
+		<result property="userVote" column="userVote" />
+		<result property="userWork" column="userWork" />
+		<result property="url" column="url" />
+		<result property="interval_" column="interval_" />
+		
+		<result property="wx_share_title" column="wx_share_title" />
+		<result property="wx_share_desc" column="wx_share_desc" />
+		<result property="wx_share_img" column="wx_share_img" />
+		<result property="rule_" column="rule_" />
+		<result property="content" column="content" />
+		<result property="color_" column="color_" />
+		<result property="click_color" column="click_color" />
+		<result property="erweima" column="erweima" />
+		<result property="guanzhu" column="guanzhu" />
+		<result property="guanzhu_tip" column="guanzhu_tip" />
+		
+		<association property="createUser" column="createUserId"
+			select="com.java1234.dao.UserDao.findById"></association>
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="Activity">
+		insert into t_vote_activity values(null,#{name},#{startDateTime},#{endDateTime},#{desc_},#{createUserId},#{createDateTime}
+		,#{state},#{click_},#{userVote},#{userWork},#{url},#{interval_}
+		,#{wx_share_title},#{wx_share_desc},#{wx_share_img},#{rule_},#{content},#{color_}
+		,#{click_color},#{erweima},#{guanzhu},#{guanzhu_tip})
+	</insert>
+	
+	
+	<update id="update" parameterType="Activity">
+		update t_vote_activity
+		<set>
+			<if test="name!=null ">
+				name=#{name},
+			</if>
+			<if test="startDateTime!=null ">
+				startDateTime=#{startDateTime},
+			</if>
+			<if test="endDateTime!=null ">
+				endDateTime=#{endDateTime},
+			</if>
+			<if test="desc_!=null ">
+				desc_=#{desc_},
+			</if>
+			<if test="state!=null ">
+				state=#{state},
+			</if>
+			<if test="click_!=null ">
+				click_=#{click_},
+			</if>
+			<if test="userVote!=null ">
+				userVote=#{userVote},
+			</if>
+			<if test="userWork!=null ">
+				userWork=#{userWork},
+			</if>
+			<if test="url!=null ">
+				url=#{url},
+			</if>
+			<if test="interval_!=null ">
+				interval_=#{interval_},
+			</if>
+			<if test="wx_share_title!=null ">
+				wx_share_title=#{wx_share_title},
+			</if>
+			<if test="wx_share_desc!=null ">
+				wx_share_desc=#{wx_share_desc},
+			</if>
+			<if test="wx_share_img!=null ">
+				wx_share_img=#{wx_share_img},
+			</if>
+			<if test="rule_!=null ">
+				rule_=#{rule_},
+			</if>
+			<if test="content!=null ">
+				content=#{content},
+			</if>
+			<if test="color_!=null ">
+				color_=#{color_},
+			</if>
+			<if test="click_color!=null ">
+				click_color=#{click_color},
+			</if>
+			<if test="erweima!=null ">
+				erweima=#{erweima},
+			</if>
+			<if test="guanzhu!=null ">
+				guanzhu=#{guanzhu},
+			</if>
+			<if test="guanzhu_tip!=null ">
+				guanzhu_tip=#{guanzhu_tip},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	
+	<select id="list" parameterType="Map" resultMap="ActivityResult">
+		select * from t_vote_activity
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  or desc_ like #{q} ) 
+			</if>
+			<if test="createUserId!=null and createUserId!='' ">
+		 		and createUserId =  #{createUserId} 
+			</if>
+			<if test="state!=null and state!='' ">
+		 		and state =  #{state} 
+			</if>
+		</where>
+		order by id DESC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select	count(*) from t_vote_activity
+		<where>
+			<if test="q!=null and q!=''">
+				and (name like #{q}  or desc_ like #{q} ) 
+			</if>
+			<if test="createUserId!=null and createUserId!='' ">
+		 		and createUserId =  #{createUserId} 
+			</if>
+			<if test="state!=null and state!='' ">
+		 		and state =  #{state} 
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="ActivityResult">
+		select * from t_vote_activity where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_vote_activity where id=#{id}
+	</delete>
+	
+	<select id="getTotalNum" parameterType="Integer" resultType="Integer">
+		select sum(num) from `t_vote_activity_work` WHERE activityId = #{id}
+	</select>
+	
+</mapper> 

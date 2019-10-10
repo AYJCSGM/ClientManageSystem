@@ -1,0 +1,27 @@
+package com.java1234.controller.wap;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+@Controller
+@RequestMapping("/wap/member")
+public class WAP_Member_Controller {
+	
+	
+	/**
+	 * 会员 查询功能 
+	 * /wap/member/search
+	 */
+	@RequestMapping("/search")
+	public ModelAndView post(HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/wap/member/search");
+		return mav;
+	}
+	
+	
+	
+}

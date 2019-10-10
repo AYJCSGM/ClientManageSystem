@@ -1,0 +1,212 @@
+package com.java1234.controller.vote.admin;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.shiro.SecurityUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.java1234.entity.Config;
+import com.java1234.entity.Goods;
+import com.java1234.entity.PageBean;
+import com.java1234.entity.Result;
+import com.java1234.entity.User;
+import com.java1234.entity.vote.ActivityLunbo;
+import com.java1234.entity.vote.ActivityWork;
+import com.java1234.service.vote.ActivityWorkService;
+import com.java1234.util.Base64Test;
+import com.java1234.util.DateUtil;
+import com.java1234.util.FileUtil;
+import com.java1234.util.MyUtil;
+import com.java1234.util.ResponseUtil;
+import com.java1234.util.StringUtil;
+
+
+
+@Controller
+@RequestMapping("/admin/activity/work")
+public class Admin_Activity_Work_Controller {
+
+	@Resource
+	private ActivityWorkService activityWorkService;
+	
+	
+	/**
+	 * /admin/activity/work/add
+	 */
+	@RequestMapping("/add")
+	public String add(ActivityWork activityWork,@RequestParam(value = "imgData", required = false) String imgData, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("currentUser");
+		activityWork.setCreateUserId(currentUser.getId());
+		activityWork.setCreateDateTime(new Date());
+		activityWork.setNum(0);
+		
+		//判断imgData是否为空，然后转为img   转存服务器
+		if(StringUtil.isNotEmpty(imgData)){
+			this.updateImgDataBase64(imgData, activityWork, request);
+		}
+		int resultTotal = activityWorkService.add(activityWork);
+		
+		
+		//从缓存中取出config
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();  
+        ServletContext servletContext = webApplicationContext.getServletContext(); 
+        Config config = (Config)  servletContext.getAttribute("config");
+        String webPath = request.getServletContext().getRealPath("");
+        
+        activityWork.setUrl(config.getWeb_site()+"/wap/activity/work/"+activityWork.getId());
+        activityWorkService.update(activityWork,webPath);
+		        
+		        
+		
+		Result result = new Result();
+		Gson gson = new Gson();
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("添加成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("添加失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	/**
+	 * /admin/activity/work/update
+	 */
+	@RequestMapping("/update")
+	public String update(ActivityWork activityWork,@RequestParam(value = "imgData", required = false) String imgData, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		String webPath = request.getServletContext().getRealPath("");
+		
+		// 判断imgData是否为空，然后转为img 转存服务器
+		if (StringUtil.isNotEmpty(imgData)) {
+			// 删除之前的 缩略图
+			ActivityWork temp = activityWorkService.findById(activityWork.getId());
+			if (StringUtil.isNotEmpty(temp.getImgUrl())) {
+				FileUtil.deleteFile(webPath + temp.getImgUrl());
+			}
+			// 上传现在的图片
+			this.updateImgDataBase64(imgData, activityWork, request);
+		}
+		
+		//从缓存中取出config
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();  
+        ServletContext servletContext = webApplicationContext.getServletContext(); 
+        Config config = (Config)  servletContext.getAttribute("config");
+        activityWork.setUrl(config.getWeb_site()+"/wap/activity/work/"+activityWork.getId());
+		
+		int resultTotal = activityWorkService.update(activityWork,webPath);
+		Result result = new Result();
+		Gson gson = new Gson();
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("修改成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("修改失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	
+	/**
+	 * /admin/activity/work/list
+	 */
+	@RequestMapping("/list")
+	public String list(@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "limit", required = false) String rows,
+			@RequestParam(value = "q", required = false) String q, 
+			@RequestParam(value = "isUse", required = false) String isUse, 
+			@RequestParam(value = "activityId", required = false) String activityId, 
+			@RequestParam(value = "createUserId", required = false) String createUserId, 
+			HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		PageBean pageBean = new PageBean(Integer.parseInt(page), Integer.parseInt(rows));
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("start", pageBean.getStart());
+		map.put("size", pageBean.getPageSize());
+		map.put("q", StringUtil.formatLike(q));
+		map.put("activityId", activityId);
+		map.put("createUserId", createUserId);
+		map.put("isUse", isUse);
+		
+		
+		List<ActivityWork> list = activityWorkService.list(map);
+		Integer total = activityWorkService.getTotal(map);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm").create();
+		map.clear();
+		map.put("data", list);
+		map.put("count", total);
+		map.put("code", 0);
+		map.put("msg", "");
+		ResponseUtil.write(response, gson.toJson(map));
+		return null;
+	}
+	
+	
+	/**
+	 * /admin/activity/work/delete
+	 */
+	@RequestMapping("/delete")
+	public String delete(@RequestParam(value = "ids", required = false) String ids, HttpServletResponse response,
+			HttpServletRequest request)
+			throws Exception {
+		String[] idsStr = ids.split(",");
+		Gson gson = new Gson();
+		Result result = new Result();
+		String webPath=request.getServletContext().getRealPath("");
+		for (int i = 0; i < idsStr.length; i++) {
+			activityWorkService.delete(Integer.parseInt(idsStr[i]),webPath);
+		}
+		result.setSuccess(true);
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	/**
+	 */
+	@RequestMapping("/findById")
+	public String findById(
+			@RequestParam(value="id",required=false)String id,
+			HttpServletResponse response,HttpServletRequest request)throws Exception{
+		Gson gson = new Gson();
+		ActivityWork activityWork   = activityWorkService.findById(Integer.parseInt(id));
+		ResponseUtil.write(response, gson.toJson(activityWork));
+		return null;
+	}
+	
+	
+	public  void   updateImgDataBase64(String imgData,ActivityWork activityWork,HttpServletRequest request ){
+		//取得根目录带d://dxxxxx/tomcat/ruzhou/
+		String webPath=request.getServletContext().getRealPath("");
+		//定义根目录下面的文件夹
+		String  updateFile = "/static/images/vote/activity/work/";
+		String fileName = DateUtil.formatDate(new Date(), "yyyyMMddHHmmss")+".jpg";
+		//调用产生文件夹的方法
+		FileUtil.makeDirs(webPath+updateFile);
+		imgData = imgData.replace("data:image/png;base64,", "");
+		Base64Test.GenerateImage(imgData, webPath+updateFile+fileName);
+		activityWork.setImgUrl(updateFile+fileName);
+	}
+	
+	
+}

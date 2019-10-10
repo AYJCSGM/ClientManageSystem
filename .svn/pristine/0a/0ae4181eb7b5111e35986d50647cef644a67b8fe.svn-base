@@ -1,0 +1,173 @@
+package com.java1234.controller;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.SecurityUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.java1234.entity.Client;
+import com.java1234.entity.PageBean;
+import com.java1234.entity.Result;
+import com.java1234.entity.ShopCart;
+import com.java1234.entity.User;
+import com.java1234.service.ShopCartService;
+import com.java1234.util.ResponseUtil;
+import com.java1234.util.StringUtil;
+
+import net.sf.json.JSONObject;
+
+
+@Controller
+@RequestMapping("/shopcart")
+public class ShopCartController {
+	
+	@Resource
+	private ShopCartService shopCartService;
+	
+	
+	
+	@RequestMapping("/add")
+	public String add(ShopCart shopcart, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		Client client = (Client) SecurityUtils.getSubject().getSession().getAttribute("client");
+		Result result = new Result();
+		Gson gson = new Gson();
+		
+		if(client==null){
+			result.setSuccess(false);
+			result.setMsg("用户未登陆");
+			ResponseUtil.write(response, gson.toJson(result));
+			return null;
+		}
+		
+		//查询购物车内是否有此商品
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("clientId", client.getId());
+		map.put("goodsId", shopcart.getGoodsId());
+		int total = shopCartService.getTotal(map);
+		if(total>0){
+			result.setSuccess(false);
+			result.setMsg("已在购物车中");
+			ResponseUtil.write(response, gson.toJson(result));
+			return null;
+		}
+		
+		shopcart.setClientId(client.getId());
+		shopcart.setCreateDateTime(new Date());
+		
+		int resultTotal = shopCartService.add(shopcart);
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("添加成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("添加失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	@RequestMapping("/del")
+	public String del(@RequestParam(value = "goodsId", required = false) Integer id, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		Client client = (Client) SecurityUtils.getSubject().getSession().getAttribute("client");
+		Result result = new Result();
+		Gson gson = new Gson();
+		if(client==null){
+			result.setSuccess(false);
+			result.setMsg("用户未登陆");
+			ResponseUtil.write(response, gson.toJson(result));
+			return null;
+		}
+		//查询此商品是不是当前登陆的用户
+		ShopCart sCart =shopCartService.findById(id);
+		if(sCart.getClientId()!=client.getId()){
+			result.setSuccess(false);
+			result.setMsg("此商品不是你的，此操作已记录日志");
+			ResponseUtil.write(response, gson.toJson(result));
+			return null;
+		}
+		int resultTotal = shopCartService.delete(id);
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("删除成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("删除失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	
+	/**
+	 *    /shopcart/getTotal
+	 * @param response
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/getTotal")
+	public String getTotal(HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		int total = 0 ; 
+		try {
+			Client client = (Client) SecurityUtils.getSubject().getSession().getAttribute("client");
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("clientId", client.getId());
+			total = shopCartService.getTotal(map);
+		} catch (Exception e) {
+		}
+		JSONObject obj = new JSONObject();
+		obj.put("total", total);
+		ResponseUtil.write(response, obj.toString());
+		return null;
+	}
+	
+	
+	
+	@RequestMapping("/list")
+	public String list(@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "rows", required = false) String rows,
+			HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		PageBean pageBean = new PageBean(Integer.parseInt(page), Integer.parseInt(rows));
+		Client client = (Client) SecurityUtils.getSubject().getSession().getAttribute("client");
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm").create();
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(client==null){
+			map.put("code", 404);
+			map.put("msg", "用户未登陆");
+			ResponseUtil.write(response, gson.toJson(map));
+			return null;
+		}
+		
+		map.put("start", pageBean.getStart());
+		map.put("size", pageBean.getPageSize());
+		map.put("clientId", client.getId());
+		List<ShopCart> list = shopCartService.list(map);
+		Integer total = shopCartService.getTotal(map);
+		
+		map.clear();
+		map.put("data", list);
+		map.put("count", total);
+		map.put("code", 200);
+		map.put("msg", "");
+		ResponseUtil.write(response, gson.toJson(map));
+		return null;
+	}
+	
+	
+	
+}

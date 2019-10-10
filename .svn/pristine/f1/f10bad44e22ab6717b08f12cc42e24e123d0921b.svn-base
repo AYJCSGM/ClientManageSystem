@@ -1,0 +1,68 @@
+package com.java1234.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.java1234.dao.ConfigDao;
+import com.java1234.dao.LunBoDao;
+import com.java1234.entity.LunBo;
+import com.java1234.service.LunBoService;
+import com.java1234.util.FileUtil;
+import com.java1234.util.StringUtil;
+
+
+@Service("lunBoService")
+public class LunBoServiceImpl implements LunBoService {
+
+
+	@Resource
+	private LunBoDao  lunBoDao;
+	
+	
+	@Override
+	public Integer add(LunBo lunBo) {
+		// TODO Auto-generated method stub
+		return lunBoDao.add(lunBo);
+	}
+
+	@Override
+	public Integer update(LunBo lunBo) {
+		// TODO Auto-generated method stub
+		return lunBoDao.update(lunBo);
+	}
+
+	@Override
+	public List<LunBo> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return lunBoDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return lunBoDao.getTotal(map);
+	}
+	
+	@Override
+	public LunBo findById(Integer id) {
+		// TODO Auto-generated method stub
+		return lunBoDao.findById(id);
+	}
+	
+	@Override
+	public Integer delete(Integer id,String webPath) {
+		// TODO Auto-generated method stub
+		LunBo lb = lunBoDao.findById(id);
+		int i = lunBoDao.delete(id);
+		if(StringUtil.isNotEmpty(lb.getImgUrl())){
+			FileUtil.deleteFile(webPath+lb.getImgUrl());
+		}
+		return i;
+	}
+	
+
+}

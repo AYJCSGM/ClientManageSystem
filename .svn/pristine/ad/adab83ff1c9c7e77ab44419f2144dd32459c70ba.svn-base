@@ -1,0 +1,293 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>${title}</title>
+
+<!-- 开启高速模式    -->
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<!-- 开启高速模式 -->
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+<!-- 加入移动布局 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+<!-- 加入移动布局 -->
+
+<!--添加  jq  支持加载-->
+<script	src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<!--添加 jq 支持加载-->
+
+<!--添加 layui  支持加载-->
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/static/layui-v2.2.5/layui/css/layui.css">
+<script
+	src="${pageContext.request.contextPath}/static/layui-v2.2.5/layui/layui.js"></script>
+<!--添加 layui  支持加载-->
+
+<!-- 引入manage 的基础css -->
+<link href="${pageContext.request.contextPath}/static/common/manage/base.css" rel="stylesheet"/>
+<!-- 引入manage 的基础css -->
+</head>
+<style>
+body{
+	padding-top: 10px;
+}
+
+/* table 复选框 向下来点 */
+.layui-table-cell .layui-form-checkbox[lay-skin=primary] {
+    top: 4px;
+    vertical-align: middle;
+}
+/*table  复选框 向下来点 */
+
+</style>
+
+
+<body>
+<script>
+var blobal_ids;
+var blobal_ids_len;
+
+var w ;//窗口的宽
+var h ;//窗口的高
+
+function getTableSelected(){
+	var selected = table.checkStatus("table");
+	if(selected.data.length<1){
+		layer.msg('请选择内容!');
+		return;
+	}
+	var ids = "";
+	if(selected.data.length>0){
+		$.each(selected.data,function(i,val){
+			ids = ids+val.id+",";
+		});
+	}
+	//去掉最后的逗号,
+	ids = ids.substring(0,ids.length-1);
+	blobal_ids = ids;
+	blobal_ids_len = selected.data.length;
+}
+
+//检测定义的宽和高，是否合适。
+function checkWindow(){
+	console.log("窗口的宽是:"+document.body.offsetWidth);
+	console.log("窗口的高是:"+document.body.offsetHeight);
+	if(h>document.body.offsetHeight){
+		h = (document.body.offsetHeight-50);
+	}
+	if(w>document.body.offsetWidth){
+		w = (document.body.offsetWidth-50);
+	}
+}
+
+//子窗口调用 的  关闭窗口方法 
+function closeDlg(msg){
+	 layer.closeAll();
+	 layer.msg(msg);
+	 reload_data();
+}
+
+//相当前刷新  重新加载
+function reload_data(){
+	var q = $("#q").val();
+	var date1 = $("#date1").val();
+	var date2 = $("#date2").val();
+	var trans_no = $("#trans_no").val();
+	table.reload('table', {
+		 where: {q:q,date1:date1,date2:date2,trans_no:trans_no}
+    });
+}
+
+
+function delSelected(){
+	blobal_ids="";
+	blobal_ids_len=0;
+	getTableSelected();
+	if(blobal_ids_len>0){
+		//询问框
+		layer.confirm('您是否要删除这'+blobal_ids_len+'个吗？', {
+		  btn: ['确定删除','取消'] //按钮
+		}, function(){
+			del(blobal_ids);
+		}, function(){
+			layer.msg('您选择了取消');
+		});
+	}
+}
+
+function del(ids){
+	var index = layer.load(1, {
+		  shade: [0.1,'#fff'] //0.1透明度的白色背景
+	});
+	
+	$.post('/admin/xiaoshou/target/delete',{ids:ids},function(result){
+		if(result.success){
+			layer.closeAll();
+			layer.msg('删除成功');
+			reload_data();
+		}else{
+			layer.closeAll();
+			layer.msg(result.msg);
+		}
+	},'json');
+}
+
+
+
+//添加
+function add(){
+	w = 600;
+	h = 400;
+	checkWindow();
+	//iframe层
+	layer.open({
+	  type: 2,
+	  title: '添加',
+	  shadeClose: true,
+	  shade: 0.8,
+	  area: [w+'px', h+'px'],
+	  
+	  content: '/houtai/xiaoshou/target/add' //iframe的url
+	});
+}
+
+
+//打开编辑窗口
+function edit(id){
+	w = 600;
+	h = 400;
+	checkWindow();
+	layer.open({
+	  type: 2,
+	  title: '修改',
+	  shadeClose: true,
+	  shade: 0.8,
+	  area: [w+'px', h+'px'],
+	  content: '/houtai/xiaoshou/target/edit?id='+id //iframe的url
+	});
+}
+
+function table_edit_update(id,field,value){
+	$.post('/admin/xiaoshou/target/update?'+field+'='+value,{id:id},function(result){
+		if(result.success){
+			layer.msg('修改成功');
+		}else{
+			layer.closeAll();
+			layer.msg(result.msg);
+		}
+	},'json');
+}
+
+
+</script>
+
+<div class="layui-form" style="min-width:1000px;">
+
+
+<div class="layui-table-toolbar" style="margin-bottom: 10px; ">
+	<div class="layui-btn-group">
+		<button onclick="add()"  class="layui-btn layui-btn-sm"><i class="layui-icon">&#xe654;</i>添加</button>
+		<button onclick="delSelected()" class="layui-btn layui-btn-sm"><i class="layui-icon">&#xe640;</i>删除</button>
+	    <button class="layui-btn layui-btn-sm" onclick="reload_data()"><i class="layui-icon">&#x1002;</i>刷新</button>
+ 	 </div>
+</div>
+
+<table class="layui-hide"   id="table" lay-filter="table"></table> 
+<script type="text/html" id="table_bar">
+<div class="layui-btn-group">
+	<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+</div>
+</script>
+
+
+<script>
+		layui.use([ 'laydate', 'laypage', 'layer', 'table', 'carousel',
+				'upload', 'element' ], function() {
+			var laydate = layui.laydate //日期
+			, laypage = layui.laypage //分页
+			layer = layui.layer //弹层
+			, table = layui.table //表格
+			, carousel = layui.carousel //轮播
+			, upload = layui.upload //上传
+			, element = layui.element; //元素操作
+			
+			  table.render({
+			    elem: '#table'
+			    ,url: '/admin/xiaoshou/target/list',
+			    height: 'full-100',
+			   cols: [[
+					{type:'checkbox'},
+			      {field:'id', title: 'ID', width:60}
+			      ,{field:'month', title: '月份', width:100 , edit: 'text' }
+			      ,{field:'name', title: '名称', width:120, edit: 'text' }
+			      ,{field:'done_jine', title: '完成金额', width:168, edit: 'text' }
+			      ,{field:'order_', title: '排序号', width:175, edit: 'text' }
+			      
+			      
+			      ,{fixed:'right', width:120,title: '操作',  toolbar: '#table_bar'}
+			      
+			    ]]
+			    ,id: 'table'
+			    ,page: true
+			    ,limits:[10,50,100,200,500,1000],
+			   limit:100
+			  });
+
+			
+			//监听单元格编辑
+			  table.on('edit(table)', function(obj){
+			    var value = obj.value //得到修改后的值
+			    ,data = obj.data //得到所在行所有键值
+			    ,field = obj.field; //得到字段
+			   // layer.msg('[ID: '+ data.id +'] ' + field + ' 字段更改为：'+ value);
+			    //这个地方能正常的值，传到table_edit_update这个方法里面。 id：2   field是order_   value是 55
+			    table_edit_update(data.id,field,value);
+			  });
+			
+			
+			//监听工具条 table_bar
+				table.on('tool(table)', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+					var data = obj.data //获得当前行数据
+					, layEvent = obj.event; //获得 lay-event 对应的值
+					if (layEvent === 'add_send_list') {
+						//layer.msg('查看操作' + data.id);
+						add_send_list(data.id)
+					} else if (layEvent === 'see_hongbao') {
+						see_hongbao(data.id);
+					} else if (layEvent === 'edit') {
+						//layer.msg('编辑操作' + data.id);
+						edit(data.id);
+					} else if(layEvent === 'see_pay_list'){
+						open_pay_list(data.id);
+					}else if(layEvent ==='see_wxuser_info'){
+						see_wxuser_info(data.weixin_user_id);
+					}
+					
+				});
+			
+			//常规用法
+			  laydate.render({
+			    elem: '#date1' 
+			  });
+			
+			//常规用法
+			  laydate.render({
+			    elem: '#date2' 
+			  });
+			
+			  //重新加载
+			   reload_data();
+				
+		});
+</script>
+
+
+</body>
+</html>

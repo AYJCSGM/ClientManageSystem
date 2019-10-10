@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.LinkDao">
+	
+	<resultMap type="Link" id="LinkResult">
+		<result property="id" column="id" />
+		<result property="title" column="title" />
+		<result property="desc_" column="desc_" />
+		<result property="img_url" column="img_url" />
+		<result property="isUse" column="isUse" />
+		<result property="order_" column="order_" />
+		<result property="content" column="content" />
+		<result property="createDateTime" column="createDateTime" />
+		<result property="updateDateTime" column="updateDateTime" />
+		
+		<result property="linkfenleiId" column="linkfenleiId" />
+		
+		<result property="url" column="url" />
+		
+		<association property="linkFeiLei" column="linkfenleiId"
+			select="com.java1234.dao.LinkFenLeiDao.findById"></association>
+	</resultMap>
+	
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="Link">
+		insert into t_link values(null,#{title},#{desc_},#{img_url},#{isUse},#{order_},#{content}
+		,#{createDateTime},#{updateDateTime},#{linkfenleiId},#{url})
+	</insert>
+	
+	<update id="update" parameterType="Link">
+		update t_link
+		<set>
+			<if test="title!=null ">
+				title=#{title},
+			</if>
+			<if test="desc_!=null ">
+				desc_=#{desc_},
+			</if>
+			<if test="img_url!=null ">
+				img_url=#{img_url},
+			</if>
+			<if test="isUse!=null ">
+				isUse=#{isUse},
+			</if>
+			<if test="order_!=null ">
+				order_=#{order_},
+			</if>
+			<if test="content!=null ">
+				content=#{content},
+			</if>
+			<if test="createDateTime!=null ">
+				createDateTime=#{createDateTime},
+			</if>
+			<if test="updateDateTime!=null ">
+				updateDateTime=#{updateDateTime},
+			</if>
+			<if test="linkfenleiId!=null ">
+				linkfenleiId=#{linkfenleiId},
+			</if>
+			<if test="url!=null ">
+				url=#{url},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="LinkResult">
+		select * from t_link
+		<where>
+			<if test="q!=null and q!=''">
+				and (title like #{q}  or desc_ like #{q} or content like #{q}  ) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="isUse!=null and isUse!='' ">
+		 		and isUse =  #{isUse} 
+			</if>
+			<if test="linkfenleiId!=null and linkfenleiId!='' ">
+		 		and linkfenleiId =  #{linkfenleiId} 
+			</if>
+		</where>
+		order by order_ ASC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select	count(*) from t_link
+		<where>
+			<if test="q!=null and q!=''">
+				and (title like #{q}  or desc_ like #{q} or content like #{q}  ) 
+			</if>
+			<if test="date1!=null and date1!='' ">
+		 		and createDateTime &gt; #{date1} 
+			</if>
+			<if test="date2!=null and date2!='' ">
+		 		and createDateTime &lt;  #{date2} 
+			</if>
+			<if test="isUse!=null and isUse!='' ">
+		 		and isUse =  #{isUse} 
+			</if>
+			<if test="linkfenleiId!=null and linkfenleiId!='' ">
+		 		and linkfenleiId =  #{linkfenleiId} 
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="LinkResult">
+		select * from t_link where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_link where id=#{id}
+	</delete>
+	
+	
+</mapper> 

@@ -1,0 +1,66 @@
+package com.java1234.service.business;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.java1234.dao.XiaoShouDao;
+import com.java1234.dao.XiaoShouTargetDao;
+import com.java1234.entity.business.XiaoShouTarget;
+
+
+@Service("xiaoShouTargetService")
+public class XiaoShouTargetServiceImpl implements XiaoShouTargetService {
+
+	
+
+	@Resource
+	private XiaoShouTargetDao xiaoShouTargetDao;
+	
+	
+	@Override
+	public Integer add(XiaoShouTarget xst) {
+		// TODO Auto-generated method stub
+		return xiaoShouTargetDao.add(xst);
+	}
+
+	@Override
+	public Integer update(XiaoShouTarget xst) {
+		// TODO Auto-generated method stub
+		return xiaoShouTargetDao.update(xst);
+	}
+
+	@Override
+	public Integer delete(Integer id) {
+		// TODO Auto-generated method stub
+		return xiaoShouTargetDao.delete(id);
+	}
+
+	@Override
+	public List<XiaoShouTarget> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return xiaoShouTargetDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return xiaoShouTargetDao.getTotal(map);
+	}
+
+	@Override
+	public XiaoShouTarget findById(Integer id) {
+		// TODO Auto-generated method stub
+		return xiaoShouTargetDao.findById(id);
+	}
+	
+	@Override
+	public XiaoShouTarget find(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return xiaoShouTargetDao.find(map);
+	}
+
+}

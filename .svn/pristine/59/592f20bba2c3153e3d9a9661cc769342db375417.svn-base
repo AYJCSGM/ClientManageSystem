@@ -1,0 +1,78 @@
+package com.java1234.entity;
+
+import java.math.BigDecimal;
+
+
+public class DingDanInfo {
+	
+	private Integer id;
+	private Integer dingdanId;//订单id
+	private String showImg;//展示图片
+	private String title;//商品标题
+	private String content;//商品内容
+	private BigDecimal price;//价格
+	private String spec;//规格
+	private Integer num;//数据
+	
+	private Integer goodsId;//商品id
+	
+	
+	
+	public Integer getGoodsId() {
+		return goodsId;
+	}
+	public void setGoodsId(Integer goodsId) {
+		this.goodsId = goodsId;
+	}
+	public Integer getNum() {
+		return num;
+	}
+	public void setNum(Integer num) {
+		this.num = num;
+	}
+	public String getShowImg() {
+		return showImg;
+	}
+	public void setShowImg(String showImg) {
+		this.showImg = showImg;
+	}
+	public BigDecimal getPrice() {
+		return price;
+	}
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+	public String getSpec() {
+		return spec;
+	}
+	public void setSpec(String spec) {
+		this.spec = spec;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public Integer getDingdanId() {
+		return dingdanId;
+	}
+	public void setDingdanId(Integer dingdanId) {
+		this.dingdanId = dingdanId;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+	
+	
+	
+}

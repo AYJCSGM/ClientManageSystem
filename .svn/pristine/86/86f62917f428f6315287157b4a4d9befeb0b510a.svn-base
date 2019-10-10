@@ -1,0 +1,65 @@
+package com.java1234.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.java1234.dao.DingDanDao;
+import com.java1234.dao.FenLeiDao;
+import com.java1234.entity.DingDan;
+import com.java1234.service.DingDanService;
+
+
+@Service("dingDanService")
+public class DingDanServiceImpl  implements DingDanService  {
+	
+
+	@Resource
+	private DingDanDao dingDanDao;
+	
+	
+	@Override
+	public Integer add(DingDan dingdan) {
+		// TODO Auto-generated method stub
+		return dingDanDao.add(dingdan);
+	}
+
+	@Override
+	public Integer update(DingDan dingdan) {
+		// TODO Auto-generated method stub
+		return dingDanDao.update(dingdan);
+	}
+
+	@Override
+	public List<DingDan> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return dingDanDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return dingDanDao.getTotal(map);
+	}
+
+	@Override
+	public Integer delete(Integer id) {
+		// TODO Auto-generated method stub
+		return dingDanDao.delete(id);
+	}
+
+	@Override
+	public DingDan findById(Integer id) {
+		// TODO Auto-generated method stub
+		return dingDanDao.findById(id);
+	}
+	
+	@Override
+	public DingDan findBy_out_trade_no(String out_trade_no) {
+		return dingDanDao.findBy_out_trade_no(out_trade_no);
+	}
+
+}

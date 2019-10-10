@@ -1,0 +1,23 @@
+package com.java1234.service.weixin;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.weixin.Receive;
+
+public interface ReceiveService {
+	
+	
+	public Integer add(Receive receive);
+	
+	public Integer update(Receive receive);
+	
+	public List<Receive> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public Receive findById(Integer id);
+	
+	public Integer delete(Integer id);
+	
+	
+}

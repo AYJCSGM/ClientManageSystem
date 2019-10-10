@@ -1,0 +1,302 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+${config.headStr}
+
+${config.layuiStr}
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport"	content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no" />
+
+<!--添加  vue.js 支持加载-->
+<script src="${pageContext.request.contextPath}/static/vue/vue.min.js"></script>
+<!--添加  vue.js 支持加载-->
+
+<!--图片剪辑 js css-->
+<script src="${pageContext.request.contextPath}/static/cropbox/cropbox.js"></script>
+<link href="${pageContext.request.contextPath}/static/cropbox/style.css" rel="stylesheet"/>
+<!--图片剪辑 js css-->
+
+<!--自己定义扩展的 图片剪辑js 符合我的ui-->
+<script src="${pageContext.request.contextPath}/static/common/base/cropbox.js"></script>
+<!--自己定义扩展的 图片剪辑js 符合我的ui-->
+
+<style>
+html, body {
+}
+.layui-form-item {
+	margin-bottom: 3px;
+}
+
+/* 改变下输入框左边的宽 */
+.layui-form-pane .layui-form-label {
+    width: 130px;
+}
+.layui-form-pane .layui-input-block {
+    margin-left: 130px;
+}
+/* 改变下输入框左边的宽 */
+
+
+</style>
+
+<script>
+$(function(){
+	
+	var  messageType =  '${clickEvent.messageType}';
+	var media_type = '${clickEvent.media_type}';
+	
+	if(messageType.length>0){
+		$("#messageType").val('${clickEvent.messageType}');
+	}else{
+		//添加
+		hideAll();
+		$("#desc_model").show();
+	}
+	
+	if(media_type.length>0){
+		$("#media_type").val('${clickEvent.media_type}');
+	}
+	
+	if(messageType=='0'){
+		hideAll();
+		$("#desc_model").show();
+	}
+	if(messageType=='1'){
+		hideAll();
+		$("#title_model").show();
+		$("#url_model").show();
+		$(".container").show();
+		$("#desc_model").show();
+	}
+	if(messageType=='2'){
+		hideAll();
+		$("#media_id_model").show();
+		$("#media_type_model").show();
+	}
+	
+	
+});
+
+
+var save_url = '${save_url}';
+function save() {
+	var index = layer.load(1, {
+		shade : [ 0.1, '#fff' ]
+	});
+	$.post(save_url, {
+		title : app.title,
+		eventKey : app.eventKey,
+		messageType : $("#messageType").val(),
+		desc_:app.desc_,
+		url:app.url,
+		order_:app.order_,
+		imgData : app.imgData,
+		media_id:app.media_id,
+		media_type:$("#media_type").val()
+	}, function(result) {
+		if (result.success) {
+			window.parent.closeDlg(result.msg);
+		} else {
+			layer.msg(result.msg);
+		}
+	}, 'json');
+}
+
+function hideAll(){
+	$("#title_model").hide();
+	$("#url_model").hide();
+	$(".container").hide();
+	$("#media_id_model").hide();
+	$("#media_type_model").hide();
+	$("#desc_model").hide();
+}
+
+</script>
+
+
+</head>
+<body id="app">
+	<div style="padding: 10px; ">
+		<div class="layui-form layui-form-pane">
+			<div class="layui-form-item">
+				<label class="layui-form-label">eventKey</label>
+				<div class="layui-input-block">
+					<input type="text" id="eventKey" autocomplete="off" v-model="eventKey"
+						value="${clickEvent.eventKey }"   class="layui-input">
+				</div>
+			</div>
+			
+			
+		<div class="layui-form-item">
+		    <label class="layui-form-label">返回消息类型</label>
+		    <div class="layui-input-block">
+		      <select name="interest" id="messageType" lay-filter="messageType">
+		        	<option value="0">文本消息</option>
+		        	<option value="1">图文消息</option>
+		        	<option value="2">公众号媒体</option>
+		      </select>
+		    </div>
+		  </div>
+			
+			<div class="layui-form-item" id="title_model">
+				<label class="layui-form-label">标题</label>
+				<div class="layui-input-block">
+					<input type="text" id="title" autocomplete="off"  v-model="title"
+						value="${clickEvent.title }"   class="layui-input">
+				</div>
+			</div>
+			
+			
+			<div class="layui-form-item layui-form-text" id="desc_model">
+				<label class="layui-form-label">描述</label>
+				<div class="layui-input-block">
+					<textarea placeholder="" class="layui-textarea" id="remark"  v-model="desc_">${clickEvent.desc_ }</textarea>
+				</div>
+			</div>
+			
+			 
+			<div class="layui-form-item" id="url_model">
+				<label class="layui-form-label">图文点击url</label>
+				<div class="layui-input-block">
+					<input type="text" id="url" autocomplete="off"   v-model="url"
+						value="${clickEvent.url }"   class="layui-input">
+				</div>
+			</div>
+			
+			
+			<div class="layui-form-item" id="media_id_model">
+				<label class="layui-form-label">媒体id</label>
+				<div class="layui-input-block">
+					<input type="text"  autocomplete="off"  v-model="media_id"
+						value="${clickEvent.media_id }"   class="layui-input">
+				</div>
+			</div>
+			
+			
+			<div class="layui-form-item" id="media_type_model">
+		    <label class="layui-form-label">媒体类型</label>
+		    <div class="layui-input-block">
+		      <select name="interest" id="media_type" lay-filter="messageType">
+		        	<option value="image">图片</option>
+		        	<option value="mpnews">文章</option>
+		        	<option value="voice">语音</option>
+		        	<option value="video">视频</option>
+		      </select>
+		    </div>
+		  </div>
+		  
+		  
+		  
+		  
+			<div class="layui-form-item">
+				<label class="layui-form-label">排序号</label>
+				<div class="layui-input-block">
+					<input type="text" id="order_" autocomplete="off"  v-model="order_"
+						value="${clickEvent.order_ }"   class="layui-input">
+				</div>
+			</div>
+			
+			
+			
+			
+			
+		</div>
+				
+		<div class="container" style="width: 100%;">
+		<div>裁剪框尺寸：__________
+			宽:<input type="text" id="w" value="600"  style="width: 60px;" onkeyup="initCutImg()"   /> 
+			高:<input type="text" id="h" value="300"  style="width: 60px;" onkeyup="initCutImg()"  /> 
+			<input type="button" onclick="initCutImg()" value="修改尺寸"  /> 
+		</div>
+	        <div class="imageBox">
+	            <div class="thumbBox">
+	            </div>
+	            <div class="spinner" style="display: none">
+	               		 请点选择图片
+	            </div>
+	        </div>
+	        
+	        <div class="CutImgBottomBar" style="position:  relative; ">
+	        		<input style=" display: inline-block;" type="file" class="" name="upload-file" id="upload-file" />
+					<button id="btnZoomIn" class="layui-btn layui-btn-xs"><i class="layui-icon">&#x1002;</i>放大</button>
+					<button id="btnZoomOut" class="layui-btn layui-btn-xs"><i class="layui-icon">&#x1002;</i>缩小</button>
+	        		<button id="btnCrop" class="layui-btn layui-btn-xs layui-btn-danger"><i class="layui-icon">&#x1002;</i>裁切</button>
+	        </div>
+	        
+        <div class="cropped">
+        </div>
+    </div>
+    
+    
+    
+		
+		<div class="site-demo-button" style="margin-top: 20px;">
+			<button id="save" onclick="save()"
+				class="layui-btn site-demo-layedit" data-type="content">${btn_text }</button>
+		</div>
+	</div>
+
+
+
+
+	<script>
+		layui.use([ 'form','laydate', 'laypage', 'layer', 'table', 'carousel',
+				'upload', 'element' ], function() {
+			var laydate = layui.laydate //日期
+			, laypage = layui.laypage //分页
+			layer = layui.layer //弹层
+			, table = layui.table //表格
+			, carousel = layui.carousel //轮播
+			, upload = layui.upload //上传
+			,form = layui.form
+			, element = layui.element; //元素操作
+			
+			
+			  
+			form.on('select(messageType)', function(data){
+				if(data.value==0){
+					hideAll();
+					$("#desc_model").show();
+			  	}
+				
+				  if(data.value==1){
+					  hideAll();
+					  $("#title_model").show();
+					  $("#url_model").show();
+					  $(".container").show();
+					  $("#desc_model").show();
+				  }
+				  
+				  if(data.value==2){
+					  hideAll();
+					  $("#media_id_model").show();
+					  $("#media_type_model").show();
+				  }
+			  
+			});
+
+			
+			
+		});
+	</script>
+
+<script>
+var app = new Vue({
+	el : '#app',
+	data : {
+	}
+});
+</script>
+	
+
+</body>
+</html>

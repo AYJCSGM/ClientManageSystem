@@ -1,0 +1,78 @@
+package com.java1234.util.weixin;
+
+
+public class WeiXinConfig {
+		
+		// 这个就是自己要保管好的私有Key了（切记只能放在自己的后台代码里，不能放在任何可能被看到源代码的客户端程序中）
+		// 每次自己Post数据给API的时候都要用这个key来对所有字段进行签名，生成的签名会放在Sign这个字段，API收到Post数据的时候也会用同样的签名算法对Post过来的数据进行签名和验证
+		// 收到API的返回的时候也要用这个key来对返回的数据算下签名，跟API的Sign数据进行比较，如果值不一致，有可能数据被第三方给篡改
+		
+		public final static String trade_type = "JSAPI";
+		public final static String SIGN_TYPE = "MD5";//签名加密方式
+		//（蚂蚁科技Token）sisstoken
+		//汝一  hello
+		//宝妈 hello
+		public final static String Token = "sisstoken";
+		
+		//蚂蚁 开发者密码  AppSecret【edec58bc894bb9d1fc803837a2af9317】
+		//三信      b73f14c56820641205a1efa013e28465
+		//龍成百业1307135922d3530e611b8278464ba8f4
+		public  final  static String APP_SECRET = "b73f14c56820641205a1efa013e28465";
+		
+		// 蚂蚁科技= 【wx2d7b8f851e2b4d2c】 
+		//三信 wxab3d090e1d6f4f9d
+		//龍成百业 wx4aa52cae06369ff3
+		public  final static String appID = "wxab3d090e1d6f4f9d";
+		
+		
+		// 1254334801(蚂蚁)
+		//1253076501三信   
+		//龍成百业1501194931
+		public final   static String MCH_ID = "1254334801";
+		//GmULUeNedGYUMlNSQslwakSYCLdAVrGpljRKYTwpFcg（蚂蚁  消息加解密密钥）
+		//cJWDMY8xmChwgQu5hG7KK2XBlSqRf8cIXpXFszY0JCP  汝一 EncodingAESKey 消息加解密密钥)
+		//4nhYWHMgLG5UwBIK6BqiNk23JhYvYntHAHZpLrazn2Q 宝马
+		public  final static String EncodingAESKey = "4nhYWHMgLG5UwBIK6BqiNk23JhYvYntHAHZpLrazn2Q";
+		
+		//API密钥 32位 大小写字母+数字（商户平台有个api 密钥） 也是商户平台的key 
+		//1234567891123456789abcdefgabcdefg蚂蚁
+		//三信0123456789aaaaaaaaaa1234567890aa
+		//龙成百业 012345678901234567890123456789aa
+		public  final  static String API_KEY = "1234567891123456789abcdefgabcdefg";
+		
+		
+		// HTTPS证书的本地路径
+		private static String certLocalPath = "";
+		
+		// HTTPS证书密码，默认密码等于商户号MCHID
+		private static String certPassword = "1253076501";
+		
+		// 是否使用异步线程的方式来上报API测速，默认为异步模式
+		private static boolean useThreadToDoReport = true;
+		
+		
+		// 机器IP
+		private static String ip = "27.54.227.50";
+		
+		// 接口链接
+		// URL地址：https://api.mch.weixin.qq.com/pay/unifiedorder
+		public final static String pay_ok_url = "http://hjdv.v050.10000net.cn/3.jsp";
+		
+		//提交post到这个地址，可以拿到prepay id
+		public  static final String PREPAY_ID_URL = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+		
+		//微信支付 退货的接口
+		public static final String REFUND_URL = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+		
+		//付款url  付到用户的零钱
+		public  static final String fukuan_URL = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
+		
+		//红包url   公众号给用户发红包
+		public  static final String hongbao_URL = "https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack";
+		
+		//微信二维码 url 基础支持: 获取access_token接口 /token
+		//请求地址ticket 方法get
+		public  static final String ticket = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wxab3d090e1d6f4f9d&secret=91d925477990157e7d9466c8c0f513fa";
+		
+		
+}

@@ -1,0 +1,61 @@
+
+.fenlei{
+	background-color: white;
+	margin-bottom: 10px;
+}
+
+.fenlei ul{    
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+.fenlei ul li{
+	width: 33.33333333%;
+	float: left;
+	list-style: none;
+	margin-bottom: 2px;
+}
+.fenlei ul li img{
+	width: 100%;
+}
+
+.tuijian{    
+	margin-bottom: 70px;
+	background-color: white;
+}
+
+.tuijian ul{    
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+.tuijian ul li{
+	width: 49.9999%;
+	float: left;
+	list-style: none;
+	margin-bottom: 2px;
+	padding: 15px;
+}
+
+.tuiguang_title{
+	font-size: 12px;
+	color: #000;
+	overflow:hidden;
+	max-height: 44px;
+	font-weight: bold;
+	height: 44px;
+}
+
+
+.tuijian_price{
+	text-align: center;
+    color: red;
+    font-weight: bold;
+}
+
+
+
+
+
+

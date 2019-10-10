@@ -1,0 +1,27 @@
+package com.java1234.controller.houtai;
+
+
+import javax.annotation.Resource;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+import com.java1234.service.ShopCartService;
+
+
+@Controller
+@RequestMapping("/shopcart/pc")
+public class ShopCart_PC_Controller {
+	
+	
+	@Resource
+	private ShopCartService shopCartService;
+	
+	
+	@RequestMapping("/manage")
+	public ModelAndView manage() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/admin/page/shopcart/shopcart_manage");
+		return mav;
+	}
+	
+}

@@ -1,0 +1,55 @@
+package com.java1234.service.weixin;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.java1234.dao.WXSuCaiDao;
+import com.java1234.dao.WeiXinUserDao;
+import com.java1234.entity.weixin.WXSuCai;
+
+
+
+@Service("wXSuCaiService")
+public class WXSuCaiServiceImpl implements WXSuCaiService {
+
+	@Resource
+	private WXSuCaiDao  wxSuCaiDao;
+	
+	
+	
+	@Override
+	public Integer add(WXSuCai wxSuCai) {
+		// TODO Auto-generated method stub
+		return wxSuCaiDao.add(wxSuCai);
+	}
+
+	@Override
+	public Integer update(WXSuCai wxSuCai) {
+		// TODO Auto-generated method stub
+		return wxSuCaiDao.update(wxSuCai);
+	}
+
+	@Override
+	public List<WXSuCai> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return wxSuCaiDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return wxSuCaiDao.getTotal(map);
+	}
+	
+
+	@Override
+	public Integer deleteAll(String type) {
+		// TODO Auto-generated method stub
+		return wxSuCaiDao.deleteAll(type);
+	}
+
+}

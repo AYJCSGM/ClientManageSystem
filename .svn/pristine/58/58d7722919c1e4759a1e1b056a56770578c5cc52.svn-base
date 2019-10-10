@@ -1,0 +1,303 @@
+package com.java1234.controller.admin;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.java1234.entity.Client;
+import com.java1234.entity.Config;
+import com.java1234.entity.DingDan;
+import com.java1234.entity.DingDanInfo;
+import com.java1234.entity.Goods;
+import com.java1234.entity.PageBean;
+import com.java1234.entity.Refund;
+import com.java1234.entity.Result;
+import com.java1234.service.ClientService;
+import com.java1234.service.ConfigService;
+import com.java1234.service.DingDanInfoService;
+import com.java1234.service.DingDanService;
+import com.java1234.service.GoodsService;
+import com.java1234.service.RefundService;
+import com.java1234.util.DateUtil;
+import com.java1234.util.MyUtil;
+import com.java1234.util.ResponseUtil;
+import com.java1234.util.StringUtil;
+import com.java1234.util.XMLUtil;
+import com.java1234.util.weixin.WeiXinConfig;
+import com.java1234.util.weixin.WeiXinUtil;
+
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+
+
+
+@Controller
+@RequestMapping("/dingdan")
+public class AdminDingDanController {
+	
+	
+	@Resource
+	private DingDanService dingDanService;
+	@Resource
+	private GoodsService goodsService;
+	@Resource
+	private ConfigService configService;
+	@Resource
+	private DingDanInfoService dingDanInfoService;
+	@Resource
+	private ClientService clientService;
+	@Resource
+	private RefundService refundService;
+	/**
+	 * //开始 创建订单 传      姓名   电话   地址  备注   商品ids  
+	 *  /dingdan/add
+	 */
+	@RequestMapping("/add")
+	public String add(DingDan dingDan,@RequestParam(value = "ids", required = false) String ids, 
+			@RequestParam(value = "jsonInfo", required = false) String jsonInfo, 
+			HttpServletResponse response, HttpServletRequest request,HttpSession session) throws Exception {
+		
+		dingDan.setCreateDateTime(new Date());
+		
+		String openid = (String) session.getAttribute("openid");
+		Client client = (Client) session.getAttribute("client");
+		client.setName(dingDan.getName());
+		client.setPhone(dingDan.getPhone());
+		client.setAddress(dingDan.getAddress());
+		clientService.update(client);
+		
+		
+		dingDan.setOpenid(openid);
+		dingDan.setClientId(client.getId());
+		dingDan.setState(0);
+		
+		
+		Config config =  configService.findById(1);
+		String out_trade_no = DateUtil.formatDate(new Date(), "yyyyMMddHHmm")+MyUtil.bu0(config.getPay_index(), 5);
+		dingDan.setOut_trade_no(out_trade_no);
+		int resultTotal = dingDanService.add(dingDan);
+		
+		Gson gson = new Gson();
+		List<JSONObject> infoList = new ArrayList<JSONObject>();
+		
+		infoList = gson.fromJson(jsonInfo,
+				new TypeToken<List<JSONObject>>() {
+				}.getType());
+		
+		Goods goods;
+		DingDanInfo info ; 
+		BigDecimal heji = new BigDecimal("0");
+		String title = "" ;
+		for(JSONObject obj : infoList){
+			info = new DingDanInfo();
+			goods = goodsService.findById(obj.getInt("goodsId"));
+			info.setGoodsId(goods.getId());
+			info.setContent(goods.getContent());
+			info.setShowImg(goods.getShowImg());
+			info.setTitle(goods.getTitle());
+			info.setDingdanId(dingDan.getId());
+			info.setPrice(goods.getPrice());
+			info.setSpec(goods.getSpec());
+			info.setNum(obj.getInt("goodsNum"));
+			dingDanInfoService.add(info);
+			title = title + "【"+info.getTitle()+"】x"+info.getNum();
+			//合计 订单金额  
+			BigDecimal b_num = new BigDecimal(info.getNum());
+			heji = heji.add(info.getPrice().multiply(b_num));
+		}
+		
+		dingDan.setJine(heji);
+		dingDan.setTitle(title);
+		dingDanService.update(dingDan);
+		
+		JSONObject result = new JSONObject();
+		
+		if (resultTotal > 0) {
+			//订单号加1
+			config.setPay_index(config.getPay_index()+1);
+			configService.update(config);
+			//订单号加1
+			
+			result.put("success", true);
+			result.put("msg","创建订单成功");
+			result.put("dingdanId", dingDan.getId());
+		} else {
+			result.put("success", false);
+			result.put("msg","创建订单失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	/**
+	 * /dingdan/update
+	 * 取消 也使用了这个方法 。  取消时需要 校验openid
+	 * @param dingDan
+	 * @param response
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/update")
+	public String update(DingDan dingDan, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		int resultTotal = dingDanService.update(dingDan);
+		Result result = new Result();
+		Gson gson = new Gson();
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("修改成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("修改失败!!!!!!!");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	
+	
+	/**
+	 * /dingdan/list
+	 */
+	@RequestMapping("/list")
+	public String list(@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "limit", required = false) String rows,
+			@RequestParam(value = "q", required = false) String q, 
+			@RequestParam(value = "state", required = false) String state, 
+			@RequestParam(value = "openid", required = false) String openid,
+			HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		PageBean pageBean = new PageBean(Integer.parseInt(page), Integer.parseInt(rows));
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("start", pageBean.getStart());
+		map.put("size", pageBean.getPageSize());
+		map.put("q", StringUtil.formatLike(q));
+		
+		if("9".equals(state)){
+			//把9过虑掉
+			state="";
+		}
+		
+		map.put("state", state);
+		map.put("openid", openid);
+		List<DingDan> list = dingDanService.list(map);
+		Integer total = dingDanService.getTotal(map);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm").create();
+		map.clear();
+		map.put("data", list);
+		map.put("count", total);
+		map.put("code", 0);
+		map.put("msg", "");
+		ResponseUtil.write(response, gson.toJson(map));
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param dingdanId
+	 * @param refund_jine
+	 * @param /dingdan/refund
+	 */
+	@RequestMapping("/refund")
+	public String refund(@RequestParam(value = "dingdanId", required = false) String dingdanId,
+			@RequestParam(value = "refund_jine", required = false) String refund_jine,
+			@RequestParam(value = "refund_desc", required = false) String refund_desc,
+			HttpServletResponse response, HttpServletRequest request) throws Exception {
+		
+		DingDan dingDan = dingDanService.findById(Integer.parseInt(dingdanId));
+		
+		Refund refund = new Refund();
+		
+		
+		
+		
+		SortedMap<Object, Object> parameters = new TreeMap<Object, Object>();
+		parameters.put("appid", WeiXinConfig.appID);
+		parameters.put("mch_id", WeiXinConfig.MCH_ID);
+		parameters.put("nonce_str", WeiXinUtil.CreateNoncestr(16));// 大小写混排16位
+		parameters.put("out_trade_no", dingDan.getOut_trade_no());//购买订单号
+		
+		
+		//从缓存中取出config
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();  
+        ServletContext servletContext = webApplicationContext.getServletContext(); 
+        Config config =(Config) servletContext.getAttribute("config");
+		
+        
+		String out_refund_no = DateUtil.formatDate(new Date(), "yyyyMMddHHmm")+MyUtil.bu0(config.getRefund_index(), 5);
+		parameters.put("out_refund_no", "tui"+out_refund_no);//退款订单号
+		parameters.put("total_fee", WeiXinUtil.yuantofen(dingDan.getJine().toString()));//订单金额 Int 100  单位分
+		parameters.put("refund_fee", WeiXinUtil.yuantofen(refund_jine));//退款金额 Int 100 单位分
+		parameters.put("refund_desc", refund_desc);//退款原因  String(80) 非必填
+		
+		//更新退款下标
+		config.setRefund_index(config.getRefund_index()+1);
+		configService.update(config);
+		//更新退款下标
+		
+		String sign = WeiXinUtil.createSign("UTF-8", parameters, WeiXinConfig.API_KEY);// md5加密前面的数据
+		parameters.put("sign", sign);
+		// 把map弄成xml数据
+		String XMLData = WeiXinUtil.MapToXml(parameters);
+		
+		
+		BigDecimal jine = new BigDecimal(refund_jine);
+		refund.setOpenid(dingDan.getOpenid());
+		refund.setRefund_jine(jine);
+		refund.setCreateDateTime(new Date());
+		refund.setOut_trade_no(dingDan.getOut_trade_no());
+		refund.setOut_refund_no("tui"+out_refund_no);
+		refund.setRefund_desc(refund_desc);
+		refund.setIp(MyUtil.getRemoteAddress(request));
+		
+		
+		String CApath = request.getSession().getServletContext().getRealPath("");//证书路径
+		CApath = CApath+"/admin/cert/apiclient_cert.p12";
+		
+		String result = WeiXinUtil.sendPostAndLoadCA(WeiXinConfig.REFUND_URL, XMLData, CApath);
+		refund.setResult_(result);
+		
+		JSONObject obj = new JSONObject();
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		if(result.indexOf("FAIL")!=-1){
+			refund.setState(2);
+			obj.put("success", false);
+			map = XMLUtil.stringToMap(result);
+			if(map.get("err_code_des")!=null){
+				obj.put("msg", map.get("err_code_des").toString());
+			}else{
+				obj.put("msg", "错误的金额");
+			}
+		}else{
+			refund.setState(1);
+			obj.put("success", true);
+		}
+		refundService.add(refund);
+		
+		ResponseUtil.write(response, obj.toString());
+		return null;
+	}
+	
+	
+}

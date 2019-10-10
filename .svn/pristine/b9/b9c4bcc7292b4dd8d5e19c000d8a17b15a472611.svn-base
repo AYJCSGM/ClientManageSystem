@@ -1,0 +1,102 @@
+package com.java1234.controller.vote.wap;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.java1234.entity.Goods;
+import com.java1234.entity.vote.Activity;
+import com.java1234.entity.vote.ActivityLunbo;
+import com.java1234.entity.vote.ActivityWork;
+import com.java1234.service.GoodsService;
+import com.java1234.service.vote.ActivityLunboService;
+import com.java1234.service.vote.ActivityService;
+import com.java1234.service.vote.ActivityWorkService;
+
+@Controller
+@RequestMapping("/wap/activity")
+public class WAP_Activity_Controller {
+	
+	
+	@Resource
+	private ActivityService  activityService;
+	
+	@Resource
+	private ActivityLunboService  activityLunboService;
+	@Resource
+	private ActivityWorkService  activityWorkService;
+	
+	
+	/**
+	 * /wap/activity/15
+	 */
+	@RequestMapping("/{id}")
+	public ModelAndView see_id(@PathVariable("id") Integer id, HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		Activity activity = activityService.findById(id);
+		activity.setClick_(activity.getClick_()+1);//+1
+        String webPath = request.getServletContext().getRealPath("");
+		activityService.update(activity, webPath);
+		
+		mav.addObject("activity", activity);
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("activityId", activity.getId());
+		map.put("isUse", "1");
+		List<ActivityLunbo> activityLunboList = activityLunboService.list(map );
+		mav.addObject("activityLunboList", activityLunboList);
+		
+		List<ActivityWork> activityWorkList = activityWorkService.list(map);
+		mav.addObject("activityWorkList", activityWorkList);
+		
+		Integer total = activityService.getTotalNum(id);
+		mav.addObject("total", total);
+		
+		
+		
+		
+		mav.setViewName("/wap/vote/activity/activity");
+		return mav;
+	}
+	
+	
+	/**
+	 * /wap/activity/detail/1
+	 */
+	@RequestMapping("/detail/{id}")
+	public ModelAndView detail(@PathVariable("id") Integer id, HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		Activity activity = activityService.findById(id);
+		mav.addObject("activity", activity);
+		mav.setViewName("/wap/vote/activity/detail");
+		return mav;
+	}
+	
+	
+	/**
+	 * /wap/activity/pm/1
+	 */
+	@RequestMapping("/pm/{id}")
+	public ModelAndView pm(@PathVariable("id") Integer id, HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		Activity activity = activityService.findById(id);
+		mav.addObject("activity", activity);
+		List<ActivityWork> activityWorkList = activityWorkService.pm(activity.getId());
+		mav.addObject("activityWorkList", activityWorkList);
+		
+		mav.setViewName("/wap/vote/activity/pai_ming");
+		return mav;
+	}
+	
+	
+	
+	
+}

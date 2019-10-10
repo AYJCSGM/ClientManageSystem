@@ -1,0 +1,83 @@
+package com.java1234.service.vote;
+
+
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import org.springframework.stereotype.Service;
+import com.java1234.dao.ActivityDao;
+import com.java1234.entity.vote.Activity;
+import com.java1234.util.FileUtil;
+import com.java1234.util.HtmlUtil;
+import com.java1234.util.StringUtil;
+
+
+
+
+@Service("activityService")
+public class ActivityServiceImpl implements ActivityService {
+	
+
+	@Resource
+	private ActivityDao activityDao;
+	
+	@Override
+	public Integer add(Activity activity) {
+		// TODO Auto-generated method stub
+		return activityDao.add(activity);
+	}
+	
+	@Override
+	public Integer update(Activity activity,String webPath) {
+		Activity origin = this.findById(activity.getId());
+		
+		int i = activityDao.update(activity);
+		
+		//·ÀÖ¹ ¸üÐÂisUse topÊ±°ÑÍ¼Æ¬É¾³ýµô
+		String this_html = "";
+		if(activity.getContent()==null){
+			this_html = origin.getContent();
+		}else{
+			this_html = activity.getContent();
+		}
+		//·ÀÖ¹ ¸üÐÂisUse topÊ±°ÑÍ¼Æ¬É¾³ýµô
+		
+		HtmlUtil.update_html_del_img(origin.getContent(), this_html, webPath);
+		return i;
+	}
+
+	@Override
+	public List<Activity> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return activityDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return activityDao.getTotal(map);
+	}
+	
+	@Override
+	public Activity findById(Integer id) {
+		// TODO Auto-generated method stub
+		return activityDao.findById(id);
+	}
+	
+	@Override
+	public Integer delete(Integer id,String webPath) {
+		Activity temp = activityDao.findById(id);
+		int i = activityDao.delete(id);
+		if(StringUtil.isNotEmpty(temp.getWx_share_img())){
+			FileUtil.deleteFile(webPath+temp.getWx_share_img());
+		}
+		return i;
+	}
+	
+	@Override
+	public Integer getTotalNum(Integer id) {
+		// TODO Auto-generated method stub
+		return activityDao.getTotalNum(id);
+	}
+
+}

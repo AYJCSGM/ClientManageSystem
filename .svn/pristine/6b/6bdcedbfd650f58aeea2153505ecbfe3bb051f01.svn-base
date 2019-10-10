@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.GoodsDao">
+	
+	<resultMap type="Goods" id="GoodsResult">
+		<result property="id" column="id" />
+		<result property="title" column="title" />
+		<result property="price" column="price" />
+		<result property="spec" column="spec" />
+		<result property="kucun" column="kucun" />
+		<result property="sales" column="sales" />
+		<result property="content" column="content" />
+		<result property="contentNoTag" column="contentNoTag" />
+		<result property="isUse" column="isUse" />
+		<result property="showImg" column="showImg" />
+		<result property="fenleiId" column="fenleiId" />
+		<result property="createUserId" column="createUserId" />
+		<result property="createDateTime" column="createDateTime" />
+		<result property="order_" column="order_" />
+		<result property="pos" column="pos" />
+		
+		<association property="fenlei" column="fenleiId"
+			select="com.java1234.dao.FenLeiDao.findById"></association>
+		
+		<association property="createUser" column="createUserId"
+			select="com.java1234.dao.UserDao.findById"></association>
+			
+			
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="Goods">
+		insert into t_goods values(null,#{title},#{price},#{spec},#{kucun},#{sales},#{content},#{contentNoTag},#{isUse},#{showImg},#{order_},#{fenleiId},#{createUserId},#{createDateTime},#{pos})
+	</insert>
+	
+	<update id="update" parameterType="Goods">
+		update t_goods
+		<set>
+			<if test="title!=null ">
+				title=#{title},
+			</if>
+			<if test="price!=null ">
+				price=#{price},
+			</if>
+			<if test="spec!=null ">
+				spec=#{spec},
+			</if>
+			<if test="kucun!=null ">
+				kucun=#{kucun},
+			</if>
+			<if test="sales!=null ">
+				sales=#{sales},
+			</if>
+			<if test="content!=null ">
+				content=#{content},
+			</if>
+			<if test="contentNoTag!=null ">
+				contentNoTag=#{contentNoTag},
+			</if>
+			<if test="isUse!=null ">
+				isUse=#{isUse},
+			</if>
+			<if test="showImg!=null ">
+				showImg=#{showImg},
+			</if>
+			<if test="fenleiId!=null ">
+				fenleiId=#{fenleiId},
+			</if>
+			<if test="createUserId!=null ">
+				createUserId=#{createUserId},
+			</if>
+			<if test="createDateTime!=null ">
+				createDateTime=#{createDateTime},
+			</if>
+			<if test="order_!=null ">
+				order_=#{order_},
+			</if>
+			<if test="pos!=null ">
+				pos=#{pos},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="GoodsResult">
+		select * from t_goods
+		<where>
+			<if test="q!=null and q!=''">
+				and (title like #{q}  or contentNoTag like #{q}  or spec like #{q}   ) 
+			</if>
+			<if test="fenleiId!=null and fenleiId!='' ">
+		 		and fenleiId  =   #{fenleiId}
+			</if>
+			<if test="isUse!=null and isUse!='' ">
+		 		and isUse  =   #{isUse}
+			</if>
+			<if test="pos!=null and pos!='' ">
+		 		and pos = #{pos}
+			</if>
+		</where>
+		order by order_ ASC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from t_goods
+		<where>
+			<if test="q!=null and q!=''">
+				and (title like #{q}  or contentNoTag like #{q}  or spec like #{q}   ) 
+			</if>
+			<if test="fenleiId!=null and fenleiId!='' ">
+		 		and fenleiId  =   #{fenleiId}
+			</if>
+			<if test="isUse!=null and isUse!='' ">
+		 		and isUse  =   #{isUse}
+			</if>
+			<if test="pos!=null and pos!='' ">
+		 		and pos = #{pos}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="GoodsResult">
+		select * from t_goods where id=#{id}
+	</select>
+	
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_goods where id=#{id}
+	</delete>
+	
+	
+	 
+	
+</mapper> 

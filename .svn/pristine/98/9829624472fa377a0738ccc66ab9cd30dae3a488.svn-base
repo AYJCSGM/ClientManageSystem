@@ -1,0 +1,29 @@
+package com.java1234.service.weixin;
+
+import java.util.List;
+import java.util.Map;
+
+import com.java1234.entity.weixin.TextEvent;
+
+public interface TextEventService {
+	
+	
+	
+	
+	public Integer add(TextEvent  textEvent);
+
+	public Integer update(TextEvent  textEvent);
+
+	public List<TextEvent> list(Map<String, Object> map);
+
+	public Integer getTotal(Map<String, Object> map);
+
+	public TextEvent findById(Integer id);
+
+	public List<TextEvent>  findByContent(String content);
+	
+	public Integer delete(Integer id);
+	
+	public String doingWeiXinText(Map<String,Object> requestMap);
+	
+}

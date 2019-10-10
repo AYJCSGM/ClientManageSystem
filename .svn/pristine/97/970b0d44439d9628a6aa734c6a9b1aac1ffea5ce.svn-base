@@ -1,0 +1,20 @@
+package com.java1234.service.weixin;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.weixin.NewsItem;
+
+
+public interface NewsItemService {
+	
+	public Integer add(NewsItem newsItem);
+
+	public List<NewsItem> listByMediaId(String media_id);
+
+	public Integer deleteByMediaId(String media_id);
+
+	public List<NewsItem> list(Map<String, Object> map);
+
+	public Integer getTotal(Map<String, Object> map);
+
+}

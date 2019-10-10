@@ -1,0 +1,69 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<!-- 开启高速模式    -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<!-- 开启高速模式 -->
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+<!-- 加入移动布局 -->
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no" />
+<!-- 加入移动布局 -->
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!--添加  本地 mui  支持-->
+<script	src="${pageContext.request.contextPath}/static/mui/js/mui.min.js"></script>
+<link href="${pageContext.request.contextPath}/static/mui/css/mui.css"	rel="stylesheet" />
+<!--添加  本地  mui  支持-->
+
+<!--添加layer移动  弹出窗口的 插件支持-->
+<script src="${pageContext.request.contextPath}/static/layer_mobile/layer.js"></script>
+<!--添加layer移动  弹出窗口的 插件支持-->
+
+<!--添加  jq  支持加载-->
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<!--添加 jq 支持加载-->
+
+<!--引入自己写的table样式 -->
+<link href="${pageContext.request.contextPath}/static/common/table/table.css" rel="stylesheet" />
+
+<title>${column.title}</title>
+
+<style type="text/css">
+</style>
+
+</head>
+<script type="text/javascript" charset="utf-8">
+	mui.init();
+</script>
+<body>
+
+<header id="header" class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left "><span style="font-size: 16px; line-height: 20px; height: 20px;">返回</span></a>
+	<h1 class="mui-title">${column.title}</h1>
+</header>
+	
+	<div class="mui-content">
+		<div class="table-view" style="margin-top: 3px; margin-bottom: 10px;">
+			<c:forEach var="columnItem" items="${columnItemList}" >
+				<a href="${columnItem.url}" class="table-view-item">
+				 	<img src="${columnItem.icon}"   />
+				 	<img src="/static/images/base/more.png"   />
+				 	<span>${columnItem.title}</span>
+				 </a>
+			</c:forEach>
+		</div>
+		<p align="center" style="margin-bottom: 0px;">技术支持-蚂蚁科技  3325699</p>
+	</div>
+</body>
+</html>

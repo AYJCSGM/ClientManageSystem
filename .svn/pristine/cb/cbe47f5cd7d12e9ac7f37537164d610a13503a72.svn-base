@@ -1,0 +1,126 @@
+package com.java1234.entity.weixin;
+
+import java.util.List;
+
+/**
+ * 公众号 菜单
+ * 
+ * @author Administrator
+ *{"button":
+ *
+ *[{"name":"关于我们55","type":"click","key":" "},
+ *
+ *{"name":"菜单555","sub_button":
+ *[{"name":"图文消息","type":"click","key":"zan"},
+ *{"name":"文本消息","type":"click","key":"02"}
+ *]}
+ *
+ *,{"name":"自定义菜单555","type":"view","url":"https://www.baidu.com/"}]}
+ *
+ *  "type": "pic_sysphoto", 
+    "name": "系统拍照发图", 
+    "key": "rselfmenu_1_0", 
+   
+      "type": "pic_photo_or_album", 
+    "name": "拍照或者相册发图", 
+    "key": "rselfmenu_1_1", 
+ 
+	                    
+	  "type": "pic_weixin", 
+	"name": "微信相册发图", 
+	"key": "rselfmenu_1_2", 
+ 
+ */
+
+
+public class GZHMenu {
+
+	private Integer id;
+	private String name;// 菜单名子
+	private String type;// view/click 由公众号后台推送东西。 文本消息或者 图文消息
+	private String key_;// 我们还有一个表，就是根据key推送什么内容。
+	private String url;// view 跳转的url
+	private Integer father;// 父节点 根节点是 -1
+	private Integer order_;
+	private GZHMenu father_;
+
+	private List<GZHMenu> sub_button;//菜单下面的子菜单
+	
+	
+	
+	
+	public List<GZHMenu> getSub_button() {
+		return sub_button;
+	}
+
+	public void setSub_button(List<GZHMenu> sub_button) {
+		this.sub_button = sub_button;
+	}
+
+	public Integer getOrder_() {
+		return order_;
+	}
+
+	public void setOrder_(Integer order_) {
+		this.order_ = order_;
+	}
+
+	public GZHMenu getFather_() {
+		return father_;
+	}
+
+	public void setFather_(GZHMenu father_) {
+		this.father_ = father_;
+	}
+
+	public Integer getFather() {
+		return father;
+	}
+
+	public void setFather(Integer father) {
+		this.father = father;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	
+	 
+	public String getKey_() {
+		return key_;
+	}
+
+	public void setKey_(String key_) {
+		this.key_ = key_;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+}

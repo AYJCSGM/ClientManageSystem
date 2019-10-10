@@ -1,0 +1,24 @@
+package com.java1234.service.vote;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.vote.ActivityLunbo;
+
+public interface ActivityLunboService {
+	
+	
+	public Integer add(ActivityLunbo activityLunbo);
+	
+	public Integer update(ActivityLunbo activityLunbo);
+	
+	public List<ActivityLunbo> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public ActivityLunbo findById(Integer id);
+	
+	public Integer delete(Integer id,String webPath );
+	
+	
+	
+}

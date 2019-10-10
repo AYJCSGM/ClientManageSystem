@@ -1,0 +1,45 @@
+package com.java1234.controller.xc;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+import com.java1234.entity.xiche.Message;
+import com.java1234.service.xiche.MessageService;
+
+
+
+@Controller
+@RequestMapping("/message")
+public class MessageController {
+	
+	
+	@Resource
+	private MessageService messageService;
+	
+	
+	
+	/**
+	 * /message/index
+	 * ¡Ù—‘∞Â ◊“≥
+	 */
+	@RequestMapping("/index")
+	public ModelAndView message_index(HttpServletResponse  res,HttpServletRequest req) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("isUse", "1");
+		List<Message> messageList =  messageService.list(map );
+		mav.addObject("messageList", messageList);
+		
+		mav.setViewName("/wap/message/message");
+		return mav;
+	}
+	
+	
+}

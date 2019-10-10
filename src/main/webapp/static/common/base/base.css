@@ -1,0 +1,337 @@
+html, body {
+	padding: 0px;
+	margin: 0px;
+}
+
+/*head的css */
+.c_head {
+	background: #000000;
+	width: 100%;
+	min-width: 1164px;
+}
+.c_head .content {
+	width: 1164px;
+	min-width: 1164px;
+	margin: 0 auto;
+}
+
+.head_daohan_list{
+	display: inline-block;
+}
+
+.head_daohan_list a{
+	 color: white ; 
+	 text-align: center;
+	 display: inline-block; 
+	 vertical-align: top;
+	 height: 100px;  
+	 width: 90px; 
+	 font-family: "Helvitica Neue",Helvitica,Arial,"Hiragino Sans GB","Microsoft YaHei","Arial Regular","Microsoft JhengHei",sans-serif;
+	 transition: all .4s;
+    -webkit-transition: all .4s;
+    -ms-transition: all .4s;
+    -moz-transition: all .4s;
+}
+.head_daohan_list a:nth-child(1):hover{
+	background-color: white;
+	color: black;
+}
+.head_daohan_list a:nth-child(2):hover{
+	background: #3a456e;
+}
+.head_daohan_list a:nth-child(3):hover{
+	background: #0fae6f;
+}
+.head_daohan_list a:nth-child(4):hover{
+	background: #0075ff;
+}
+
+
+.head_daohan_list a span:nth-child(1){
+	display: block;
+	padding: 28px 0px 0px 0px;
+	font-weight:bold;
+	letter-spacing: 5px;
+}
+
+
+.head_daohan_list a span:nth-child(2){
+	display: block;
+	letter-spacing: 2px;
+}
+
+
+
+
+
+
+
+
+
+/*
+下同的样式 是旧的。  已抛弃的。
+background: url(/static/images/base/log_small.png) left center no-repeat;
+center 是指上下居中
+*/
+.c_head .content .log {
+	display: inline-block;
+	vertical-align: middle;
+	width: 127px;
+	height: 39px;
+	background: url(/static/images/base/log_small.png) left center no-repeat;
+}
+
+.c_head .content .tip {
+	display: inline-block;
+	vertical-align: middle;
+	width: 127px;
+	height: 39px;
+	font-style: italic;
+	color: #85909A;
+}
+
+.c_head .content .path_list {
+	display: inline-block;
+	vertical-align: middle;
+	height: 39px;
+}
+
+.c_head .content .path_list a {
+	padding: 0px 5px 0px 5px;
+	color: #333;
+	text-decoration: none;
+}
+
+.c_head .content .path_list a:hover {
+	color: #dd1a10;
+	text-decoration: underline;
+}
+
+
+/*
+a 标签  选中 保持这个样式  不变
+*/
+.head_path_list_a_this {
+	color: #dd1a10;
+	text-decoration: underline;
+}
+/*head的css */
+
+
+
+
+
+
+
+/*脚部  的css */
+.foot {
+	padding: 20px 0px 20px 0px;
+	background-color: black;
+	overflow: hidden;
+	min-width: 1164px;
+}
+
+.foot .content {
+	overflow: hidden;
+	width: 1164px;
+	margin: 0 auto;
+}
+
+.foot .content .inner {
+	width: 100%;
+	padding:10px 0px 10px 0px; 
+}
+.foot .content .inner .name{
+	    padding: 20px 10px 10px 10px;
+    display: block;
+    color: white;
+    font-weight: bold;
+    font-size: 33px;
+}
+
+.foot .content .inner .yewu{
+	display: inline-block; 
+	vertical-align: top;
+}
+
+.foot .content .inner .yewu .title{
+	 color: white;
+	 font-weight: bold;
+	 margin-bottom: 15px;
+}
+
+.yewu_content{
+	color: white;
+}
+
+
+.yewu_content a{
+	font-family: "Helvitica Neue", Helvitica, Arial, "Hiragino Sans GB",
+		"Microsoft YaHei", "Arial Regular", "Microsoft JhengHei", sans-serif;
+	margin-bottom: 10px;
+	display:block;
+	 color: #999999;
+	 
+	 
+	text-decoration: none;
+	font-size: 14px;
+}
+
+
+
+/*脚部---友情连接  的css */
+.foot .content .link {
+	border-bottom: 1px solid #333;
+	border-top: 1px solid #333;
+	font-family: "Helvitica Neue", Helvitica, Arial, "Hiragino Sans GB",
+		"Microsoft YaHei", "Arial Regular", "Microsoft JhengHei", sans-serif;
+	font-size: 14px;
+}
+
+
+.foot .content .link .left {
+	padding: 10px 0px 10px 0px;
+	border-top: 1px solid #FFF;
+	width: 14%;
+	text-align: center;
+	overflow: hidden;
+	color: white;
+	float: left;
+}
+.foot .content .link .right {
+	float: left;
+	width: 85%;
+	padding: 10px 0px 10px 0px;
+	overflow: hidden;
+}
+
+
+.foot .content .link .right a {
+	display:inline-block;
+	line-height: 30px;
+	margin: 10px 50px 10px 0;
+	color: #666;
+	text-decoration: none;
+	font-family: "Helvitica Neue", Helvitica, Arial, "Hiragino Sans GB",
+		"Microsoft YaHei", "Arial Regular", "Microsoft JhengHei", sans-serif;
+}
+
+
+.foot .content .link .right a:hover {
+	text-decoration: underline;
+}
+
+/*脚部---友情连接  的css */
+
+/*脚部---备案  的css */
+.foot .content .beian {
+	padding: 20px 10px 20px 0px;
+	overflow: hidden;
+	float: right;
+}
+
+.foot .content .beian a {
+	font-family: "Helvitica Neue", Helvitica, Arial, "Hiragino Sans GB",
+		"Microsoft YaHei", "Arial Regular", "Microsoft JhengHei", sans-serif;
+	font-size: 13px;
+	color: #666;
+	text-decoration: none;
+}
+/*脚部---备案  的css */
+
+/*脚部  的css */
+
+
+
+
+
+
+
+/*模块的css */
+.module {
+	padding: 35px 0px 35px 0px;
+	position: relative;
+	min-width: 1164px;
+	background: #222;
+}
+
+
+.module .top {
+	margin: 0 auto;
+	width: 1164px;
+	position: relative;
+}
+
+.module .top .title {
+	background: #222;
+	font-size: 24px;
+	position: absolute;
+	top: -17px;
+	color: red;
+	color: #f1f1f1;
+	padding: 0px 20px 0px 20px;
+	font-family: "Helvitica Neue", Helvitica, Arial, "Hiragino Sans GB",
+		"Microsoft YaHei", "Arial Regular", "Microsoft JhengHei", sans-serif;
+}
+
+
+.module .top .title .fang {
+	transform: rotate(45deg);
+	-webkit-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	background: #f1f1f1;
+	position: relative;
+	top: -5px;
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+}
+
+
+.module .content {
+	margin: 0 auto;
+	width: 1164px;
+	position: relative;
+}
+
+
+/*模块的css */
+
+
+.noselect {
+-webkit-touch-callout: none; /* iOS Safari */
+-webkit-user-select: none; /* Chrome/Safari/Opera */
+-khtml-user-select: none; /* Konqueror */
+-moz-user-select: none; /* Firefox */
+-ms-user-select: none; /* Internet Explorer/Edge */
+user-select: none; /* Non-prefixed version, currently
+not supported by any browser */
+}
+
+
+/*首页加载更多按钮,默认灰色，*/
+.index_more_a{
+	display: inline-block;
+    padding: 13px 60px 13px 60px;
+    letter-spacing: 5px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .4s;
+    -webkit-transition: all .4s;
+    -ms-transition: all .4s;
+    -moz-transition: all .4s;
+}
+.index_more_a_default{
+	color: #d6c3c3;
+	border: 1px solid rgba(255, 255, 255, 0.45);
+	background-color: rgba(255, 255, 255, 0);
+}
+.index_more_a_green{
+	border: 1px solid #0ebaa6;
+	background-color: rgba(255, 255, 255, 0);
+	color:#0ebaa6;
+}
+
+
+

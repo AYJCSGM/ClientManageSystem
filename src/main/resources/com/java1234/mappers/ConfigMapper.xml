@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.ConfigDao">
+	
+	<resultMap type="Config" id="ConfigResult">
+		<result property="id" column="id" />
+		<result property="domain_name" column="domain_name" />
+		<result property="web_site" column="web_site" />
+		<result property="headStr" column="headStr" />
+		<result property="layuiStr" column="layuiStr" />
+		<result property="init_money" column="init_money" />
+	</resultMap>
+	
+	<update id="update" parameterType="Config">
+		update t_config
+		<set>
+			<if test="domain_name!=null    ">
+				domain_name=#{domain_name},
+			</if>
+			<if test="web_site!=null    ">
+				web_site=#{web_site},
+			</if>
+			<if test="headStr!=null    ">
+				headStr=#{headStr},
+			</if>
+			<if test="layuiStr!=null    ">
+				layuiStr=#{layuiStr},
+			</if>
+			<if test="init_money!=null    ">
+				init_money=#{init_money},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	
+	<select id="findById" parameterType="Integer" resultMap="ConfigResult">
+		select * from t_config where id=#{id}
+	</select>
+	
+	
+	
+</mapper> 

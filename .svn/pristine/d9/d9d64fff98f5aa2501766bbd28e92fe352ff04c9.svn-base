@@ -1,0 +1,73 @@
+package com.java1234.service.xiche;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.java1234.dao.ClientTypeDao;
+import com.java1234.dao.MemberDao;
+import com.java1234.entity.Client;
+import com.java1234.entity.xiche.Member;
+
+
+
+@Service("memberService")
+public class MemberServiceImpl implements MemberService {
+
+
+	@Resource
+	private MemberDao nemberDao;
+
+	@Override
+	public Integer add(Member member) {
+		// TODO Auto-generated method stub
+		return nemberDao.add(member);
+	}
+
+	@Override
+	public Integer update(Member member) {
+		// TODO Auto-generated method stub
+		return nemberDao.update(member);
+	}
+
+	@Override
+	public List<Member> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return nemberDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return nemberDao.getTotal(map);
+	}
+
+	@Override
+	public Member findById(Integer id) {
+		// TODO Auto-generated method stub
+		return nemberDao.findById(id);
+	}
+
+	@Override
+	public Integer delete(Integer id) {
+		// TODO Auto-generated method stub
+		return nemberDao.delete(id);
+	}
+	
+	@Override
+	public Member find(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return nemberDao.find(map);
+	}
+
+	@Override
+	public Member findByCard(String card) {
+		// TODO Auto-generated method stub
+		return nemberDao.findByCard(card);
+	}
+	 
+
+}

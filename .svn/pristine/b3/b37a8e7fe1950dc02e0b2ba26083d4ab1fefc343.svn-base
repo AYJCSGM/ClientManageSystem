@@ -1,0 +1,52 @@
+package com.java1234.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.java1234.dao.LunBoDao;
+import com.java1234.dao.RefundDao;
+import com.java1234.entity.Refund;
+import com.java1234.service.RefundService;
+
+
+
+@Service("refundService")
+public class RefundServiceImpl implements RefundService {
+
+	
+
+	@Resource
+	private RefundDao  refundDao;
+	
+	
+	@Override
+	public Integer add(Refund refund) {
+		// TODO Auto-generated method stub
+		return refundDao.add(refund);
+	}
+
+	@Override
+	public List<Refund> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return refundDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return refundDao.getTotal(map);
+	}
+	
+	
+	@Override
+	public Integer delete(Integer id) {
+		// TODO Auto-generated method stub
+		return refundDao.delete(id);
+	}
+	
+	
+}

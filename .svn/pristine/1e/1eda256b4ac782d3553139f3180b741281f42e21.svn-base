@@ -1,0 +1,236 @@
+package com.java1234.controller.weixin;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.http.client.entity.GzipCompressingEntity;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.java1234.entity.Config;
+import com.java1234.entity.LunBo;
+import com.java1234.entity.PageBean;
+import com.java1234.entity.Result;
+import com.java1234.entity.User;
+import com.java1234.entity.weixin.GZHMenu;
+import com.java1234.service.weixin.GZHMenuService;
+import com.java1234.util.Base64Test;
+import com.java1234.util.DateUtil;
+import com.java1234.util.FileUtil;
+import com.java1234.util.ResponseUtil;
+import com.java1234.util.StringUtil;
+import com.java1234.util.weixin.WeiXinUtil;
+
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+
+
+@Controller
+@RequestMapping("/admin/gzhmenu")
+public class AdminGZHMenuController {
+	
+	@Resource
+	private GZHMenuService gzhMenuService;
+	
+	
+	/**
+	 * /admin/gzhmenu/add
+	 */
+	@RequestMapping("/add")
+	public String add(GZHMenu gzhMenu, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		int resultTotal = gzhMenuService.add(gzhMenu);
+		Result result = new Result();
+		Gson gson = new Gson();
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("添加成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("添加失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	/**
+	 * /admin/gzhmenu/update
+	 */
+	@RequestMapping("/update")
+	public String update(GZHMenu gzhMenu,@RequestParam(value = "imgData", required = false) String imgData, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		int resultTotal = gzhMenuService.update(gzhMenu);
+		Result result = new Result();
+		Gson gson = new Gson();
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("修改成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("修改失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	/**
+	 * /admin/directory/list
+	 */
+	@RequestMapping("/list")
+	public String list(@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "limit", required = false) String rows,
+			@RequestParam(value = "q", required = false) String q, 
+			@RequestParam(value = "father", required = false) String father, 
+			HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		PageBean pageBean = new PageBean(Integer.parseInt(page), Integer.parseInt(rows));
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("start", pageBean.getStart());
+		map.put("size", pageBean.getPageSize());
+		map.put("q", StringUtil.formatLike(q));
+		map.put("father", father);
+		List<GZHMenu> list = gzhMenuService.list(map);
+		Integer total = gzhMenuService.getTotal(map);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm").create();
+		map.clear();
+		map.put("data", list);
+		map.put("count", total);
+		map.put("code", 0);
+		map.put("msg", "");
+		ResponseUtil.write(response, gson.toJson(map));
+		return null;
+	}
+	
+	
+	/**
+	 * /admin/directory/delete
+	 */
+	@RequestMapping("/delete")
+	public String delete(@RequestParam(value = "ids", required = false) String ids, HttpServletResponse response)
+			throws Exception {
+		String[] idsStr = ids.split(",");
+		Gson gson = new Gson();
+		Result result = new Result();
+		for (int i = 0; i < idsStr.length; i++) {
+			gzhMenuService.delete(Integer.parseInt(idsStr[i]));
+		}
+		result.setSuccess(true);
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	
+	/**
+	 * 
+	 * {
+     "button":[
+     {	
+          "type":"view",
+          "name":"关于我们",
+          "url":"https://mp.weixin.qq.com/s?__biz=MzI4MDkyMjc2Mg==&mid=100000001&idx=1&sn=04b35188ba5e179f078f61ce1cc61694&chksm=6bb05ee45cc7d7f2ecb669287f71517ed0d0ae1aa202ca3087b1ab1d2922b79371747fce3a3d#rd"
+      }
+     ,
+         {
+            "name": "菜单", 
+            "sub_button": [
+               
+              {
+               "type":"click",
+               "name":"由公众号推送消息，赞一下",
+               "key":"zan"
+            },
+ {	
+          "type":"view",
+          "name":"点击跳转网站",
+          "url":"https://mp.weixin.qq.com/s?__biz=MzI4MDkyMjc2Mg==&mid=100000001&idx=1&sn=04b35188ba5e179f078f61ce1cc61694&chksm=6bb05ee45cc7d7f2ecb669287f71517ed0d0ae1aa202ca3087b1ab1d2922b79371747fce3a3d#rd"
+      },
+{	
+          "type":"view",
+          "name":"自定义菜单",
+          "url":"https://mp.weixin.qq.com/s?__biz=MzI4MDkyMjc2Mg==&mid=100000001&idx=1&sn=04b35188ba5e179f078f61ce1cc61694&chksm=6bb05ee45cc7d7f2ecb669287f71517ed0d0ae1aa202ca3087b1ab1d2922b79371747fce3a3d#rd"
+      }
+
+            ]
+        }
+ 
+         ]
+ }
+ 
+	 * /admin/gzhmenu/syn
+	 * 更新微信菜单   到   公众号 
+	 */
+	@RequestMapping("/syn")
+	public String syn( HttpServletResponse response)throws Exception {
+		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+		
+		Result result = new Result();
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("father", -1);
+		List<GZHMenu> root = gzhMenuService.list(map);
+		List<GZHMenu> sub_button = null ; 
+		JSONArray buttons = new JSONArray();
+		
+		
+		for(GZHMenu menu : root){
+			map.put("father", menu.getId());
+			sub_button = gzhMenuService.list(map);
+			JSONObject node ;
+			
+			if(sub_button.size()==0){
+				node = WeiXinUtil.getNode(menu);
+			}else{
+				node = new JSONObject();
+				node.put("name", menu.getName());
+				JSONArray array = new JSONArray();
+				for(GZHMenu sub_node : sub_button){
+					array.add(WeiXinUtil.getNode(sub_node));
+				}
+				node.put("sub_button", array);
+			}
+			buttons.add(node);
+		}
+		
+		JSONObject data = new JSONObject();
+		data.put("button", buttons);
+		
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		JSONObject token = (JSONObject) servletContext.getAttribute("token");
+		String post_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token="+token.getString("access_token");
+		System.out.println("菜单 json："+gson.toJson(data));
+		String post_result = WeiXinUtil.updateMenu(post_url, gson.toJson(data));
+		
+		System.out.println("返回值："+post_result);
+		
+		//==-1是换不到ok
+		if(post_result.indexOf("ok")==-1){
+			result.setSuccess(false);
+			result.setMsg("更新公众号菜单，失败!!!!"+post_result);
+		}else{
+			result.setSuccess(true);
+			result.setMsg("更新公众号菜单，成功");
+		}
+		
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	
+	
+	
+}

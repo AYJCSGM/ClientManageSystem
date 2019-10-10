@@ -1,0 +1,15 @@
+
+/*¹«¹²´úÂë */
+.wrap {
+	min-width: 1200px;
+}
+
+.wrap .model {
+	background-color: black;
+}
+.wrap .model .content {
+	width: 1200px;
+	margin: 0 auto;
+	position: relative;
+}
+

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.ActivityLunboDao">
+	
+	<resultMap type="ActivityLunbo" id="ActivityLunboResult">
+		<result property="id" column="id" />
+		<result property="title" column="title" />
+		<result property="url" column="url" />
+		<result property="imgUrl" column="imgUrl" />
+		<result property="isUse" column="isUse" />
+		<result property="order_" column="order_" />
+		<result property="createUserId" column="createUserId" />
+		<result property="createDateTime" column="createDateTime" />
+		<result property="activityId" column="activityId" />
+		
+		<association property="createUser" column="createUserId"
+			select="com.java1234.dao.UserDao.findById"></association>
+	</resultMap>
+	
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="ActivityLunbo">
+		insert into t_vote_activity_lunbo values(null,#{title},#{url},#{imgUrl},#{isUse},#{order_}
+		,#{createUserId},#{createDateTime},#{activityId})
+	</insert>
+	
+	<update id="update" parameterType="ActivityLunbo">
+		update t_vote_activity_lunbo
+		<set>
+			<if test="title!=null ">
+				title=#{title},
+			</if>
+			<if test="url!=null ">
+				url=#{url},
+			</if>
+			<if test="imgUrl!=null ">
+				imgUrl=#{imgUrl},
+			</if>
+			<if test="isUse!=null ">
+				isUse=#{isUse},
+			</if>
+			<if test="order_!=null ">
+				order_=#{order_},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="ActivityLunboResult">
+		select * from t_vote_activity_lunbo
+		<where>
+			<if test="activityId!=null and activityId!=''">
+				and  activityId = #{activityId} 
+			</if>
+			<if test="isUse!=null and isUse!=''">
+				and  isUse = #{isUse} 
+			</if>
+		</where>
+		order by order_ ASC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select	count(*) from t_vote_activity_lunbo
+		<where>
+			<if test="activityId!=null and activityId!=''">
+				and  activityId = #{activityId} 
+			</if>
+			<if test="isUse!=null and isUse!=''">
+				and  isUse = #{isUse} 
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="ActivityLunboResult">
+		select * from t_vote_activity_lunbo where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_vote_activity_lunbo where id=#{id}
+	</delete>
+	
+</mapper> 

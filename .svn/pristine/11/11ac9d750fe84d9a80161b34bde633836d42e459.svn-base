@@ -1,0 +1,41 @@
+package com.java1234.controller;
+
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import com.google.gson.Gson;
+import com.java1234.entity.Client;
+import com.java1234.entity.Result;
+import com.java1234.service.ClientService;
+import com.java1234.util.ResponseUtil;
+
+
+@Controller
+@RequestMapping("/client")
+public class ClientController {
+	
+	@Resource
+	private ClientService clientService;
+	
+	@RequestMapping("/update")
+	public String update(Client client, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		int resultTotal = clientService.update(client);
+		Result result = new Result();
+		Gson gson = new Gson();
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("修改成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("修改失败!!!!!!!");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+}

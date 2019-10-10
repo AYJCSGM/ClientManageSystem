@@ -1,0 +1,28 @@
+package com.java1234.service.weixin;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.weixin.WeiXinUser;
+
+
+public interface WeiXinUserService {
+	
+	public Integer add(WeiXinUser wxuser);
+	
+	public Integer update(WeiXinUser wxuser);
+	
+	public List<WeiXinUser> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public WeiXinUser findById(Integer id);
+	
+	public Integer delete(Integer id);
+	
+	public WeiXinUser findByOpenId(String openid);
+	
+	public void add_tongbu_weixin_user(String access_token,String next_openid);
+	
+	public WeiXinUser findByOpenidState(Map<String,Object> map);
+	
+}

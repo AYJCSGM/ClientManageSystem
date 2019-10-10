@@ -1,0 +1,22 @@
+package com.java1234.dao;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.weixin.GZHMenu;
+
+
+public interface GZHMenuDao {
+
+	public Integer add(GZHMenu gzhMenu);
+	
+	public Integer update(GZHMenu gzhMenu);
+	
+	public List<GZHMenu> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public GZHMenu findById(Integer id);
+	
+	public Integer  delete(Integer id);
+	
+}

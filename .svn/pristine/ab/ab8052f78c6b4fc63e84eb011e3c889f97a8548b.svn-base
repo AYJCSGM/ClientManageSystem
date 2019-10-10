@@ -1,0 +1,61 @@
+package com.java1234.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.java1234.dao.ConfigDao;
+import com.java1234.dao.FenLeiDao;
+import com.java1234.entity.FenLei;
+import com.java1234.service.FenLeiService;
+
+
+
+
+@Service("fenLeiService")
+public class FenLeiServiceImpl implements FenLeiService {
+
+
+	@Resource
+	private FenLeiDao fenLeiDao;
+	
+	@Override
+	public Integer add(FenLei fenlei) {
+		// TODO Auto-generated method stub
+		return fenLeiDao.add(fenlei);
+	}
+
+	@Override
+	public Integer update(FenLei fenlei) {
+		// TODO Auto-generated method stub
+		return fenLeiDao.update(fenlei);
+	}
+
+	@Override
+	public List<FenLei> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return fenLeiDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return fenLeiDao.getTotal(map);
+	}
+
+	@Override
+	public FenLei findById(Integer id) {
+		// TODO Auto-generated method stub
+		return fenLeiDao.findById(id);
+	}
+
+	@Override
+	public Integer delete(Integer id) {
+		// TODO Auto-generated method stub
+		return fenLeiDao.delete(id);
+	}
+
+}

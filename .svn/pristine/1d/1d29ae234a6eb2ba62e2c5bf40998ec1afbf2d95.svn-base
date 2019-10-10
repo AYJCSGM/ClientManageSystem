@@ -1,0 +1,782 @@
+package com.java1234.controller.weixin;
+
+import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import javax.annotation.Resource;
+import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.StreamingHttpOutputMessage.Body;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.ModelAndView;
+import com.google.gson.Gson;
+import com.java1234.entity.Client;
+import com.java1234.entity.Config;
+import com.java1234.entity.DingDan;
+import com.java1234.entity.DingDanInfo;
+import com.java1234.entity.Goods;
+import com.java1234.entity.Result;
+import com.java1234.entity.weixin.NewsItem;
+import com.java1234.entity.weixin.News_;
+import com.java1234.entity.weixin.Receive;
+import com.java1234.entity.weixin.WXSuCai;
+import com.java1234.entity.weixin.WXTextMessage;
+import com.java1234.entity.weixin.WeiXinUser;
+import com.java1234.http.HttpClient;
+import com.java1234.service.ClientService;
+import com.java1234.service.ConfigService;
+import com.java1234.service.DingDanService;
+import com.java1234.service.GoodsService;
+import com.java1234.service.weixin.ClickEventService;
+import com.java1234.service.weixin.NewsItemService;
+import com.java1234.service.weixin.News_Service;
+import com.java1234.service.weixin.ReceiveService;
+import com.java1234.service.weixin.TextEventService;
+import com.java1234.service.weixin.WXSuCaiService;
+import com.java1234.service.weixin.WeiXinService;
+import com.java1234.service.weixin.WeiXinUserService;
+import com.java1234.util.CryptographyUtil;
+import com.java1234.util.DateUtil;
+import com.java1234.util.FileUtil;
+import com.java1234.util.MyUtil;
+import com.java1234.util.QRcodeUtil;
+import com.java1234.util.ResponseUtil;
+import com.java1234.util.StringUtil;
+import com.java1234.util.XMLUtil;
+import com.java1234.util.weixin.WeiXinConfig;
+import com.java1234.util.weixin.WeiXinUtil;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+
+@Controller
+@RequestMapping("/weixin")
+public class WeiXinController {
+	
+	
+	@Resource
+	private WeiXinUserService weiXinUserService;
+	@Resource
+	private ClientService clientService;
+	@Resource
+	private ClickEventService clickEventService;
+	@Resource
+	private ConfigService configService;
+	@Resource
+	private DingDanService dingDanService;
+	@Resource
+	private News_Service news_Service;
+	@Resource
+	private NewsItemService newsItemService;
+	@Resource
+	private TextEventService textEventService;
+	@Resource
+	private GoodsService goodsService;
+	@Resource
+	private WeiXinService weiXinService;
+	@Resource
+	private WXSuCaiService wXSuCaiService;
+	
+	/**
+	 * /weixin/oauth2
+	 * @param code
+	 * @param state  就相当于 活动id
+	 * @param response
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/oauth2")
+	public ModelAndView oauth2(
+			@RequestParam(value="code",required=false)String code,
+			@RequestParam(value="state",required=false)String state,//这个state就是机构号
+			HttpServletResponse response,HttpSession session)throws Exception{
+			ModelAndView mav = new ModelAndView();
+			String accessToken_openid_json = "";
+			
+			if(StringUtil.isNotEmpty(code)){
+				accessToken_openid_json = HttpClient.get(WeiXinUtil.getOpenidUrl(code));
+			}else{
+			}
+			
+			JSONObject accessToken_openid_obj = JSONObject.fromObject(accessToken_openid_json);
+			String openid = accessToken_openid_obj.getString("openid").toString();
+			WeiXinUser weiXinUser = null ;
+			Client client = null ; 
+			if(StringUtil.isNotEmpty(openid)){
+				Map<String,Object> map = new HashMap<String,Object>();
+				map.put("openid", openid);
+				map.put("state", state);
+				
+				weiXinUser = weiXinUserService.findByOpenidState(map);
+				
+				if(weiXinUser==null){
+					//不存在这个openid 存一个吧
+					weiXinUser = new WeiXinUser();
+					weiXinUser.setOpenid(openid);
+					weiXinUser.setState_(Integer.parseInt(state));
+					weiXinUser.setSubscribe(0);//默认0   没有关注 
+					weiXinUserService.add(weiXinUser);
+					client = new Client();
+					client.setCreateDateTime(new Date());
+					client.setOpenid(openid);
+					client.setWeixin_user_id(weiXinUser.getId());
+					clientService.add(client);
+				}
+			}
+			
+			client = clientService.finbByOpenid(openid);
+			session.setAttribute("client", client);
+			session.setAttribute("openid", openid);
+			session.setAttribute("weiXinUser", weiXinUser);
+			
+			//登陆我们的shior 系统
+			Subject subject=SecurityUtils.getSubject();
+			
+			SecurityUtils.getSubject().getSession().setAttribute("login_type", "wx_login");
+			UsernamePasswordToken token=new UsernamePasswordToken(openid, CryptographyUtil.md5(openid, "chenhao"));
+			try{
+				subject.login(token); // 登录验证
+			}catch(Exception e){
+				e.printStackTrace();
+				return null;
+			}
+			//登陆我们的shior 系统
+			
+			
+			/*
+			//可以判断下是否要求用户 补全资料
+			if(station.getCompletionData()==1){
+				//需要补全资料
+				if(StringUtil.isEmpty(client.getName())&&StringUtil.isEmpty(client.getPhone())){
+					mav.setViewName("wap/weixin/client_write_info");
+					mav.addObject("title", "补全资料即可,微信支付,还有无门槛红包等你领");
+					mav.addObject("mui_title", "补全资料即可,微信支付");
+				}else{
+					mav.setViewName("wap/weixin/oauth2");
+				}
+			}else{
+				mav.setViewName("wap/weixin/oauth2");
+			}
+			*/
+			mav.setViewName("wap/weixin/oauth2");
+			return mav;
+	}
+	
+	
+	
+	/**
+	 * 
+	 * 可以看到该查询字符串有4个字段
+signature：微信加密签名
+echostr：随机字符串
+timestamp：时间戳
+nonce：随机数
+只有在验证URL的时候查询字符串中才会有“echostr”这个字段，验证的方法是
+将token、timestamp、nonce三个参数进行字典序排序
+将三个参数字符串拼接成一个字符串进行sha1加密
+开发者获得加密后的字符串可与signature对比，标识该请求来源于微信
+
+
+	 * 功能1、公众号，服务器配置，接受并返回
+	 * 
+	 *  /weixin/message
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/message")
+	public String message(HttpServletResponse response, HttpServletRequest request,
+			@RequestParam(value = "signature", required = false) String signature,
+			@RequestParam(value = "timestamp", required = false) String timestamp,
+			@RequestParam(value = "nonce", required = false) String nonce,
+			@RequestParam(value = "echostr", required = false) String echostr
+			,@RequestParam(value = "MsgType", required = false) String MsgType
+			) throws Exception {
+		System.out.println("signature:"+signature);//密码了Token的东西。校验这个东西。
+		System.out.println("timestamp:"+timestamp);
+		System.out.println("nonce:"+nonce);
+		System.out.println("echostr:"+echostr);
+		System.out.println("MsgType:"+MsgType);
+		/////////////此代码，公众号，服务器配置。接受校验代码//////////////
+		if(StringUtil.isNotEmpty(echostr)){
+			ResponseUtil.write(response, echostr);
+			return null;
+		}
+		/////////////此代码，公众号，服务器配置。接受校验代码//////////////
+		
+		
+		String RespXml =""; 
+		/////////////接受流数据，转成string --string转成map//////////////
+		
+		InputStream inputStream;
+		StringBuffer sb = new StringBuffer();
+		inputStream = request.getInputStream();
+		String s;
+		BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+		while ((s = in.readLine()) != null) {
+			sb.append(s);
+		}
+		in.close();
+		inputStream.close();
+		System.out.println(sb.toString());
+		Map<String,Object> requestMap = XMLUtil.stringToMap(sb.toString());
+		
+		
+		/////////////接受用户发送的文本消息，和语音消息，图片//////////////
+		if(requestMap.get("MsgType")!=null){
+			switch (requestMap.get("MsgType").toString()) {
+			case "text":
+				RespXml = textEventService.doingWeiXinText(requestMap);
+				ResponseUtil.write(response, RespXml);
+				return null;
+				
+			case "image":
+				
+				WXTextMessage text = new WXTextMessage();
+				text.setToUserName(requestMap.get("FromUserName").toString());
+				text.setFromUserName(requestMap.get("ToUserName").toString());
+				text.setContent("传来的图片地址为:"+requestMap.get("PicUrl").toString());
+				text.setMsgType("text");
+				text.setCreateTime(new Date().getTime()+"");
+				RespXml = WeiXinUtil.TextMessageToXML(text);
+				ResponseUtil.write(response, RespXml);
+				
+				break;
+			}
+		}
+		
+		
+		//处理   用户点击菜单---用户订单----扫描带参数的二维码
+		if(requestMap.get("Event")!=null){
+			
+			//处理扫描带参数的二维码
+			if(requestMap.get("Event").equals("SCAN")){
+				return null;
+			}
+			
+			//处理 用户订阅    【订阅渠道有二种  1种是官方 1种是参数二维码】
+			if(requestMap.get("Event").equals("subscribe")){
+				return null;
+			}
+			
+			//点击菜单 
+			if(requestMap.get("Event").equals("CLICK")){
+				RespXml = clickEventService.doingWXClick(requestMap);
+				ResponseUtil.write(response, RespXml);
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * /weixin/appid
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/appid")
+	public String appid(HttpServletResponse response) throws Exception {
+		ResponseUtil.write(response, WeiXinConfig.appID);
+		return null ;
+	}
+	
+	
+	/**
+	 * /weixin/syn/weixin/user  同步微信粉丝
+	 */
+	@RequestMapping("/syn/weixin/user")
+	public String syn_weixin_user( HttpServletResponse response, HttpServletRequest request) throws Exception {
+		
+		//从缓存中取出token
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();  
+        ServletContext servletContext = webApplicationContext.getServletContext(); 
+		JSONObject token = (JSONObject)  servletContext.getAttribute("token");
+		String next_openid="";
+		
+		weiXinUserService.add_tongbu_weixin_user(token.getString("access_token"), next_openid);
+		Result result = new Result();
+		Gson gson = new Gson();
+		int resultTotal = 1;
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("同步成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("同步失败!!!!!!!");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	/**
+	 * @url /weixin/pay
+	 * @param goodsId
+	 * @param jine
+	 * @param response
+	 * @param req
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/pay")
+	public String pay(@RequestParam(value = "dingdanId", required = false) Integer dingdanId,
+			 HttpServletResponse response,
+			HttpServletRequest req, HttpSession session) throws Exception {
+		Gson gson = new Gson();
+		
+		DingDan dingDan = dingDanService.findById(dingdanId);
+		String total_fee = WeiXinUtil.yuantofen(dingDan.getJine().toString());
+		
+		//从缓存中取出config
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();  
+        ServletContext servletContext = webApplicationContext.getServletContext(); 
+		Config config =  configService.findById(1);
+		
+		String ip = MyUtil.getRemoteAddress(req);
+		String openid = (String) session.getAttribute("openid");
+		Client client = (Client) session.getAttribute("client");
+		// 设置一个微信 订单
+		dingDan.setSpbill_create_ip(ip);
+		
+		if(!dingDan.getOpenid().equals(openid)){
+			return null;
+		}
+		
+		String body = "";
+		if(dingDan.getTitle().length()>128){
+			body = dingDan.getTitle().substring(0, 110);
+		}else{
+			body = dingDan.getTitle();
+		}
+		
+		Map<String,Object> data = new HashMap<String,Object>();
+		
+		//////////////拿到预付id/////////////////// 
+		String notify_url = config.getWeb_site() + "/weixin/jspay/notify";//支付成功的回调地址
+		
+		data.put("notify_url", notify_url);
+		data.put("body", body);
+		data.put("detail", dingDan.getTitle());
+		data.put("out_trade_no", dingDan.getOut_trade_no());
+		data.put("total_fee", total_fee);
+		data.put("ip", ip);
+		data.put("openid", openid);
+		data.put("trade_type", "JSAPI");
+		
+		Map<String, String> map  = WeiXinUtil.getPrepayId(data);
+		//////////////拿到预付id///////////////////
+		
+		dingDan.setPrepay_id(map.get("prepay_id"));
+		dingDanService.update(dingDan);
+		
+		////////用 预付id去换发起支付的 内容//////////
+		SortedMap<Object, Object> params  = WeiXinUtil.getPayMap(map);
+		params.put("dingdanId", dingdanId);
+		////////用 预付id去换发起支付的 内容//////////
+		ResponseUtil.write(response, gson.toJson(params));
+		
+		return null;
+	}
+	
+	
+	/**
+	 * /weixin/share  传来一个url
+	 * 取得微信 分享  朋友圈的数据
+	 * @throws 
+	 */
+	@RequestMapping("/share")
+	public String share(@RequestParam(value = "url", required = false) String url,HttpServletResponse response) throws Exception {
+			//从缓存中取出ticket
+			WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();  
+	        ServletContext servletContext = webApplicationContext.getServletContext(); 
+			JSONObject ticket = (JSONObject)  servletContext.getAttribute("ticket");
+			
+	        JSONObject result = new JSONObject();
+	        result.put("noncestr", WeiXinUtil.CreateNoncestr(16));
+	        result.put("appId", WeiXinConfig.appID);
+	        result.put("timestamp", Long.toString(new Date().getTime()));
+	        result.put("url", url);
+	        
+	        String str = "jsapi_ticket=" + ticket.get("ticket").toString() +
+	                "&noncestr="+result.get("noncestr").toString()+
+	                "&timestamp=" + result.get("timestamp").toString()+
+	                "&url="+ result.get("url").toString() ;
+	        
+	        result.put("signature", WeiXinUtil.SHA1(str));
+	        ResponseUtil.write(response, result);
+	        return null;
+	}
+	
+	
+	
+	/**
+	 *    http://ybc83w.natappfree.cc/weixin/nativePay?body=打印机&jine=10
+	 * @param response
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/nativePay")
+	public String nativePay(@RequestParam(value = "body", required = false) String body,
+			@RequestParam(value = "jine", required = false) String jine,
+			HttpServletResponse response,HttpServletRequest req) throws Exception {
+		
+		//商品id
+		String product_id = DateUtil.formatDate(new Date(), "yyyyMMddHHmm")+"c";
+		SortedMap<Object, Object> params = new TreeMap<Object, Object>();
+		params.put("appid", WeiXinConfig.appID);
+		params.put("mch_id", WeiXinConfig.MCH_ID);
+		params.put("nonce_str", WeiXinUtil.CreateNoncestr(32));
+		params.put("time_stamp",Long.toString(new Date().getTime()));
+		params.put("body",body);
+		params.put("total_fee",WeiXinUtil.yuantofen(jine));
+		
+		//从缓存中取出config
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();  
+        ServletContext servletContext = webApplicationContext.getServletContext(); 
+        Config config  = (Config)  servletContext.getAttribute("config");
+        //从缓存中取出config
+		String out_trade_no = DateUtil.formatDate(new Date(), "yyyyMMddHHmm")+MyUtil.bu0(config.getPay_index(), 5);
+		params.put("out_trade_no",out_trade_no);
+		String ip = MyUtil.getRemoteAddress(req);
+		params.put("spbill_create_ip",ip);
+		//通知地址
+		params.put("notify_url",config.getWeb_site()+"/weixin/nativePay/notify");
+		//交易类型
+		params.put("trade_type","NATIVE");
+		params.put("product_id",product_id);
+		String sign = WeiXinUtil.createSign("UTF-8", params, WeiXinConfig.API_KEY);// md5加密前面的数据
+		params.put("sign", sign);
+		//请求地址及请求数据
+        String url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+        config.setPay_index(config.getPay_index()+1);
+        configService.update(config);
+        
+        // 把map弄成xml数据
+     	String XMLData = WeiXinUtil.MapToXml(params);
+     	//拿预付id
+     	String result = HttpClient.post(WeiXinConfig.PREPAY_ID_URL, XMLData);
+     	
+     	
+     	//转成map
+     	Map<String, String> map =XMLUtil.stringToMap(result);
+     	String code_url = map.get("code_url").toString();
+     	//将code url变成二维码。 提供扫码支付 
+     	
+     	// 生成二维码QRCode图片
+     	BufferedImage bufImg = QRcodeUtil.qRCodeCommon(code_url.trim(), "jpg", QRcodeUtil.getSize(code_url.trim()));
+     	// 保存到电脑
+ 		String fileName = DateUtil.formatDate(new Date(), "yyyyMMddHHmmssSSS");
+ 		String path = req.getSession().getServletContext().getRealPath("");
+ 		String file_path = "/static/images/nativePayImg/"+DateUtil.formatDate(new Date(), "yyyyMMdd")+"/";
+ 		path = path +file_path ;
+ 		FileUtil.makeDirs(path);
+ 		try {
+			// 把img存到服务器上面。 返回地址给对面
+			ImageIO.write(bufImg, "jpg", new File(path + fileName + ".jpg"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+ 		JSONObject obj = new JSONObject();
+ 		obj.put("success", true);
+ 		obj.put("url", config.getWeb_site()+file_path+fileName + ".jpg");
+ 		obj.put("msg", "扫码支付链接");
+ 		obj.put("state", 200);
+        ResponseUtil.write(response, obj.toString());
+        return null;
+	}
+	
+	
+	/**  
+	 * 
+	 * /weixin/nativePay/notify
+	 * @param response
+	 * @param request
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/nativePay/notify")
+	public String nativePay_notify(HttpServletResponse response, HttpServletRequest request, HttpSession session)
+			throws Exception {
+		InputStream inputStream;
+		StringBuffer sb = new StringBuffer();
+		inputStream = request.getInputStream();
+		String s;
+		BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+		while ((s = in.readLine()) != null) {
+			sb.append(s);
+		}
+		in.close();
+		inputStream.close();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map = XMLUtil.stringToMap(sb.toString());
+		
+		System.out.println("扫码回调是，内容是"+sb.toString());
+		System.out.println("openid:"+map.get("openid"));
+		
+		String resultXML = "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
+		System.out.println("返回微信服务器是:"+resultXML);
+		BufferedOutputStream out = new BufferedOutputStream(response.getOutputStream());
+		out.write(resultXML.getBytes());
+		out.flush();
+		out.close();
+		return null;
+	}
+	
+	/**
+	 * 
+	 * /weixin/jspay/notify
+	 * 
+	 * 	/*
+	 * 付款成功  微信 向我们的notify_url发送的数据 以流的形式发送的
+	 * <xml> <appid><![CDATA[wx2d7b8f851e2b4d2c]]></appid>
+	 * <bank_type><![CDATA[CFT]]></bank_type><cash_fee><![CDATA[1]]></cash_fee>
+	 * <fee_type><![CDATA[CNY]]></fee_type> <is_subscribe><![CDATA[Y]]>
+	 * </is_subscribe><mch_id> <![CDATA[1254334801]]>
+	 * </mch_id><nonce_str><![CDATA[hukzCxR3qvE72d6T]]>
+	 * </nonce_str><openid><![CDATA[oTcsmsxH3N0Clz8R9A_p8JRrMlI0]]>
+	 * </openid><out_trade_no> <![CDATA[20170926_1538_33151]]></out_trade_no>
+	 * <result_code><![CDATA[SUCCESS]]></result_code>
+	 * <return_code><![CDATA[SUCCESS]]></return_code><sign><![CDATA[
+	 * 1CD625AC84D055A7422A1BFD827470FA]]>
+	 * </sign><time_end><![CDATA[20170926153842]]></time_end>
+	 * <total_fee>1</total_fee><trade_type>
+	 * <![CDATA[JSAPI]]></trade_type><transaction_id>
+	 * <![CDATA[4200000007201709264365961732]]> </transaction_id></xml>
+	 * @param response
+	 * @param request
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/jspay/notify")
+	public String jspay_notify(HttpServletResponse response, HttpServletRequest request)
+			throws Exception {
+		InputStream inputStream;
+		StringBuffer sb = new StringBuffer();
+		inputStream = request.getInputStream();
+		String s;
+		BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+		while ((s = in.readLine()) != null) {
+			sb.append(s);
+		}
+		in.close();
+		inputStream.close();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map = XMLUtil.stringToMap(sb.toString());
+		System.out.println("扫码回调是，内容是"+sb.toString());
+		DingDan dingDan = dingDanService.findBy_out_trade_no((String) map.get("out_trade_no"));
+		dingDan.setState(1);
+		dingDan.setPayDateTime(new Date());
+		dingDan.setWx_msm(String.valueOf(Float.parseFloat((String) map.get("total_fee")) / 100));
+		dingDanService.update(dingDan);
+		String webPath=request.getServletContext().getRealPath("/");
+		
+		Goods temp_goods = null;
+		for(DingDanInfo info : dingDan.getInfo()){
+			temp_goods = 	goodsService.findById(info.getGoodsId());
+			if(temp_goods!=null){
+				temp_goods.setSales(temp_goods.getSales()+info.getNum());
+				goodsService.update(temp_goods,webPath);
+			}
+		}
+		
+		//推送消息
+		weiXinService.push_pay_ok_template_msg(dingDan);
+		
+		
+		String resultXML = "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
+		BufferedOutputStream out = new BufferedOutputStream(response.getOutputStream());
+		out.write(resultXML.getBytes());
+		out.flush();
+		out.close();
+		return null;
+	}
+	
+	
+	/**
+	 * 同步微信 图文素材
+	 * /weixin/syn/news/item  
+	 * size默认是10
+	 */
+	@RequestMapping("/syn/news/item")
+	public String syn_news_item(@RequestParam(value="size",required=false)String size, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		
+		Gson gson = new Gson();
+		//Result result = new Result();
+		
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		JSONObject token = (JSONObject) servletContext.getAttribute("token");
+		
+		String post_url = "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=ACCESS_TOKEN";
+		post_url = post_url.replaceAll("ACCESS_TOKEN", token.getString("access_token"));
+		
+		JSONObject totalObj  = WeiXinUtil.getSuCaiTotal(token.getString("access_token"));
+		int new_total =totalObj.getInt("news_count");
+		//System.out.println("一共:"+new_total);
+		int count = Integer.parseInt(size);//一次取多少
+		int pageSize = (int) Math.ceil( Float.valueOf(new_total+"")/Float.valueOf(count+"")); 
+		
+		//删除全部素材
+		news_Service.deleteAll(1);
+		
+		
+		for(int i=0;i<pageSize;i++){
+			JSONObject obj = new JSONObject();
+			obj.put("type", "news");
+			obj.put("offset", count*i);
+			obj.put("count", count);
+			String result = HttpClient.post(post_url, obj.toString());
+			//System.out.println(result);
+			
+			JSONObject data =JSONObject.fromObject(result);
+			JSONArray item= data.getJSONArray("item");
+			NewsItem newsItem = null ; 
+			News_ news = null;
+			News_ temp_news = null;
+			Date updateDateTime;
+			for(int j=0;j<item.size();j++){
+				news = new News_();
+				JSONObject item__ = JSONObject.fromObject(item.get(j).toString());
+				//System.out.println("media_id:"+item__.getString("media_id"));
+				JSONObject item__content = JSONObject.fromObject(item__.getString("content"));
+				JSONArray item__content__news_item = item__content.getJSONArray("news_item");
+				news.setMedia_id(item__.getString("media_id"));
+				temp_news = news_Service.findByMediaId(news.getMedia_id());
+				if(temp_news==null){
+					news_Service.add(news);
+				}else{
+					news.setId(temp_news.getId());
+					newsItemService.deleteByMediaId(news.getMedia_id());
+				}
+				
+				updateDateTime = MyUtil.longToDate(item__.getLong("update_time")*1000L, "yyyy-MM-dd HH:mm");
+				
+				for(int x=0;x<item__content__news_item.size();x++){
+					newsItem = new NewsItem();
+					newsItem.setNewsId(news.getId());
+					newsItem.setMedia_id(item__.getString("media_id"));
+					JSONObject news_item__ = JSONObject.fromObject(item__content__news_item.get(x).toString());
+					//System.out.println("title:"+news_item__.getString("title"));
+					newsItem.setTitle(news_item__.getString("title"));
+					//System.out.println("author:"+news_item__.getString("author"));
+					newsItem.setAuthor(news_item__.getString("author"));
+					//System.out.println("digest:"+news_item__.getString("digest"));
+					newsItem.setDigest(news_item__.getString("digest"));
+					//System.out.println("thumb_media_id:"+news_item__.getString("thumb_media_id"));
+					newsItem.setThumb_media_id(news_item__.getString("thumb_media_id"));
+					//System.out.println("url:"+news_item__.getString("url"));
+					newsItem.setUrl(news_item__.getString("url"));
+					//System.out.println("thumb_url:"+news_item__.getString("thumb_url"));
+					newsItem.setThumb_url(news_item__.getString("thumb_url"));
+					newsItem.setUpdateDateTime(updateDateTime);
+					newsItemService.add(newsItem);
+				}
+			}
+		}
+		
+		Result result2 = new Result();
+		result2.setSuccess(true);
+		ResponseUtil.write(response, gson.toJson(result2));
+		return null;
+		
+	}
+	
+	
+	/**
+	 * 同步微信  图片素材
+	 * /weixin/syn/sucai  
+	 * size默认是10
+	 * type 指定  image图片  voice语音    video视频     music音乐    mpnews文章消息 图文     wxcard 发送卡券
+	 * 
+	 */
+	@RequestMapping("/syn/sucai")
+	public String syn_sucai(@RequestParam(value="size",required=false)String size,
+			@RequestParam(value="type",required=false)String type,
+			HttpServletResponse response, HttpServletRequest request) throws Exception {
+		
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		JSONObject token = (JSONObject) servletContext.getAttribute("token");
+		
+		String post_url = "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=ACCESS_TOKEN";
+		post_url = post_url.replaceAll("ACCESS_TOKEN", token.getString("access_token"));
+		
+		JSONObject totalObj  = WeiXinUtil.getSuCaiTotal(token.getString("access_token"));
+		int sucai_total =totalObj.getInt(type+"_count");
+		int count = Integer.parseInt(size);//一次取多少 默认10
+		int pageSize = (int) Math.ceil( Float.valueOf(sucai_total+"")/Float.valueOf(count+"")); 
+		
+		System.out.println(type+"素材一共:"+sucai_total);
+		wXSuCaiService.deleteAll(type);
+		
+		
+		for(int i=0;i<pageSize;i++){
+			
+			JSONObject obj = new JSONObject();
+			obj.put("type", type);
+			obj.put("offset", count*i);
+			obj.put("count", count);
+			String result = HttpClient.post(post_url, obj.toString());
+			
+			System.out.println(result);
+			
+			JSONObject data =JSONObject.fromObject(result);
+			JSONArray itemList= data.getJSONArray("item");
+			
+			WXSuCai wxSuCai ;
+			
+			for(int j=0;j<itemList.size();j++){
+				
+				wxSuCai = new WXSuCai();
+				JSONObject item = JSONObject.fromObject(itemList.get(j).toString());
+				wxSuCai.setMedia_id(item.get("media_id").toString());
+				wxSuCai.setName(item.get("name").toString());
+				wxSuCai.setType(type);
+				
+				//语音没有url
+				if(item.get("url")!=null){
+					wxSuCai.setUrl(item.get("url").toString());
+				}
+				
+				
+				wxSuCai.setUpdateDateTime(MyUtil.longToDate(item.getLong("update_time")*1000L, "yyyy-MM-dd HH:mm"));
+				wXSuCaiService.add(wxSuCai);
+			}
+		}
+		
+		totalObj.put("success", true);
+		ResponseUtil.write(response, totalObj.toString());
+		return null;
+		
+	}
+}

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.WeiXinUserDao">
+	
+	<resultMap type="WeiXinUser" id="WeiXinUserResult">
+		<result property="id" column="id" />
+		<result property="subscribe" column="subscribe" />
+		<result property="openid" column="openid" />
+		<result property="nickname" column="nickname" />
+		<result property="sex" column="sex" />
+		<result property="language" column="language" />
+		<result property="city" column="city" />
+		<result property="province" column="province" />
+		<result property="country" column="country" />
+		<result property="headimgurl" column="headimgurl" />
+		<result property="subscribe_time" column="subscribe_time" />
+		<result property="remark" column="remark" />
+		<result property="groupid" column="groupid" />
+		<result property="state_" column="state_" />
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="WeiXinUser">
+		insert into t_weixin_user values(null,#{subscribe},#{openid},#{nickname},#{sex},#{language},#{city},#{province}
+		,#{country},#{headimgurl},#{subscribe_time},#{remark},#{groupid},#{state_})
+	</insert>
+	
+	<update id="update" parameterType="WeiXinUser">
+		update t_weixin_user
+		<set>
+			<if test="subscribe!=null ">
+				subscribe=#{subscribe},
+			</if>
+			<if test="openid!=null ">
+				openid=#{openid},
+			</if>
+			<if test="nickname!=null ">
+				nickname=#{nickname},
+			</if>
+			<if test="sex!=null ">
+				sex=#{sex},
+			</if>
+			<if test="language!=null ">
+				language=#{language},
+			</if>
+			<if test="city!=null ">
+				city=#{city},
+			</if>
+			<if test="province!=null ">
+				province=#{province},
+			</if>
+			<if test="country!=null ">
+				country=#{country},
+			</if>
+			<if test="headimgurl!=null ">
+				headimgurl=#{headimgurl},
+			</if>
+			<if test="subscribe_time!=null ">
+				subscribe_time=#{subscribe_time},
+			</if>
+			<if test="remark!=null ">
+				remark=#{remark},
+			</if>
+			<if test="groupid!=null ">
+				groupid=#{groupid},
+			</if>
+			<if test="state_!=null ">
+				state_=#{state_},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="WeiXinUserResult">
+		select * from t_weixin_user
+		<where>
+			<if test="isUse!=null and isUse!='' ">
+				and  isUse = #{isUse} 
+			</if>
+		</where>
+		order by id DESC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select
+		count(*) from t_weixin_user
+		<where>
+			<if test="stationId!=null and stationId!='' ">
+				and  stationId = #{stationId} 
+			</if>
+			<if test="isUse!=null and isUse!='' ">
+				and  isUse = #{isUse} 
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="WeiXinUserResult">
+		select * from t_weixin_user where id=#{id}
+	</select>
+	
+	<select id="findByOpenId" parameterType="String" resultMap="WeiXinUserResult">
+		select * from t_weixin_user where openid=#{openid}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_weixin_user where id=#{id}
+	</delete>
+	
+	<select id="findByOpenidState" parameterType="Map" resultMap="WeiXinUserResult">
+		select * from t_weixin_user where openid=#{openid} and  state_=${state}
+	</select>
+	
+	
+</mapper> 

@@ -1,0 +1,167 @@
+package com.java1234.entity;
+
+import java.util.Date;
+
+public class Config {
+	
+	private Integer id;
+	private String remark;
+	private Integer pay_index;//订单下标
+	
+	private String title_;//网站标题
+	private String desc_;//网站 摘要
+	private String wx_share_img;//微信分享首页 图片
+	
+	private String address;//地址商品的  一个地方显示的 通一地址 
+	private String domain_title;//网站的标题   蚂蚁科技-微信商城
+	private String web_site;//网址 http://www.baiduc.com
+	
+	private String headStr;//head头里面的东西  万一修改head头   不用一个一个文件修改    高速模式  jq   和网站小图标
+	
+	private Integer refund_index;//退款的下标  每天清零
+	
+	private String bus_date;//统计年份  2018
+	private Date bus_last_update;//最后一次更新的时间
+	private Integer bus_update_day;//一次更新几天  从今天向后数几天
+	
+	//layui 版本
+	private String layuiStr;
+	
+	
+	public String getLayuiStr() {
+		return layuiStr;
+	}
+	public void setLayuiStr(String layuiStr) {
+		this.layuiStr = layuiStr;
+	}
+	public Date getBus_last_update() {
+		return bus_last_update;
+	}
+	public void setBus_last_update(Date bus_last_update) {
+		this.bus_last_update = bus_last_update;
+	}
+	public Integer getBus_update_day() {
+		return bus_update_day;
+	}
+	
+	public void setBus_update_day(Integer bus_update_day) {
+		this.bus_update_day = bus_update_day;
+	}
+	
+	public String getBus_date() {
+		return bus_date;
+	}
+	public void setBus_date(String bus_date) {
+		this.bus_date = bus_date;
+	}
+	public Integer getRefund_index() {
+		return refund_index;
+	}
+
+
+	public void setRefund_index(Integer refund_index) {
+		this.refund_index = refund_index;
+	}
+
+
+	public String getHeadStr() {
+		return headStr;
+	}
+
+
+	public void setHeadStr(String headStr) {
+		this.headStr = headStr;
+	}
+
+
+	public String getWeb_site() {
+		return web_site;
+	}
+
+
+	public void setWeb_site(String web_site) {
+		this.web_site = web_site;
+	}
+
+
+	public String getAddress() {
+		return address;
+	}
+
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+
+	public String getDomain_title() {
+		return domain_title;
+	}
+
+
+	public void setDomain_title(String domain_title) {
+		this.domain_title = domain_title;
+	}
+
+
+	public String getTitle_() {
+		return title_;
+	}
+
+
+	public void setTitle_(String title_) {
+		this.title_ = title_;
+	}
+
+
+	public String getDesc_() {
+		return desc_;
+	}
+
+
+	public void setDesc_(String desc_) {
+		this.desc_ = desc_;
+	}
+
+
+	public String getWx_share_img() {
+		return wx_share_img;
+	}
+
+
+	public void setWx_share_img(String wx_share_img) {
+		this.wx_share_img = wx_share_img;
+	}
+
+
+	public Integer getPay_index() {
+		return pay_index;
+	}
+
+
+	public void setPay_index(Integer pay_index) {
+		this.pay_index = pay_index;
+	}
+
+
+	public Integer getId() {
+		return id;
+	}
+
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+
+	public String getRemark() {
+		return remark;
+	}
+
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	
+  
+}

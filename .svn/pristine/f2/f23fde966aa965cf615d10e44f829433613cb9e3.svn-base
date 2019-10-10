@@ -1,0 +1,20 @@
+package com.java1234.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import com.java1234.entity.vote.ActivityTicket;
+
+public interface ActivityTicketDao {
+	
+	public Integer add(ActivityTicket activityTicket);
+	
+	public List<ActivityTicket> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	
+	//拿这个用户 在今天  一共投了多少个人
+	public List<ActivityTicket> getGroup(Map<String,Object> map);
+	
+}

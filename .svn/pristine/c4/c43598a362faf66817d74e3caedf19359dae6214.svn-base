@@ -1,0 +1,300 @@
+package com.java1234.controller.vote.admin;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.java1234.entity.Config;
+import com.java1234.entity.Link;
+import com.java1234.entity.PageBean;
+import com.java1234.entity.Result;
+import com.java1234.entity.User;
+import com.java1234.entity.vote.Activity;
+import com.java1234.entity.vote.ActivityWork;
+import com.java1234.entity.weixin.WeiXinUser;
+import com.java1234.service.LinkService;
+import com.java1234.service.vote.ActivityService;
+import com.java1234.service.weixin.WeiXinService;
+import com.java1234.service.weixin.WeiXinUserService;
+import com.java1234.util.Base64Test;
+import com.java1234.util.DateUtil;
+import com.java1234.util.FileUtil;
+import com.java1234.util.ResponseUtil;
+import com.java1234.util.StringUtil;
+
+@Controller
+@RequestMapping("/admin/activity")
+public class Admin_Activity_Controller {
+
+	@Resource
+	private ActivityService activityService;
+	@Resource
+	private WeiXinUserService weiXinUserService;
+	
+	
+	@InitBinder
+    public void initBinder(WebDataBinder binder) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        dateFormat.setLenient(false);
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true)); // true:允许输入空值，false:不能为空值
+    }
+	
+	/**
+	 * /admin/activity/add
+	 */
+	@RequestMapping("/add")
+	public String add(Activity  activity, @RequestParam(value = "imgData", required = false) String imgData,
+			HttpServletResponse response, HttpServletRequest request) throws Exception {
+		
+		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("currentUser");
+		activity.setCreateUserId(currentUser.getId());
+		activity.setCreateDateTime(new Date());
+		activity.setClick_(0);
+		
+		if(StringUtil.isEmpty(activity.getColor_())){
+			activity.setColor_("#4CAF50");//绿色主体
+			activity.setClick_color("#8BC34A");
+		}
+		
+		
+		// 判断imgData是否为空，然后转为img 转存服务器
+		if (StringUtil.isNotEmpty(imgData)) {
+			this.updateImgDataBase64(imgData, activity, request);
+		}
+		
+		int resultTotal = activityService.add(activity);
+		
+		
+		//从缓存中取出config
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();  
+        ServletContext servletContext = webApplicationContext.getServletContext(); 
+        Config config = (Config)  servletContext.getAttribute("config");
+        String webPath = request.getServletContext().getRealPath("");
+        
+        activity.setUrl(config.getWeb_site()+"/wap/activity/"+activity.getId());
+        activityService.update(activity,webPath);
+		
+		
+		Result result = new Result();
+		Gson gson = new Gson();
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("添加成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("添加失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	/**
+	 * /admin/activity/update
+	 */
+	@RequestMapping("/update")
+	public String update(Activity  activity, @RequestParam(value = "imgData", required = false) String imgData,
+			HttpServletResponse response, HttpServletRequest request) throws Exception {
+		
+		String webPath = request.getServletContext().getRealPath("");
+		
+		//从缓存中取出config
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();  
+        ServletContext servletContext = webApplicationContext.getServletContext(); 
+        Config config = (Config)  servletContext.getAttribute("config");
+        activity.setUrl(config.getWeb_site()+"/wap/activity/"+activity.getId());
+		
+        
+        // 判断imgData是否为空，然后转为img 转存服务器
+ 		if (StringUtil.isNotEmpty(imgData)) {
+ 			// 删除之前的 缩略图
+ 			Activity temp = activityService.findById(activity.getId());
+ 			if (StringUtil.isNotEmpty(temp.getWx_share_img())) {
+ 				FileUtil.deleteFile(webPath + temp.getWx_share_img());
+ 			}
+ 			// 上传现在的图片
+ 			this.updateImgDataBase64(imgData, activity, request);
+ 		}
+ 		
+		int resultTotal = activityService.update(activity,webPath);
+		Result result = new Result();
+		Gson gson = new Gson();
+		if (resultTotal > 0) {
+			result.setSuccess(true);
+			result.setMsg("修改成功");
+		} else {
+			result.setSuccess(false);
+			result.setMsg("修改失败");
+		}
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	/**
+	 * /admin/activity/list
+	 */
+	@RequestMapping("/list")
+	public String list(@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "limit", required = false) String rows,
+			@RequestParam(value = "q", required = false) String q,
+			@RequestParam(value = "createUserId", required = false) String createUserId, HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		PageBean pageBean = new PageBean(Integer.parseInt(page), Integer.parseInt(rows));
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("start", pageBean.getStart());
+		map.put("size", pageBean.getPageSize());
+		map.put("q", StringUtil.formatLike(q));
+		map.put("createUserId", createUserId);
+		List<Activity> list = activityService.list(map);
+		Integer total = activityService.getTotal(map);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm").create();
+
+		map.clear();
+		map.put("data", list);
+		map.put("count", total);
+		map.put("code", 0);
+		map.put("msg", "");
+		ResponseUtil.write(response, gson.toJson(map));
+		return null;
+	}
+	
+	
+	/**
+	 * /admin/activity/delete
+	 */
+	@RequestMapping("/delete")
+	public String delete(@RequestParam(value = "ids", required = false) String ids, HttpServletResponse response,
+			HttpServletRequest request) throws Exception {
+		String[] idsStr = ids.split(",");
+		Gson gson = new Gson();
+		Result result = new Result();
+		String webPath = request.getServletContext().getRealPath("");
+		
+		for (int i = 0; i < idsStr.length; i++) {
+			activityService.delete(Integer.parseInt(idsStr[i]),webPath);
+		}
+
+		result.setSuccess(true);
+		ResponseUtil.write(response, gson.toJson(result));
+		return null;
+	}
+	
+	
+	
+	/**
+	 */
+	@RequestMapping("/findById")
+	public String findById(
+			@RequestParam(value="id",required=false)String id,
+			HttpServletResponse response,HttpServletRequest request)throws Exception{
+		Gson gson = new Gson();
+		Activity activity    = activityService.findById(Integer.parseInt(id));
+		ResponseUtil.write(response, gson.toJson(activity));
+		return null;
+	}
+	
+	public void updateImgDataBase64(String imgData, Activity  activity, HttpServletRequest request) {
+		// 取得根目录带d://dxxxxx/tomcat/ruzhou/
+		String webPath = request.getServletContext().getRealPath("");
+		// 定义根目录下面的文件夹
+		String folder = "/static/images/activity/" + DateUtil.formatDate(new Date(), "yyyyMMdd") + "/";
+		
+		String fileName = DateUtil.formatDate(new Date(), "yyyyMMddHHmmss") + ".jpg";
+		// 调用产生文件夹的方法
+		FileUtil.makeDirs(webPath + folder);
+
+		imgData = imgData.replace("data:image/png;base64,", "");
+		Base64Test.GenerateImage(imgData, webPath + folder + fileName);
+		activity.setWx_share_img(folder + fileName);
+	}
+	
+	/**
+	 * /admin/activity/addEWM
+	 */
+	@RequestMapping("/addEWM")
+	public String addEWM(
+	        @RequestParam(value="name",required=false)String name,
+	        @RequestParam("file") MultipartFile file, 
+	        HttpServletResponse response, HttpServletRequest request) throws Exception {
+	        Gson gson = new Gson();
+	        Result result = new Result();
+	         
+	        if(!file.isEmpty()){
+	            String filePath=request.getServletContext().getRealPath("/");
+	            //把文件名子换成（时间搓.png）
+	            String imageName=DateUtil.getCurrentDateStr()+"."+file.getOriginalFilename().split("\\.")[1];
+	            file.transferTo(new File(filePath+"static/images/vote/erweima/"+imageName));
+	            result.setSuccess(true);
+	            result.setMsg("/static/images/vote/erweima/"+imageName);
+	        }
+	        ResponseUtil.write(response, gson.toJson(result));
+	        return null;
+	}
+	
+	
+	/**
+	 * /admin/activity/addTip
+	 */
+	@RequestMapping("/addTip")
+	public String addTip(
+	        @RequestParam(value="name",required=false)String name,
+	        @RequestParam("file2") MultipartFile file, 
+	        HttpServletResponse response, HttpServletRequest request) throws Exception {
+	        Gson gson = new Gson();
+	        Result result = new Result();
+	        
+	        if(!file.isEmpty()){
+	            String filePath=request.getServletContext().getRealPath("/");
+	            //把文件名子换成（时间搓.png）
+	            String imageName=DateUtil.getCurrentDateStr()+"."+file.getOriginalFilename().split("\\.")[1];
+	            file.transferTo(new File(filePath+"static/images/vote/erweima/"+imageName));
+	            result.setSuccess(true);
+	            result.setMsg("/static/images/vote/erweima/"+imageName);
+	        }
+	        ResponseUtil.write(response, gson.toJson(result));
+	        return null;
+	}
+	
+	/**
+	 * 将缓存中的openid 设置 为已关注 
+	 *   /admin/activity/guanzhu
+	 */
+	@RequestMapping("/guanzhu")
+	public String guanzhu(HttpServletResponse response, HttpServletRequest request,HttpSession session) throws Exception {
+	        Gson gson = new Gson();
+	        Result result = new Result();
+	        
+	        WeiXinUser weiXinUser = (WeiXinUser) session.getAttribute("weiXinUser");
+	        weiXinUser.setSubscribe(1);
+	        weiXinUserService.update(weiXinUser);
+	        result.setSuccess(true);
+	        session.setAttribute("weiXinUser", weiXinUser);
+	        ResponseUtil.write(response, gson.toJson(result));
+	        return null;
+	}
+	
+	
+	
+}

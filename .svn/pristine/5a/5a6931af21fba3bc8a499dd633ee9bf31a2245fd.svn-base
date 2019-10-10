@@ -1,0 +1,23 @@
+package com.java1234.dao;
+
+import java.util.List;
+import java.util.Map;
+import com.java1234.entity.LinkFenLei;
+
+
+public interface LinkFenLeiDao {
+	
+	public Integer add(LinkFenLei linkFenLei);
+	
+	public Integer update(LinkFenLei linkFenLei);
+	
+	public List<LinkFenLei> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public LinkFenLei findById(Integer id);
+	
+	public Integer delete(Integer id);
+	
+}
+

@@ -1,0 +1,46 @@
+body{
+	padding-top: 3px;
+}
+
+er {
+	font-style: normal;
+	color: #c00;
+}
+ber{
+	font-style: normal;
+	color: #c00;
+	font-weight: bold;
+}
+eg {
+	font-style: normal;
+	color: #009688;
+}
+beg {
+	font-style: normal;
+	font-weight: bold;
+	color: #009688;
+}
+eb {
+	font-style: normal;
+	color: #1E9FFF;
+}
+beb {
+	font-style: normal;
+	font-weight: bold;
+	color: #1E9FFF;
+}
+
+
+
+/* 修复table上面10px改成0px */
+.layui-table-view {
+	margin: 0px 0 !important;	    
+}
+/* 修复table上面10px改成0px */
+
+
+/* 修改管理页面  左边的复选框 有点靠上 */
+.layui-table-cell .layui-form-checkbox[lay-skin=primary] {
+    top: 4px;
+}
+/* 修改管理页面  左边的复选框 有点靠上 */

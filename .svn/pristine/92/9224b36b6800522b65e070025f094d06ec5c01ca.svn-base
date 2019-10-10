@@ -1,0 +1,58 @@
+package com.java1234.service.weixin;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.java1234.dao.NewsItemDao;
+import com.java1234.dao.ReceiveTypeDao;
+import com.java1234.entity.weixin.ReceiveType;
+
+
+@Service("receiveTypeService")
+public class ReceiveTypeServiceImpl implements ReceiveTypeService {
+
+	@Resource
+	private ReceiveTypeDao receiveTypeDao;
+	
+	
+	@Override
+	public Integer add(ReceiveType receiveType) {
+		// TODO Auto-generated method stub
+		return receiveTypeDao.add(receiveType);
+	}
+
+	@Override
+	public Integer update(ReceiveType receiveType) {
+		// TODO Auto-generated method stub
+		return receiveTypeDao.update(receiveType);
+	}
+
+	@Override
+	public List<ReceiveType> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return receiveTypeDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return receiveTypeDao.getTotal(map);
+	}
+
+	@Override
+	public ReceiveType findById(Integer id) {
+		// TODO Auto-generated method stub
+		return receiveTypeDao.findById(id);
+	}
+	
+	@Override
+	public Integer delete(Integer id) {
+		// TODO Auto-generated method stub
+		return receiveTypeDao.delete(id);
+	}
+
+}

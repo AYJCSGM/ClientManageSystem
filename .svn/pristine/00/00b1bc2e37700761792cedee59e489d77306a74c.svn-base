@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.DingDanDao">
+	
+	<resultMap type="DingDan" id="DingDanResult">
+		<result property="id" column="id" />
+		<result property="openid" column="openid" />
+		<result property="title" column="title" />
+		<result property="clientId" column="clientId" />
+		
+		<result property="createDateTime" column="createDateTime" />
+		<result property="spbill_create_ip" column="spbill_create_ip" />
+		<result property="out_trade_no" column="out_trade_no" />
+		<result property="prepay_id" column="prepay_id" />
+		<result property="state" column="state" />
+		<result property="payDateTime" column="payDateTime" />
+		<result property="wx_msm" column="wx_msm" />
+		<result property="remark" column="remark" />
+		
+		<result property="name" column="name" />
+		<result property="phone" column="phone" />
+		<result property="address" column="address" />
+		
+		<result property="jine" column="jine" />
+		
+		<result property="desc_" column="desc_" />
+		
+		
+		<association property="client" column="clientId"
+			select="com.java1234.dao.ClientDao.findById"></association>
+		
+		<collection property="info"  column="id"  
+			select="com.java1234.dao.DingDanInfoDao.list"></collection>
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="DingDan">
+		insert into t_dingdan values(null,#{openid},#{title},#{clientId},#{createDateTime},#{spbill_create_ip},#{out_trade_no},#{prepay_id}
+		,#{state},#{payDateTime},#{wx_msm},#{remark},#{name},#{phone},#{address},#{jine},#{desc_})
+	</insert>
+	
+	
+	<update id="update" parameterType="DingDan">
+		update t_dingdan
+		<set>
+			<if test="title!=null ">
+				title=#{title},
+			</if>
+			<if test="spbill_create_ip!=null ">
+				spbill_create_ip=#{spbill_create_ip},
+			</if>
+			<if test="out_trade_no!=null ">
+				out_trade_no=#{out_trade_no},
+			</if>
+			<if test="prepay_id!=null ">
+				prepay_id=#{prepay_id},
+			</if>
+			<if test="state!=null ">
+				state=#{state},
+			</if>
+			<if test="payDateTime!=null ">
+				payDateTime=#{payDateTime},
+			</if>
+			<if test="wx_msm!=null ">
+				wx_msm=#{wx_msm},
+			</if>
+			<if test="remark!=null ">
+				remark=#{remark},
+			</if>
+			<if test="name!=null ">
+				name=#{name},
+			</if>
+			<if test="phone!=null ">
+				phone=#{phone},
+			</if>
+			<if test="address!=null ">
+				address=#{address},
+			</if>
+			<if test="jine!=null ">
+				jine=#{jine},
+			</if>
+			
+			<if test="desc_!=null ">
+				desc_=#{desc_},
+			</if>
+			
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="DingDanResult">
+		select * from t_dingdan
+		<where>
+			<if test="q!=null and q!=''">
+				and (phone like #{q}  or name like #{q} or desc_ like #{q} or out_trade_no like #{q}  or address like #{q} or remark like #{q}   ) 
+			</if>
+			<if test="state!=null and state!='' ">
+		 		and state  =  #{state}
+			</if>
+			<if test="openid!=null and openid!='' ">
+		 		and openid  =  #{openid}
+			</if>
+		</where>
+		order by id DESC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from t_dingdan
+		<where>
+			<if test="q!=null and q!=''">
+				and (phone like #{q}  or name like #{q} or desc_ like #{q} or out_trade_no like #{q}  or address like #{q} or remark like #{q}   ) 
+			</if>
+			<if test="state!=null and state!='' ">
+		 		and state  =  #{state}
+			</if>
+			<if test="openid!=null and openid!='' ">
+		 		and openid  =  #{openid}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="DingDanResult">
+		select * from t_dingdan where id=#{id}
+	</select>
+	
+	
+	<select id="findBy_out_trade_no" parameterType="String" resultMap="DingDanResult">
+		select * from t_dingdan where out_trade_no=#{out_trade_no}
+	</select>
+	
+	
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_dingdan where id=#{id}
+	</delete>
+	
+	
+	 
+	
+</mapper> 

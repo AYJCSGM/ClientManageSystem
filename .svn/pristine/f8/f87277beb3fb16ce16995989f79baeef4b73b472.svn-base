@@ -1,0 +1,52 @@
+package com.java1234.service.weixin;
+
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import org.springframework.stereotype.Service;
+
+import com.java1234.dao.NewsItemDao;
+import com.java1234.entity.weixin.NewsItem;
+
+
+
+@Service("newsItemService")
+public class NewsItemServiceImpl implements NewsItemService {
+	
+
+	@Resource
+	private NewsItemDao newsItemDao;
+	
+	
+	@Override
+	public Integer add(NewsItem newsItem) {
+		// TODO Auto-generated method stub
+		return newsItemDao.add(newsItem);
+	}
+
+	@Override
+	public List<NewsItem> listByMediaId(String media_id) {
+		// TODO Auto-generated method stub
+		return newsItemDao.listByMediaId(media_id);
+	}
+
+	@Override
+	public Integer deleteByMediaId(String media_id) {
+		// TODO Auto-generated method stub
+		return newsItemDao.deleteByMediaId(media_id);
+	}
+
+	@Override
+	public List<NewsItem> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return newsItemDao.list(map);
+	}
+
+	
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return newsItemDao.getTotal(map);
+	}
+
+}

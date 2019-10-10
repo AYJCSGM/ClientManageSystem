@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.ReceiveDao">
+	
+	<resultMap type="Receive" id="ReceiveResult">
+		<result property="id" column="id" />
+		<result property="openid" column="openid" />
+		<result property="receiveTypeId" column="receiveTypeId" />
+		<result property="order_" column="order_" />
+	
+	<association property="receiveType" column="receiveTypeId"
+			select="com.java1234.dao.ReceiveTypeDao.findById"></association>
+			
+	<association property="client" column="openid"
+			select="com.java1234.dao.ClientDao.finbByOpenid"></association>
+			
+	<association property="wxUser" column="openid"
+			select="com.java1234.dao.WeiXinUserDao.findByOpenId"></association>
+	</resultMap>
+	
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="Receive">
+		insert into t_weixin_receive values(null,#{openid},#{receiveTypeId},#{order_})
+	</insert>
+	
+	<update id="update" parameterType="Receive">
+		update t_weixin_receive
+		<set>
+			<if test="openid!=null ">
+				openid=#{openid},
+			</if>
+			<if test="order_!=null ">
+				order_=#{order_},
+			</if>
+			<if test="receiveTypeId!=null ">
+				receiveTypeId=#{receiveTypeId},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="ReceiveResult">
+		select * from t_weixin_receive
+		<where>
+			<if test="q!=null and q!=''">
+				and (title like #{q}     or desc_ like #{q} ) 
+			</if>
+			<if test="receiveTypeId!=null and receiveTypeId!=''">
+				and  receiveTypeId = #{receiveTypeId}
+			</if>
+		</where>
+		order by order_ ASC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from t_weixin_receive
+		<where>
+			<if test="q!=null and q!=''">
+				and (title like #{q}     or desc_ like #{q} ) 
+			</if>
+			<if test="receiveTypeId!=null and receiveTypeId!=''">
+				and  receiveTypeId = #{receiveTypeId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="ReceiveResult">
+		select * from t_weixin_receive where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_weixin_receive where id=#{id}
+	</delete>
+	
+	
+</mapper> 

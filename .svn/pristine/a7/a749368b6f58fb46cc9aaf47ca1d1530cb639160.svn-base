@@ -1,0 +1,10 @@
+package com.java1234.service.weixin;
+
+import com.java1234.entity.DingDan;
+
+public interface WeiXinService {
+	
+	public void push_pay_ok_template_msg(DingDan dingdan);
+	
+	
+}

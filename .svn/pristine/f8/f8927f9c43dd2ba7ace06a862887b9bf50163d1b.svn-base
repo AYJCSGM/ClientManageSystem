@@ -1,0 +1,26 @@
+package com.java1234.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import com.java1234.entity.weixin.WeiXinUser;
+
+public interface WeiXinUserDao {
+	
+	public Integer add(WeiXinUser wxuser);
+	
+	public Integer update(WeiXinUser wxuser);
+	
+	public List<WeiXinUser> list(Map<String,Object> map);
+	
+	public Integer getTotal(Map<String,Object> map);
+	
+	public WeiXinUser findById(Integer id);
+	
+	public Integer delete(Integer id);
+	
+	public WeiXinUser findByOpenId(String openid);
+	
+	public WeiXinUser findByOpenidState(Map<String,Object> map);
+	
+}

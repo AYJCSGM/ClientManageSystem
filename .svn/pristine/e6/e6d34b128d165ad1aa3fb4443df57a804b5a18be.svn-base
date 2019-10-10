@@ -1,0 +1,253 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+${config.headStr}
+
+${config.layuiStr}
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!-- 加入移动布局 -->
+<meta name="viewport"	content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no" />
+<!-- 加入移动布局 -->
+
+
+<!--添加  vue.js 支持加载-->
+<script src="${pageContext.request.contextPath}/static/vue/vue.min.js"></script>
+<!--添加  vue.js 支持加载-->
+
+<!--图片剪辑 js css-->
+<script src="${pageContext.request.contextPath}/static/cropbox/cropbox.js"></script>
+<link href="${pageContext.request.contextPath}/static/cropbox/style.css" rel="stylesheet"/>
+<!--图片剪辑 js css-->
+
+<!--自己定义扩展的 图片剪辑js 符合我的ui-->
+<script src="${pageContext.request.contextPath}/static/common/base/cropbox.js"></script>
+<!--自己定义扩展的 图片剪辑js 符合我的ui-->
+
+
+<script>
+var save_url = '${save_url}';
+
+function save() {
+	//loading
+	var index = layer.load(1, {
+		shade : [ 0.1, '#fff' ]
+	//0.1透明度的白色背景
+	});
+	var isUse = $('input[name="isUse"]:checked').val();
+	if(isUse){
+	}else{
+		isUse = 0 ;
+	}
+	$.post(save_url, {
+		title : app.title,
+		url : app.url,
+		order_ : app.order_,
+		imgData : app.imgData,
+		isUse:isUse
+	}, function(result) {
+		if (result.success) {
+			//调用 父窗口的  关闭所有窗口 并且刷新 页面
+			window.parent.closeDlg(result.msg);
+		} else {
+			layer.msg(result.msg);
+		}
+	}, 'json');
+}
+</script>
+<style>
+html, body {
+}
+.layui-form-item {
+	margin-bottom: 3px;
+}
+</style>
+</head>
+<body id="app">
+	<div style="padding: 10px; overflow: hidden;">
+		<div class="layui-form layui-form-pane">
+			<div class="layui-form-item">
+				<label class="layui-form-label">标题</label>
+				<div class="layui-input-block">
+					<input type="text" autocomplete="off" v-model="title"
+						value="${lunbo.title }" placeholder="请输入 标题" class="layui-input">
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">链接地址</label>
+				<div class="layui-input-block">
+					<input type="text" autocomplete="off" v-model="url"
+						value="${lunbo.url }" placeholder="请输入 链接地址" class="layui-input">
+				</div>
+			</div>
+			
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">排序号</label>
+				<div class="layui-input-block">
+					<input type="text" autocomplete="off" v-model="order_"
+						value="${lunbo.order_ }" placeholder="请输入  排序号" class="layui-input">
+				</div>
+			</div>
+			
+			<div class="layui-form-item" pane="">
+	         	<label class="layui-form-label">是否使用</label>
+			    <div class="layui-input-block">
+			       <c:choose>
+				    <c:when test="${lunbo.isUse==1}">
+				    	<input type="checkbox" id="isUse" name="isUse"  checked="" value="1" lay-filter="isUse"  lay-skin="switch" lay-text="开|关" />
+				    </c:when>
+				     <c:when test="${lunbo.isUse==0 || lunbo==null }">
+				     	<input type="checkbox" id="isUse" name="isUse" value="1" lay-filter="isUse"  lay-skin="switch" lay-text="开|关" />
+				     </c:when>
+				  </c:choose>
+			    </div>
+	  		</div>
+	  
+	  
+			
+		</div>
+		
+		<div class="container" style="width: 100%;">
+		<div>裁剪框尺寸：___________	
+			宽:<input type="text" id="w" value="500"  style="width: 60px;" onkeyup="initCutImg()"   /> 
+			高:<input type="text" id="h" value="300"  style="width: 60px;" onkeyup="initCutImg()"  /> 
+			<input type="button" onclick="initCutImg()" value="修改尺寸"  /> 
+		</div>
+			
+	        <div class="imageBox">
+	            <div class="thumbBox">
+	            </div>
+	            <div class="spinner" style="display: none">
+	               		 请点选择图片
+	            </div>
+	        </div>
+	        
+	        <div class="CutImgBottomBar" style="position:  relative; ">
+	        		<input style=" display:inline-block; width: 115px; height: 35px; " type="file" class="" name="upload-file" id="upload-file" />
+					<button class="layui-btn layui-btn-xs"><i class="layui-icon">&#xe654;</i>选本地图像</button>
+					<button id="btnZoomIn" class="layui-btn layui-btn-xs"><i class="layui-icon">&#x1002;</i>放大</button>
+					<button id="btnZoomOut" class="layui-btn layui-btn-xs"><i class="layui-icon">&#x1002;</i>缩小</button>
+	        		<button id="btnCrop" class="layui-btn layui-btn-xs layui-btn-danger"><i class="layui-icon">&#x1002;</i>裁切</button>
+	        </div>
+        
+        
+        <!--
+        <div class="action">
+             <input type="file" id="file" style=" width: 200px">
+            <div class="new-contentarea tc" style="width:210px;">
+                <a href="javascript:void(0)" class="upload-img">
+                    <label for="upload-file">选本地图像</label>
+                </a>
+                <input type="file" class="" name="upload-file" id="upload-file" />
+                 
+                <a href="javascript:change_pic()" class="upload-img">切换图片</a>
+                 
+            </div>
+            <input type="button" id="btnSubmit" class="Btnsty_peyton" value="上传" />
+            <input type="button" id="btnCrop" class="Btnsty_peyton" value="裁切" />
+            <input type="button" id="btnZoomIn" class="Btnsty_peyton" value="+" />
+            <input type="button" id="btnZoomOut" class="Btnsty_peyton" value="-" />
+        </div>
+         -->
+        
+        <div class="cropped">
+        </div>
+    </div>
+    
+		<div class="site-demo-button" style="margin-top: 20px;">
+			<button id="save" onclick="save()"
+				class="layui-btn site-demo-layedit" data-type="content">${btn_text }</button>
+		</div>
+	</div>
+
+<script type="text/javascript">
+$(window).load(function () {
+        var options = {
+	    thumbBox: '.thumbBox',
+	    spinner: '.spinner',
+	    imgSrc: '${imgSrc}'
+	    }
+
+            var cropper = $('.imageBox').cropbox(options);
+            $('#upload-file').on('change', function () {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    options.imgSrc = e.target.result;
+                    cropper = $('.imageBox').cropbox(options);
+                }
+                reader.readAsDataURL(this.files[0]);
+                //this.files = []; 这一行会报错。暂时注释-ch
+            })
+            
+            $('#btnCrop').on('click', function () {
+            	//"data:image/png;base64,iVBORw0KGgoAAA后面非常多的字符，就是imgData
+            	//可以在浏览器直接打开 观看
+                var imgData = cropper.getDataURL();
+            	app.imgData = imgData;
+                $('.cropped').html('');
+                $('.cropped').append('<img onclick="openImg(\'' + imgData + '\')" src="' + imgData + '" align="absmiddle" style="margin-top:4px;box-shadow:0px 0px 12px #7E7E7E;" >');
+                //$('.cropped').append('<img src="' + img + '" align="absmiddle" style="width:128px;margin-top:4px;border-radius:128px;box-shadow:0px 0px 12px #7E7E7E;"><p>128px*128px</p>');
+                //$('.cropped').append('<img src="' + img + '" align="absmiddle" style="width:180px;margin-top:4px;border-radius:180px;box-shadow:0px 0px 12px #7E7E7E;"><p>180px*180px</p>');
+            })
+			
+            $('#btnZoomIn').on('click', function () {
+                cropper.zoomIn();
+            })
+            $('#btnZoomOut').on('click', function () {
+                cropper.zoomOut();
+            })
+            $('#btnSubmit').on('click', function () {
+                //$('#circularG').show();
+                var img = cropper.getDataURL().replace('data:image/png;base64,', '');
+                console.log(img);
+                $.post(save_url, {base64 : img}, function(result) {
+        			if (result.success) {
+        				//调用 父窗口的  关闭所有窗口 并且刷新 页面
+        				window.parent.closeDlg(result.msg);
+        			}
+        		},"json");
+            })
+        });
+</script>
+    
+    
+
+
+	<script>
+		layui.use([ 'laydate', 'laypage', 'layer', 'table', 'carousel',
+				'upload', 'element' ], function() {
+			var laydate = layui.laydate //日期
+			, laypage = layui.laypage //分页
+			layer = layui.layer //弹层
+			, table = layui.table //表格
+			, carousel = layui.carousel //轮播
+			, upload = layui.upload //上传
+			, element = layui.element; //元素操作
+		});
+	</script>
+	
+	<script>
+		var app = new Vue({
+			el : '#app',
+			data : {
+				title : '',
+				order_ : '',
+				url : '',
+				imgData : '',
+			}
+		});
+	</script>
+
+</body>
+</html>

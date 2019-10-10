@@ -1,0 +1,448 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<!-- JSTL -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- JSTL -->
+
+${config.headStr}
+
+${config.layuiStr}
+
+<title>${title}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport"	content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no" />
+
+<!--添加  vue.js 支持加载-->
+<script src="${pageContext.request.contextPath}/static/vue/vue.min.js"></script>
+<!--添加  vue.js 支持加载-->
+
+<link href="${pageContext.request.contextPath}/static/common/base/pc_base.css" rel="stylesheet"/>
+
+<!--图片剪辑 js css-->
+<script	src="${pageContext.request.contextPath}/static/cropbox/cropbox.js"></script>
+<link href="${pageContext.request.contextPath}/static/cropbox/style.css"	rel="stylesheet" />
+<!--图片剪辑 js css-->
+
+<!--自己定义扩展的 图片剪辑js 符合我的ui-->
+<script src="${pageContext.request.contextPath}/static/common/base/cropbox.js"></script>
+<!--自己定义扩展的 图片剪辑js 符合我的ui-->
+
+
+<!--添加百度 编辑器  支持加载-->
+<script type="text/javascript" charset="gbk"
+	src="${pageContext.request.contextPath}/static/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="gbk"
+	src="${pageContext.request.contextPath}/static/ueditor/ueditor.all.min.js">
+</script>
+<!--建议手动加在语言，避免在ie下有时因为加载语言失败导致编辑器加载失败-->
+<!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
+<script type="text/javascript" charset="gbk"	src="${pageContext.request.contextPath}/static/ueditor/lang/zh-cn/zh-cn.js"></script>
+<!--添加百度 编辑器  支持加载-->
+
+<!--异步上传 js-->
+<script src="${pageContext.request.contextPath}/static/AjaxFileUpload/ajaxfileupload.js"></script>
+<!--异步上传 js-->
+
+
+<style>
+html, body {
+}
+</style>
+
+<script>
+$(function(){
+	if("${activity.state}"!=""){
+		$("#state").val("${activity.state}");
+	}
+});
+
+var save_url = '${save_url}';
+
+function sub() {
+	//loading
+	var index = layer.load(1, {
+		shade : [ 0.1, '#fff' ]
+	//0.1透明度的白色背景
+	});
+	
+	app.startDateTime = $("#startDateTime").val();
+	app.endDateTime = $("#endDateTime").val();
+	app.state = $("#state").val();
+	app.content = UE.getEditor('editor').getContent();
+	
+	var guanzhu = $('input[name="guanzhu"]:checked').val();
+	if(guanzhu){
+	}else{
+		guanzhu = 0 ;
+	}
+	
+	
+	$.post(save_url, {
+		name : app.name,
+		startDateTime : app.startDateTime, endDateTime : app.endDateTime,
+		desc_ : app.desc_,
+		userVote: app.userVote,userWork:app.userWork,
+		interval_:app.interval_,
+		wx_share_title:app.wx_share_title,wx_share_desc:app.wx_share_desc,
+		wx_share_img:app.wx_share_img,
+		imgData : app.imgData,rule_:app.rule_,state:app.state,
+		content:app.content,color_:app.color_,click_color:app.click_color,
+		guanzhu :guanzhu,
+		erweima :app.erweima,guanzhu_tip:app.guanzhu_tip
+	}, function(result) {
+		if (result.success) {
+			//询问框
+			layer.confirm(result.msg+",返回列表，刷新即可", {
+			  btn: ['好','我知道了'] //按钮
+			}, function(){
+				layer.closeAll();
+				$("#save").addClass("layui-btn-disabled");
+				$("#save").attr("onclick","void();"); 
+				window.opener=null;window.open('','_self');window.close();
+			}, function(){
+				layer.closeAll();
+				$("#save").addClass("layui-btn-disabled");
+				$("#save").attr("onclick","void();"); 
+				window.opener=null;window.open('','_self');window.close();
+			});
+		} else {
+			layer.msg(result.msg);
+		}
+	}, 'json');
+}
+
+function uploadFile(file){
+    $.ajaxFileUpload({  
+        url : '/admin/activity/addEWM', //用于文件上传的服务器端请求地址  
+        secureuri : false, //一般设置为false
+        fileElementId : 'file', //文件上传空间的id属性  <input type="file" id="file" name="file" />  
+        type : 'post',  
+        dataType : 'text', //返回值类型 一般设置为json  
+        success : function(result) //服务器成功响应处理函数  
+        {
+            var result=eval('('+result+')');
+            if(result.success){
+            	app.erweima = result.msg;
+            	$("#erweima").empty();
+            	$("#erweima").append('<img style="width: 200px;" src="'+result.msg+'" />');
+            }
+        },  
+        error : function(result)//服务器响应失败处理函数  
+        {  
+        }
+    });  
+    return false;
+}
+
+function uploadFile2(file){
+    $.ajaxFileUpload({  
+        url : '/admin/activity/addTip', //用于文件上传的服务器端请求地址  
+        secureuri : false, //一般设置为false
+        fileElementId : 'file2', //文件上传空间的id属性  <input type="file" id="file" name="file" />  
+        type : 'post',  
+        dataType : 'text', //返回值类型 一般设置为json  
+        success : function(result) //服务器成功响应处理函数  
+        {
+            var result=eval('('+result+')');
+            if(result.success){
+            	app.guanzhu_tip = result.msg;
+            	$("#guanzhu_tip").empty();
+            	$("#guanzhu_tip").append('<img style="width: 200px;" src="'+result.msg+'" />');
+            }
+        },  
+        error : function(result)//服务器响应失败处理函数  
+        {  
+        }
+    });  
+    return false;
+}
+
+
+
+</script>
+
+</head>
+<body id="app">
+
+<div class="wrap">
+		<div class="model" style="background-color: white; padding: 0px 0px 0px 0px;">
+			<div class="content">
+				<blockquote class="layui-elem-quote">${title}</blockquote>
+			</div>
+		</div>
+		
+		
+		<div class="model" style="background-color: white; padding: 0px 0px 0px 0px;">
+			<div class="content" >
+				<div class="layui-form layui-form-pane" action="">
+					<div class="layui-form-item">
+						<label class="layui-form-label">活动名称</label>
+						<div class="layui-input-block">
+							<input type="text" name="name" v-model="name" value="${activity.name }"  lay-verify="name"  autocomplete="off" placeholder="请输入,活动名称" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">投票规则</label>
+						<div class="layui-input-block">
+							<input type="text" name="name" v-model="rule_" value="${activity.rule_ }"  lay-verify="name"  autocomplete="off" placeholder="请输入,投票规则" class="layui-input">
+						</div>
+					</div>
+					
+					<div class="layui-form-item layui-form-text">
+						<label class="layui-form-label">首页-活动详情</label>
+						<div class="layui-input-block">
+							<textarea placeholder="请输入,首页-活动详情【40-50字左右】" v-model="desc_" class="layui-textarea">${activity.desc_ }</textarea>
+						</div>
+					</div>
+					
+					<div class="layui-form-item">
+						<div class="layui-inline">
+							<label class="layui-form-label" style="width: 150px;">主体色</label>
+							<div class="layui-input-inline" style="width: 100px;">
+								<input type="text" name="name" v-model="color_" value="${activity.color_ }"  lay-verify="name"  autocomplete="off" placeholder="请输入,主体色" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-inline">
+							<label class="layui-form-label" style="width:150px;">点击色</label>
+							<div class="layui-input-inline" style="width: 100px;">
+								<input type="text" class="layui-input" v-model="click_color" value="${activity.click_color }" id="click_color" placeholder="请输入,点击色">
+							</div>
+						</div>
+					</div>
+					
+					<div class="layui-form-item">
+						<label class="layui-form-label">活动状态</label>
+						<div class="layui-input-block">
+							<select name="interest" lay-filter="aihao" id="state">
+        						<option value="0">暂不使用</option>
+        						<option value="1">使用中</option>
+        						<option value="2">已结束</option>
+      						</select>
+						</div>
+					</div>
+					
+					<div class="layui-form-item" >
+						<label class="layui-form-label" style="width: 120px;" >是否强制关注</label>
+						<div class="layui-input-block" >
+							<c:choose>
+								<c:when test="${activity.guanzhu==1}">
+									<input type="checkbox" id="guanzhu" name="guanzhu"  checked="" value="1" lay-filter="guanzhu"  lay-skin="switch" lay-text="是|否" />
+								</c:when>
+								<c:when test="${activity.guanzhu==0 || activity==null }">
+									<input type="checkbox" id="guanzhu" name="guanzhu" value="1" lay-filter="guanzhu"  lay-skin="switch" lay-text="是|否" />
+								</c:when>
+							</c:choose>
+						</div>
+					</div>
+					
+					
+					<div class="layui-form-item">
+						<div class="layui-inline">
+							<label class="layui-form-label">开始时间</label>
+							<div class="layui-input-inline">
+								<input type="text" class="layui-input" v-model="startDateTime" value="<fmt:formatDate value="${activity.startDateTime}" pattern="yyyy-MM-dd HH:mm:ss"/>"  id="startDateTime" placeholder="yyyy-MM-dd HH:mm:ss">
+							</div>
+						</div>
+						<div class="layui-inline">
+							<label class="layui-form-label">截止时间</label>
+							<div class="layui-input-inline">
+								<input type="text" class="layui-input" v-model="endDateTime" value="<fmt:formatDate value="${activity.endDateTime}" pattern="yyyy-MM-dd HH:mm:ss"/>"  id="endDateTime" placeholder="yyyy-MM-dd HH:mm:ss">
+							</div>
+						</div>
+					</div>
+					
+					<div class="layui-form-item">
+						<div class="layui-inline">
+							<label class="layui-form-label" style="width: 206px;">1人对1个作品最多投几票</label>
+							<div class="layui-input-inline" style="width: 100px;">
+								<input type="text" class="layui-input" v-model="userVote" value="${activity.userVote }" id="userVote" placeholder="1人对1个作品最多投几票">
+							</div>
+						</div>
+						<div class="layui-inline">
+							<label class="layui-form-label" style="width:166px;">1人可以投几个作品</label>
+							<div class="layui-input-inline" style="width: 100px;">
+								<input type="text" class="layui-input" v-model="userWork" value="${activity.userWork }" id="userWork" placeholder="1人可以投几个作品">
+							</div>
+						</div>
+						
+						<input type="hidden" class="layui-input" v-model="interval_" value="24" id="interval_" placeholder="重置时间" />
+						
+						
+						<%-- <div class="layui-inline">
+							<label class="layui-form-label" style="width: 100px;">时间间隔</label>
+							<div class="layui-input-inline" style="width: 100px;">
+								
+							</div>
+							<div style="display: inline-block; line-height: 38px;">小时</div>
+						</div> --%>
+						
+					</div>
+				</div>
+			</div><!-- content结束 -->
+		</div>
+		
+		<div class="model" style="background-color: white; padding: 0px 0px 0px 0px;">
+			<div class="content">
+				<blockquote class="layui-elem-quote">微信分享设置</blockquote>
+				
+				<div class="layui-form layui-form-pane" action="">
+					<div class="layui-form-item">
+						<label class="layui-form-label">标题</label>
+						<div class="layui-input-block">
+							<input type="text" name="wx_share_title" value="${activity.wx_share_title }"  v-model="wx_share_title" lay-verify="wx_share_title" autocomplete="off" placeholder="请输入，微信分享标题" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">摘要</label>
+						<div class="layui-input-block">
+							<input type="text" name="title" lay-verify="title" value="${activity.wx_share_desc }" v-model="wx_share_desc" autocomplete="off" placeholder="请输入，微信分享摘要" class="layui-input">
+						</div>
+					</div>
+				</div>
+				
+				<blockquote class="layui-elem-quote">设置微信分享封面图片</blockquote>
+				<div class="container" style="width: 100%;">
+					<div>
+						裁剪框尺寸：__________ 宽:<input type="text" id="w" value="300"
+							style="width: 60px;" onkeyup="initCutImg()" /> 高:<input
+							type="text" id="h" value="300" style="width: 60px;"
+							onkeyup="initCutImg()" /> <input type="button"
+							onclick="initCutImg()" value="修改尺寸" />_______真实尺寸+2，裁剪后才是真实尺寸
+					</div>
+					
+					<div class="imageBox">
+						<div class="thumbBox"></div>
+						<div class="spinner" style="display: none">请点选择图片</div>
+					</div>
+					
+					<div class="CutImgBottomBar" style="position: relative;">
+						<input	style="display: inline-block;" type="file" class="" name="upload-file" id="upload-file" />
+						<button id="btnZoomIn" class="layui-btn layui-btn-xs">
+							<i class="layui-icon">&#x1002;</i>放大
+						</button>
+						<button id="btnZoomOut" class="layui-btn layui-btn-xs">
+							<i class="layui-icon">&#x1002;</i>缩小
+						</button>
+						<button id="btnCrop"
+							class="layui-btn layui-btn-xs layui-btn-danger">
+							<i class="layui-icon">&#x1002;</i>裁切
+						</button>
+					</div>
+					
+					<div class="cropped">
+						<c:if test="${isEdit}">
+							<img onclick='openImg("${activity.wx_share_img }")' src="${activity.wx_share_img }">
+						</c:if>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="model" style="background-color: white; padding: 0px 0px 0px 0px;">
+			<div class="content">
+				<blockquote class="layui-elem-quote" style="margin-bottom: 0px;">活动【详情菜单】内容【可以使用，视频+图片+文字】 </blockquote>
+				<script id="editor" name="content" type="text/plain" style="width:100%;height:600px; z-index:1; "></script>
+			</div>
+		</div>
+		
+		<div class="model" style="background-color: white; padding: 0px 0px 0px 0px;">
+			<div class="content">
+				<blockquote class="layui-elem-quote" style="margin-bottom: 0px;">添加公众号二维码 </blockquote>
+				<div><input type="file" name="file" id="file" onchange ="uploadFile(this)" />    </div>
+				<div id="erweima">
+					<img style="width: 200px;" alt="" src="${activity.erweima }" />
+				</div>
+			</div>
+		</div>
+		
+		<div class="model" style="background-color: white; padding: 0px 0px 0px 0px;">
+			<div class="content">
+				<blockquote class="layui-elem-quote" style="margin-bottom: 0px;">关注公众号提示操作图片 </blockquote>
+				<div><input type="file" name="file2" id="file2" onchange ="uploadFile2(this)" />    </div>
+				<div id="guanzhu_tip">
+					<img style="width: 200px;" alt="" src="${activity.guanzhu_tip }" />
+				</div>
+			</div>
+		</div>
+		
+		<!-- 最后按钮 -->
+		<div class="model"
+			style="background-color: white; padding: 40px 0px 40px 0px;">
+			<div class="content">
+				 <button id="save" onclick="sub()"class="layui-btn site-demo-layedit" data-type="content">${btn_text }</button>
+				 <button onclick=" window.opener=null;window.open('','_self');window.close();" class="layui-btn layui-btn-danger">关闭页面</button>
+			</div>
+		</div>
+		<!-- 最后按钮 -->
+		
+		
+		
+		
+</div>
+
+</body>
+
+<!-- 实例化百度编辑器 -->
+<script type="text/javascript">
+	var ue = UE.getEditor('editor');
+</script>
+
+<c:if test="${isEdit}">
+<!-- 实例化编辑器 -->
+<script type="text/javascript">
+    ue.addListener("ready",function(){
+    	// 通过ajax请求数据
+    	UE.ajax.request("${pageContext.request.contextPath}/admin/activity/findById",
+    			{
+    				method:"post",
+    				async:false,
+    				data:{"id":"${activity.id}"},
+    				onsuccess:function(result){
+    					result=eval("("+result.responseText+")");
+    					UE.getEditor('editor').setContent(result.content);
+    				}
+   			});
+    });
+</script>
+</c:if>
+
+<script>
+		layui.use([ 'form','laydate', 'laypage', 'layer', 'table', 'carousel',
+				'upload', 'element' ], function() {
+			var laydate = layui.laydate //日期
+			, laypage = layui.laypage //分页
+			layer = layui.layer //弹层
+			, table = layui.table //表格
+			, carousel = layui.carousel //轮播
+			, upload = layui.upload //上传
+			,form = layui.form
+			, element = layui.element; //元素操作
+			
+			//日期时间选择器
+			  laydate.render({
+			    elem: '#startDateTime'
+			    ,type: 'datetime'
+			  });
+			  laydate.render({
+			    elem: '#endDateTime'
+			    ,type: 'datetime'
+			  });
+			
+			  
+			  
+		});
+	</script>
+
+<script>
+var app = new Vue({
+	el : '#app',
+	data : {
+	}
+});
+</script>
+</html>

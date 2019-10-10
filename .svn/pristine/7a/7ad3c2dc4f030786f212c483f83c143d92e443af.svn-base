@@ -1,0 +1,88 @@
+package com.java1234.controller.weixin;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+
+@Controller
+@RequestMapping("/houtai/weixin/messages")
+public class HouTai_WeiXinMessagesController {
+	
+	
+	/**
+	 * 这是模板消息的控制器，跳转页面
+	 * /houtai/weixin/messages/template?jsp=123213&clientIds=213,23,23,23
+	 * @param clientIds 
+	 * @param jsp页面  /admin/page/weixin/TemplateMessages/wei_oa_notice
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/template")
+	public ModelAndView manage(@RequestParam(value = "clientIds", required = false) String clientIds,
+			@RequestParam(value = "jsp", required = false) String jsp
+			) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("clientIds", clientIds);
+		mav.setViewName(jsp);
+		return mav;
+	}
+	
+	
+	
+	/**
+	 * 向用户发送纯文本 
+	 *   /houtai/weixin/messages/text?clientIds=32,23
+	 * @param clientIds
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/text")
+	public ModelAndView text(@RequestParam(value = "clientIds", required = false) String clientIds
+			) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("clientIds", clientIds);
+		mav.setViewName("/admin/page/weixin/messages/send_text");
+		return mav;
+	}
+	
+	/**
+	 * /houtai/weixin/messages/client?clientIds=12,12&msgtype=fdsf
+	 * 向用户发送 图文本 消息  即是 公众号的文章
+	 * @param clientIds
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/client")
+	public ModelAndView client(@RequestParam(value = "clientIds", required = false) String clientIds,
+			@RequestParam(value = "msgtype", required = false) String msgtype
+			) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("clientIds", clientIds);
+		mav.addObject("msgtype", msgtype);
+		mav.setViewName("/admin/page/weixin/messages/send_gzh_client_message");
+		return mav;
+	}
+	
+	
+	/**
+	 * /houtai/weixin/messages/custom/news?clientIds=12,12
+	 * 向用户发送 自定义  图文本 消息   自己定义 链接
+	 * @param clientIds
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/custom/news")
+	public ModelAndView custom_news(@RequestParam(value = "clientIds", required = false) String clientIds
+			) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("clientIds", clientIds);
+		mav.setViewName("/admin/page/weixin/messages/send_custom_news");
+		return mav;
+	}
+	
+	
+	
+	
+}

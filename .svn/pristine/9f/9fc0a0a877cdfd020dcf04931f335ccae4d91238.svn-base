@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.ShopCartDao">
+	
+	<resultMap type="ShopCart" id="ShopCartResult">
+		<result property="id" column="id" />
+ 		<result property="goodsId" column="goodsId" />
+		<result property="clientId" column="clientId" />
+		<result property="createDateTime" column="createDateTime" />
+		
+		
+		<association property="goods" column="goodsId"
+			select="com.java1234.dao.GoodsDao.findById"></association>
+		<association property="client" column="clientId"
+			select="com.java1234.dao.ClientDao.findById"></association>
+			
+	</resultMap>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="ShopCart">
+		insert into t_shop_cart values(null,#{goodsId},#{clientId},#{createDateTime})
+	</insert>
+	
+	<update id="update" parameterType="ShopCart">
+		update t_shop_cart
+		<set>
+			<if test="goodsId!=null ">
+				goodsId=#{goodsId},
+			</if>
+			<if test="clientId!=null ">
+				clientId=#{clientId},
+			</if>
+			<if test="createDateTime!=null ">
+				createDateTime=#{createDateTime},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="list" parameterType="Map" resultMap="ShopCartResult">
+		select * from t_shop_cart
+		<where>
+			<if test="clientId!=null and clientId!='' ">
+		 		and clientId = #{clientId}
+			</if>
+			<if test="goodsId!=null and goodsId!='' ">
+		 		and goodsId = #{goodsId}
+			</if>
+		</where>
+		order by createDateTime ASC
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from t_shop_cart
+		<where>
+			<if test="clientId!=null and clientId!='' ">
+		 		and clientId = #{clientId}
+			</if>
+			<if test="goodsId!=null and goodsId!='' ">
+		 		and goodsId = #{goodsId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findById" parameterType="Integer" resultMap="ShopCartResult">
+		select * from t_shop_cart where id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_shop_cart where id=#{id}
+	</delete>
+	
+	
+	 
+	
+</mapper> 

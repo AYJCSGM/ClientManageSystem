@@ -1,0 +1,56 @@
+package com.java1234.service.weixin;
+
+
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import org.springframework.stereotype.Service;
+import com.java1234.dao.GZHMenuDao;
+import com.java1234.entity.weixin.GZHMenu;
+
+
+
+@Service("gzhMenuService")
+public class GZHMenuServiceImpl implements GZHMenuService {
+	
+	@Resource
+	private GZHMenuDao gzhMenuDao;
+	
+	
+	@Override
+	public Integer add(GZHMenu gzhMenu) {
+		// TODO Auto-generated method stub
+		return gzhMenuDao.add(gzhMenu);
+	}
+
+	@Override
+	public Integer update(GZHMenu gzhMenu) {
+		// TODO Auto-generated method stub
+		return gzhMenuDao.update(gzhMenu);
+	}
+
+	@Override
+	public List<GZHMenu> list(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return gzhMenuDao.list(map);
+	}
+
+	@Override
+	public Integer getTotal(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return gzhMenuDao.getTotal(map);
+	}
+
+	@Override
+	public GZHMenu findById(Integer id) {
+		// TODO Auto-generated method stub
+		return gzhMenuDao.findById(id);
+	}
+	
+	@Override
+	public Integer delete(Integer id) {
+		// TODO Auto-generated method stub
+		return gzhMenuDao.delete(id);
+	}
+
+}
